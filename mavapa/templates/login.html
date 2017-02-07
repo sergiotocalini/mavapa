@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block body %}
+<div class="login-form panel panel-default">
+  <div class="panel-heading text-center">
+    <big><strong>Login to your account</strong></big>
+  </div>
+  
+  <div class="panel-body">	
+    <img src="{{ config['CDN_MAVAPA'] }}/img/login.png" alt="">
+    <form role="form" method="POST" action="">
+      <fieldset>
+	<div class="col-md-offset-1 col-sm-12 col-md-10">
+	  <div class="form-group">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="fa fa-envelope fa-fw"></i>
+	      </span>
+	      {{ form.email(class="form-control",required=True,autofocus=True,placeholder="Email") }}
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="fa fa-lock fa-fw"></i>
+	      </span>
+	      {{ form.password(class="form-control",required=True,placeholder="Password") }}
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    {{ form.submit(class="btn btn-primary btn-block") }}
+	  </div>
+	</div>
+      </fieldset>
+    </form>
+  </div>
+  
+  <div class="panel-footer text-center">
+    <a href="{{ url_for('reset') }}">Forgot your password?</a>
+  </div>
+</div>
+{% endblock %}

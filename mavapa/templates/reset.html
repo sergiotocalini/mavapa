@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Reset Password Account{% endblock %}
+{% block navbar %}
+{% endblock %}
+{% block body %}
+<div class="login-form reset-form panel panel-default">
+  <div class="panel-heading text-center">
+    <big><strong>Reset your account</strong></big>
+  </div>
+  <div class="panel-body">
+    {% if not user %}
+    <img class="img-circle" src="{{ config['CDN_MAVAPA'] }}/img/login.png" alt="">
+    {% else %}
+    <img class="img-circle" src="{{ user.avatar(148) }}" alt="">
+    <div class="displayname row text-center">
+      <label>{{ user.lastname }}, {{ user.firstname }}</label>
+    </div>
+    <div class="clearfix"></div>
+    <hr class="separator"/>
+    {% endif %}
+    <form role="form" method="POST" action="">
+      <fieldset>
+	<div class="col-md-offset-1 col-md-10 {% if user %}hidden{% endif %}">
+	  <div class="form-group">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="fa fa-envelope fa-fw"></i>
+	      </span>
+	      {{ form.email(class="form-control",required=True,autofocus=True,placeholder="Email") }}
+	    </div>
+	  </div>
+	  {% if not user %}
+	  <div class="form-group">
+	    {{ form.check(class="btn btn-primary btn-block") }}
+	  </div>
+	  {% endif %}
+	</div>
+	{% if user and not reset %}
+	<div class="row text-center">
+	  <label>Send verification code to :</label>
+	</div>
+	{% if user.mailrecovery %}
+	<div class="col-md-offset-2 col-md-8">
+	  <div class="alert alert-reset">
+	    <i class="fa fa-envelope fa-fw"></i>
+	    <strong>{{ encrypt_email(user.mailrecovery) }}</strong>
+	    <a href="#mail" id="sendmail" class="pull-right" data-userid="{{ user.userid }}">
+	      <i class="fa fa-fw fa-send"></i>
+	    </a>
+	  </div>
+	</div>
+	{% endif %}
+	{% if user.mobile %}
+	<div class="col-md-offset-2 col-md-8">
+	  <div class="alert alert-reset">
+	    <i class="fa fa-mobile fa-fw"></i>
+	    <strong>{{ encrypt_telephone(user.mobile) }}</strong>
+	    <a href="#sms" id="sendsms" class="pull-right" data-userid="{{ user.userid }}">
+	      <i class="fa fa-fw fa-send"></i>
+	    </a>
+	  </div>
+	</div>
+	{% endif %}
+	<div class="clearfix"></div>
+	<hr class="separator"/>
+	{% endif %}
+	{% if user %}
+	<div class="col-md-offset-3 col-md-6 {% if reset %}hidden{% endif %}">
+	  <div class="form-group">
+	    <div class="row text-center">
+	      <label>Code :</label>
+	    </div>
+	    {{ form.code(class="form-control text-center",required=True,autofocus=True,autocomplete="off") }}
+	  </div>
+	  {% if not reset %}
+	  <div class="form-group">
+	    {{ form.submit(class="btn btn-primary btn-block") }}
+	  </div>
+	  {% endif %}
+	</div>
+	{% endif %}
+	{% if reset %}
+	<div class="col-md-offset-3 col-md-6">
+	  <div class="form-group">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="fa fa-key fa-fw"></i>
+	      </span>
+	      {{ form.passwd(class="form-control",required=True,autofocus=True,autocomplete="off") }}
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <div class="input-group">
+	      <span class="input-group-addon">
+		<i class="fa fa-lock fa-fw"></i>
+	      </span>
+	      {{ form.confirm(class="form-control",required=True,autocomplete="off") }}
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    {{ form.change(class="btn btn-primary btn-block") }}
+	  </div>
+	</div>	
+	{% endif %}
+      </fieldset>
+    </form>
+  </div>
+  <div class="panel-footer text-center">
+    <a href="{{ url_for('login') }}">Login to your account</a>
+  </div>
+</div>
+{% endblock %}
+{% if user %}
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+	$("#sendmail").click(function(e){
+	    e.preventDefault();
+	    if ( $(this).find('i').hasClass('fa-send') ) {
+		var mail = "{{ user.email }}";
+		console.log(mail);
+		$(this).find('i').removeClass('fa-send');
+		$(this).find('i').addClass('fa-spinner');
+		sendcode({type: 'mail', account: mail});
+	    };
+	});
+	$("#sendsms").click(function(e){
+	    e.preventDefault();
+	    if ( $(this).find('i').hasClass('fa-send') ) {
+		var mail = "{{ user.email }}";
+		console.log(mail);
+		$(this).find('i').removeClass('fa-send');
+		$(this).find('i').addClass('fa-spinner');
+		sendcode({type: 'sms', account: mail});
+	    };
+	});
+
+    });
+function sendcode (data) {
+    var url = "{{ url_for('api_code') }}";
+    $.ajax({
+	async: true,
+	url: url,
+	type: 'POST',
+	data: JSON.stringify(data),
+	contentType: "application/json",
+	success: function(e) {
+	    if (data['type'] == 'mail') {
+		var sent = $("#sendmail");
+	    } else {
+		var sent = $('#sendsms');
+	    }
+	    $(sent).find('i').removeClass('fa-spinner');
+	    $(sent).find('i').addClass('fa-check');	    
+	}
+    });    
+};
+</script>
+{% endblock %}
+{% endif %}

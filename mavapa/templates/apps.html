@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Accounts Applications{% endblock %}
+
+{% block body %}
+<div id="apps">
+  <div class="products">
+    {% for tag in apps_list %}
+    <h2>{{ tag }}</h2>
+    <ul>
+    {% for app in apps_list[tag] %}
+    <li>
+      <a href="{{ app.url }}">
+	<img src="{{ app.icon }}" alt>
+      </a>
+      <p>
+	<a href="{{ app.url }}">{{ app.name }}</a>
+      </p>
+      <p>
+	{{ app.desc }}
+      </p>
+    </li>
+    {% endfor %}
+    </ul>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

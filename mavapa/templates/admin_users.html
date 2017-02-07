@@ -1,0 +1,742 @@
+{% extends "admin.html" %}
+{% set snactive = "users" %}
+
+{% block title %}Administration - Users{% endblock %}
+
+{% block container %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#users">
+      <i class="fa fa-users fa-fw"></i>
+      Users
+    </a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#backends">
+      <i class="fa fa-globe fa-fw"></i>
+      Backends
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="users" class="tab-pane fade in active">
+    <div id="toolbar-user">
+      <button class="btn btn-default" type="button" data-toggle="modal"
+	      data-target="#UserSearch" aria-haspopup="true"
+	      aria-expanded="false">
+	<i class="fa fa-search fa-fw"></i>
+      </button>      
+    </div>
+    <table id="table-users" data-show-toggle="false"
+	   data-show-export="false"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="name" data-pagination="true"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-user"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-valign="middle" data-visible="false">
+	    <i class="fa fa-key fa-fw"></i>
+	    ID
+	  </th>
+	  <th data-valign="middle" data-field="name"
+	      data-sortable="true" data-formatter="FormatDisplayName">
+	    <i class="fa fa-sort-amount-desc fa-fw"></i>
+	    Name
+	  </th>
+	  <th data-valign="middle" data-field="email">
+	    <i class="fa fa-envelope fa-fw"></i>
+	    Email
+	  </th>
+	  <th data-valign="middle" data-align="center" data-field="backend">
+	    <i class="fa fa-database fa-fw"></i>
+	    Backend
+	  </th>
+	  <th data-valign="middle" data-align="right" data-halign="center">
+	    <i class="fa fa-calendar fa-fw"></i>
+	    Created on
+	  </th>
+	  <th data-valign="middle" data-align="right" data-halign="center">
+	    <i class="fa fa-calendar fa-fw"></i>
+	    Last seen
+	  </th>
+	  <th data-valign="middle" data-align="center">
+	    <i class="fa fa-cogs fa-fw"></i>
+	    Actions
+	  </th>
+	</tr>
+      </thead>
+      <tbody>	
+	{% for user in data('User') %}
+	<tr>
+	  <td>{{ user.id }}</td>
+	  <td data-avatar="{{ user.avatar(48) }}">
+	    {{ user.lastname }}, {{ user.firstname }}
+	  </td>
+	  <td>{{ user.email }}</td>
+	  <td>
+	    {{ user.backend.name if user.backend != None else 'Local' }}
+	  </td>
+	  <td>{{ ago(user.created_at) }}</td>
+	  <td>
+	    {{ ago(user.last_seen) if user.last_seen != None else 'Never' }}
+	  </td>
+	  <td>
+	    <a class="user-open" target="_blank"
+	       href="{{ url_for('profile', userid=user.id) }}">
+	      <i class="fa fa-fw fa-info-circle"></i>
+	    </a>
+	    <a class="edit-user" data-id="{{ user.id }}">
+	      <i class="fa fa-fw fa-pencil"></i>
+	    </a>
+	    <a class="user-admin" data-id="{{ user.id }}">
+	      {% if user.admin %}
+	      <i class="fa fa-fw fa-user-secret"></i>
+	      {% else %}
+	      <i class="fa fa-fw fa-user"></i>
+	      {% endif %}
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div id="backends" class="tab-pane fade">
+    <div id="toolbar-backend">
+      <button class="btn btn-default" type="button" data-toggle="modal"
+	      data-target="#BackendMod" aria-haspopup="true"
+	      aria-expanded="false">
+	<i class="fa fa-plus fa-fw"></i>
+      </button>
+    </div>
+    <table id="table-backends" data-show-toggle="false"
+	   data-show-export="false"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="display" data-pagination="true"
+	   data-toggle="table" data-search="true"
+	   data-toolbar="#toolbar-backend"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-field="name">
+	    <i class="fa fa-sort-amount-desc fa-fw"></i>
+	    Name
+	  </th>
+	  <th data-halign="center">
+	    <i class="fa fa-filter fa-fw"></i>
+	    Type
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-server fa-fw"></i>
+	    Host
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-users fa-fw"></i>
+	    Users
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for backend in data('Backend') %}
+	<tr class="edit-backend" data-id="{{ backend.id }}">
+	  <td>{{ backend.name }}</td>
+	  <td>
+	    {% if backend.type == 'AD' %}
+	    <i class="fa fa-windows fa-fw"></i>
+	    Active Directory
+	    {% elif backend.type == 'LDAP' %}
+	    <i class="fa fa-book fa-fw"></i>
+	    {{ backend.type }}
+	    {% else %}
+	    <i class="fa fa-globe fa-fw"></i>
+	    {% endif %}
+	  </td>
+	  <td>{{ backend.host }}</td>
+	  <td>{{ backend.users.count() }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="UserSearch" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content" style="padding-bottom: 1%; width:75%;">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body" style="height: 500px;">
+	  <form id="toolbar-user-search" class="form-inline"
+		role="form" onsubmit="return user_search()">
+	    <input type="text" class="form-control" id="mail"
+		   name="mail" placeholder="Email">
+	    <button class="btn btn-default" type="submit"
+		    aria-haspopup="true" aria-expanded="false">
+	      <i class="fa fa-fw fa-search"></i>
+	    </button>
+	  </form>
+	  <table id="table-users-search"
+		 data-show-toggle="false" data-show-export="false"
+		 data-show-columns="true" data-show-multi-sort="true"
+		 data-sort-name="display" data-pagination="true"
+		 data-toggle="table" data-search="false"
+		 data-toolbar="#toolbar-user-search"
+		 data-show-footer="false" data-page-size="50"
+		 data-escape="false"
+		 class="table-hover table-striped table-compact
+			table-condensed table-autosize">
+	    <thead>
+	      <tr>
+		<th data-field="name">
+		  <i class="fa fa-sort-amount-desc fa-fw"></i>
+		  Name
+		</th>
+		<th data-field="email">
+		  <i class="fa fa-envelope fa-fw"></i>
+		  Email
+		</th>
+		<th data-field="backend" data-align="center">
+		  <i class="fa fa-server fa-fw"></i>
+		  Backend
+		</th>
+		<th data-field="actions" data-align="center">
+		  <i class="fa fa-cogs fa-fw"></i>
+		  Actions
+		</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	    </tbody>
+	  </table>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="UserMod" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-content" style="height:60%;width:50%">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;height: 12%;">
+      <button type="button" class="close"
+	      style="position:relative;top:45%;
+		     transform:translateY(-50%);z-index: 100"
+	      data-dismiss="modal" aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title"
+	  style="position:relative;top:45%;transform: translateY(-50%);">
+	New
+      </h4>
+    </div>
+    <div class="modal-body" style="height:75%;padding:2%;">
+      <img id="avatar" class="img-circle"
+	   style="float:left;width:28%;padding:0% 1%;
+		  top:50%;position:relative;transform:translateY(-50%);"/>
+      <form style="float:left;top:50%;position:relative;width:72%;
+		   transform:translateY(-50%);"
+	    role="form" method="POST">
+	<fieldset id="fieldset">
+	  <div class="row" style="margin:0px">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="userid">
+		<i class="fa fa-fw fa-key"></i>
+		ID
+	      </label>
+	      <input type="text" class="form-control"
+		     id="userid" name="userid" readonly>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="backend">
+		<i class="fa fa-fw fa-database"></i>
+		Backend
+	      </label>
+	      <select class="selectpicker show-tick form-control"
+		      id="backends" name="backends" title="...">
+	      </select>
+	    </div>	
+	  </div>
+	  <div class="row" style="margin:0px">
+    	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="email">
+		<i class="fa fa-fw fa-envelope"></i>
+		Email
+	      </label>
+	      <input type="text" class="form-control"
+		     id="email" name="email" readonly>
+	    </div>
+    	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="recovery">
+		<i class="fa fa-fw fa-envelope-o"></i>
+		Recovery
+	      </label>
+	      <input type="text" class="form-control"
+		     id="recovery" name="recovery" placeholder="Email">
+	    </div>	    
+	  </div>
+	  <div class="row" style="margin:0px">
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="mobile">
+		<i class="fa fa-fw fa-mobile"></i>
+		Mobile
+	      </label>
+	      <input type="text" class="form-control"
+		     id="mobile" name="mobile" placeholder="Mobile">
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="language">
+		<i class="fa fa-fw fa-language"></i>
+		Language
+	      </label>
+	      <select class="selectpicker show-tick form-control"
+		      id="lang" name="lang" disabled>
+		<option value="English" data-tokens="English">
+		  English
+		</option>
+		<option value="Spanish" data-tokens="Spanish">
+		  Spanish
+		</option>
+	      </select>
+	    </div>
+	  </div>
+	  <div class="row" style="margin:0px">
+	    <div class="col-md-6">
+	      <label class="control-label" for="genre">
+		<i class="fa fa-fw fa-venus-mars"></i>
+		Genre
+	      </label>
+	      <select class="selectpicker show-tick form-control"
+		      id="genre" name="genre" title="...">
+		<option value="Female"
+			data-content="<i class='fa fa-fw fa-venus'></i>
+				      Female"
+			data-tokens="Female">
+		  Female
+		</option>
+		<option value="Male"
+			data-content="<i class='fa fa-fw fa-mars'></i>
+				      Male"
+			data-tokens="Male">
+		  Male
+		</option>
+	      </select>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <label class="control-label" for="timezone">
+		<i class="fa fa-fw fa-clock-o"></i>
+		Timezone
+	      </label>
+	      <select class="selectpicker show-tick form-control"
+		      id="timezone" name="timezone" data-live-search="true"
+		      disabled>
+		<option value="America/Argentina/Buenos_Aires"
+			data-tokens="Buenos Aires">
+		  Argentina - Buenos Aires
+		</option>
+	      </select>
+	    </div>
+	  </div>
+	</fieldset>
+      </form>
+    </div>
+    <div class="modal-footer" style="height: 13%;">
+      <div class="pull-left">
+	<a id="user-profile" target="_blank"
+	   style="outline: none;text-decoration: none;cursor: pointer;">
+	  <i class="fa fa-fw fa-2x fa-info" aria-hidden="true"></i>
+	</a>
+      </div>
+      <div class="pull-right">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary" id="update-user">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="BackendMod" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body">
+	  <form role="form" method="POST">
+	    <fieldset id="fieldset">
+	      <input class="col-md-8 form-control-static hidden" id="id">
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="name">Name</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="name" name="name" placeholder="Name">
+		  </div>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend">Type</label>
+		  <div class="input-group">
+		    <select class="selectpicker show-tick"
+			    id="type" name="type" title="...">
+		      <option value="AD" data-icon="fa fa-windows fa-fw"
+			      data-tokens="AD">Active Directory</option>
+		      <option value="LDAP" data-icon="fa fa-book fa-fw"
+			      data-tokens="OpenLDAP">LDAP</option>
+		    </select>
+		  </div>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="host">Host</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="host" name="host"
+			   placeholder="LDAP://localhost:389/">
+		  </div>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="host">Timeout</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="timeout" name="timeout"
+			   placeholder="60">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row">
+    		<div class="col-md-6 form-group">
+		  <label for="account">Account</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="account" name="account"
+			   placeholder="Account"> 
+		  </div>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="password">Password</label>
+		  <div class="input-group">
+		    <input type="password" class="form-control"
+			   id="password" name="password"
+			   placeholder="Password">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="backend">Search</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="search" name="search"
+			   placeholder="Search">
+		  </div>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend">Filter</label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="filter" name="filter"
+			   placeholder="Filter">
+		  </div>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+	<div class="modal-footer">
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-default"
+		    data-dismiss="modal">
+	      Close
+	    </button>
+	    <button type="button" class="btn btn-primary"
+		    id="update-backend">
+	      Save
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+    
+{% block scripts%}
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<link href="//cdn.corpam.com.ar/bootstrap-select/stable/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-select/stable/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	});
+	jqlisteners();
+    });
+var USER_FOUND = [];
+function user_search() {
+    var mail = document.forms["toolbar-user-search"]["mail"].value;
+    var url = "{{ url_for('api_search_users') }}?email=*" + mail + "*&exist=false"
+    $.ajax({
+    	async: true,
+    	url: url,
+    	type: 'GET',
+    	success: function(e) {
+	    USER_FOUND = e['users'];
+	    var table = '#table-users-search';
+	    $(table).bootstrapTable('showLoading');
+	    $(table).bootstrapTable('removeAll');
+	    for(i in e['users']) {
+		var user = e['users'][i];
+		html = '<a class="add-user" data-id="' + i + '">';
+                html+= '<i class="fa fa-fw fa-plus"></i>';
+                html+= '</a>';
+		$(table).bootstrapTable('append', {
+		    'name': user['lastname'] + ', ' + user['firstname'],
+		    'email': user['email'],
+		    'backend': user['backend']['name'],
+		    'actions': html,
+		});
+	    };
+	    $(table).bootstrapTable('hideLoading');
+    	}
+    });
+    return false;
+}
+function jqlisteners() {
+    $(".add-user").click(function(e) {
+	e.preventDefault();
+	var user = USER_FOUND[$(this).data('id')];
+	var url = "{{ url_for('api_users') }}?email=" +user['email'];
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify({
+		'email': user['email'],
+		'firstname': user['firstname'],
+		'lastname': user['lastname'],
+		'mobile': user['mobile'],
+		'mailrecovery': user['mailrecovery'],
+		'backend': user['backend']['id'],
+		'admin': false,
+	    }),
+	    contentType: "application/json",
+	    success: function(e) {
+		var listdel = {'field': 'email', 'values': [user['email']] };
+		$('#table-users-search').bootstrapTable('remove', listdel);
+	    }
+	});
+    });
+    $(".edit-backend").click(function(e) {
+	e.preventDefault();
+	var backend = $(this).data('id');
+	var url = "{{ url_for('api_backends') }}?id=" + backend;
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'GET',
+	    success: function(e) {
+		$('#BackendMod').find('.modal-title').html(e['backends'][0]['name']);
+		$('#BackendMod').find('#id').val(e['backends'][0]['id']);
+		$('#BackendMod').find('#name').val(e['backends'][0]['name']);
+		$('#BackendMod').find('#type').selectpicker('val', e['backends'][0]['type']);
+		$('#BackendMod').find('#host').val(e['backends'][0]['host']);
+		$('#BackendMod').find('#timeout').val(e['backends'][0]['timeout']);
+		$('#BackendMod').find('#account').val(e['backends'][0]['binddn']);
+		$('#BackendMod').find('#password').val(e['backends'][0]['bindpw']);
+		$('#BackendMod').find('#search').val(e['backends'][0]['basedn']);
+		$('#BackendMod').find('#filter').val(e['backends'][0]['filter']);
+		$('#BackendMod').modal('show');
+	    }
+	});
+    });
+    $(".edit-user").click(function(e){
+	e.preventDefault();
+	var userid = $(this).data('id');
+	var url = "{{ url_for('api_users') }}?id=" + userid;
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'GET',
+	    success: function(e) {
+		var data = e['users'][0];
+		var profile = '{{ url_for("profile") }}/' + data['id'];
+		var display = data['lastname'] + ', ' + data['firstname'];
+		$('#UserMod').find('.modal-title').html(display);
+		$('#UserMod').find('#avatar').attr('src', data['avatar']);
+		$('#UserMod').find('#userid').val(data['id']);
+		$('#UserMod').find('#email').val(data['email']);
+		$('#UserMod').find('#recovery').val(data['mailrecovery']);
+		$('#UserMod').find('#mobile').val(data['mobile']);
+		$('#user-profile').attr('href', profile);
+		$('#UserMod').find('#genre').selectpicker('val',data['genre'])
+		var url = "{{ url_for('api_backends') }}";
+		$.ajax({
+		    async: true,
+		    url: url,
+		    type: 'GET',
+		    success: function(e2) {
+			var backends = e2['backends']
+			if (data['backend']) {
+			    html = '<option value="0">Local</option>'
+			} else {
+			    html = '<option value="0" selected="selected">Local</option>'
+			}
+			for(i in backends) {
+			    if (data['backend'] == backends[i]['id']) {
+				html += '<option selected="selected" '
+				html += 'value="' + backends[i]['id'] + '">';
+				html += backends[i]['name'] +'</option>';
+			    } else {
+				html += '<option value="' + backends[i]['id'];
+				html += '">' + backends[i]['name'] + '</option>';
+			    }
+			}
+			$('#UserMod').find('#backends').html(html);
+			$('#UserMod').find('#backends').selectpicker('refresh');
+		    }
+		});
+		$('#UserMod').modal('show');
+	    }
+	});
+    });
+    $(".user-admin").click(function(e){
+	e.preventDefault();
+    	var i_tag = $(this).find('i');
+	if ( ! i_tag.hasClass("fa-spinner") ) {
+	    var userid = $(this).data('id');
+	    var url = "{{ url_for('api_users') }}?id=" + userid;
+	    if (i_tag.hasClass('fa-user-secret')) {
+		var active = false;
+		i_tag.removeClass('fa-user-secret');
+		i_tag.addClass('fa-spinner fa-pulse');
+	    } else {
+		var active = true;
+		i_tag.removeClass('fa-user');
+		i_tag.addClass('fa-spinner fa-pulse');
+	    };
+	    $.ajax({
+		async: true,
+		url: url,
+		type: 'POST',
+		data: JSON.stringify({'admin': active}),
+		contentType: "application/json",
+		success: function(e) {
+		    i_tag.removeClass('fa-spinner fa-pulse');
+		    if (active == true) {
+			i_tag.addClass('fa-user-secret');
+		    } else {
+			i_tag.addClass('fa-user');	    
+		    };
+		}
+	    });
+	};
+    });
+    $("#update-backend").click(function(){
+	var id = $('#BackendMod').find('#id').val();
+	var url = "{{ url_for('api_backends') }}?id=" + id;
+	$.ajax({
+	    async: false,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify(
+		{'name': $('#BackendMod').find('#name').val(),
+		 'host': $('#BackendMod').find('#host').val(),
+		 'type': $('#BackendMod').find('#type').val(),
+		 'timeout':$('#BackendMod').find('#timeout').val(),
+		 'binddn':$('#BackendMod').find('#account').val(),
+		 'bindpw':$('#BackendMod').find('#password').val(),
+		 'basedn':$('#BackendMod').find('#search').val(),
+		 'filter':$('#BackendMod').find('#filter').val(),
+		}
+	    ),
+	    contentType: "application/json",
+	    success: function(e) {
+		$('#BackendMod').modal('hide');
+	    }
+	});
+    });
+    $("#update-user").click(function(){
+	var userid = $('#UserMod').find('#userid').val();
+	var mailrecovery = $('#UserMod').find('#recovery').val();
+	var mobile = $('#UserMod').find('#mobile').val();
+	var genre = $('#UserMod').find('#genre').val();
+	var backend = $('#UserMod').find('#backends').val();
+	var url = "{{ url_for('api_users') }}?id=" + userid;
+	$.ajax({
+	    async: false,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify({'mailrecovery': mailrecovery,
+				  'mobile': mobile, 'genre': genre,
+				  'backend': backend}),
+	    contentType: "application/json",
+	    success: function(e) {
+		$('#UserMod').modal('hide');
+	    }
+	});	    
+    });
+}
+function autosize_tables() {
+    var tables = $('body').find(".table-autosize");
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+	    height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+	    height: table_height(selector),
+	});	    
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};
+function FormatDisplayName(value, row, index) {
+    html = '<img class="img-circle fa fa-fw" '
+    html+= 'src="' + row['_name_data']['avatar'] + '"'
+    html+=' alt="' + value.trim() + '"/>'
+    html+= value
+    return html;
+}
+</script>
+{% endblock %}

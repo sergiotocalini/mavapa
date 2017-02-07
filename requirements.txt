@@ -1,0 +1,7 @@
+flask
+arrow
+wtforms
+pony
+python-ldap
+MySQL-python
+requests

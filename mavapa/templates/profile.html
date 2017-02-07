@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Account settings{% endblock %}
+
+{% block body %}
+<div id="profile">
+  <div class="sidebar">
+    <div class="image">
+      <img class="img-circle" src="{{ account.avatar }}"/>
+    </div>
+    <div class="info">
+      <div class="name">
+	{{ account.lastname }}, {{ account.firstname }}
+      </div>
+      <div class="title">
+	{% if account.has_key('title') %}
+	<p>{{ account.title.decode('utf-8') }}</p>
+	{% endif%}
+      </div>
+      <div class="description">
+	{% if account.has_key('description') %}
+	{{ account.description.decode('utf-8') }}
+	{% endif%}
+      </div>
+    </div>
+    <div class="social">
+    </div>
+  </div>
+  <div class="content">
+    <div class="details">
+      <h1>About</h1>
+      <ul>
+	<li>
+	  <i class="fa fa-user fa-fw"></i>
+	  <label>Name</label>
+	  <span class="value">
+	    {{ account.lastname }}, {{ account.firstname }}
+	  </span>
+	  <div class="clear"></div>
+	</li>
+	<li>
+	  <i class="fa fa-envelope fa-fw"></i>
+	  <label>Email</label>
+	  <span class="value">
+	    {{ account.mail }}
+	  </span>
+	  <div class="clear"></div>
+	</li>
+	{% if account.has_key('idNumber') %}
+	<li>
+	  <i class="fa fa-info fa-fw"></i>
+	  <label>ID</label>
+	  <span class="value">{{ account.idNumber }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}      
+	{% if account.has_key('birthDate') %}
+	<li>
+	  <i class="fa fa-calendar fa-fw"></i>
+	  <label>Birthday</label>
+	  <span class="value">
+	    {{timez(account.birthDate)}} ( {{age(account.birthDate)}} )
+	  </span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}
+	{% if account.has_key('postalAddress') %}
+	<li>
+	  <i class="fa fa-map-marker fa-fw"></i>
+	  <label>Address</label>
+	  <span class="value">{{ account.postalAddress.decode('utf-8') }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}
+	<li>
+	  <i class="fa fa-mobile fa-fw"></i>
+	  <label>Mobile</label>
+	  <span class="value">{{ account.mobile }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% if account.has_key('telephoneNumber') %}
+	<li>
+	  <i class="fa fa-phone fa-fw"></i>
+	  <label>Phone</label>
+	  <span class="value">{{ account.telephoneNumber }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}
+	{% if account.has_key('company') %}
+	<li>
+	  <i class="fa fa-building fa-fw"></i>
+	  <label>Company</label>
+	  <span class="value">{{ account.company.decode('utf-8') }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}
+	{% if account.has_key('department') %}
+	<li>
+	  <i class="fa fa-group fa-fw"></i>
+	  <label>Department</label>
+	  <span class="value">{{ account.department.decode('utf-8') }}</span>
+	  <div class="clear"></div>
+	</li>
+	{% endif %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
