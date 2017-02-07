@@ -7,11 +7,11 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'WYmpcUG1UA2ORJgRJoYt'
     APPLICATION_ROOT = ''
-    CDN_BOOTSTRAP = "//cdn.corpam.com.ar/bootstrap/stable"
-    CDN_FONTAWESOME = "//cdn.corpam.com.ar/fontawesome/stable"
-    CDN_COMMON = '//cdn.corpam.com.ar/common/stable'
-    CDN_DATATABLES = '//cdn.corpam.com.ar/datatables/stable'
-    #CDN_MAVAPA = '//cdn.corpam.com.ar/mavapa/stable'
+    CDN_BOOTSTRAP = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7"
+    CDN_FONTAWESOME = "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0"
+    #CDN_COMMON = ''
+    #CDN_DATATABLES = ''
+    #CDN_MAVAPA = ''
     DEBUG = False
     DB_DEBUG = False
     DB_TYPE = 'mysql'
@@ -19,18 +19,18 @@ class Config(object):
     DB_NAME = 'mavapa'
     
 class Production(Config):
-    DB_HOST = 'mysql01.prd.srv.hon.ar.internal'
+    DB_HOST = 'localhost'
     DB_USER = 'app_mavapa'
     DB_PASS = 'nooX3pegh5loh8T'
     
 class Staging(Config):
-    DB_HOST = 'mysql.stg.srv.hon.ar.internal'
+    DB_HOST = 'localhost'
     DB_USER = 'app_mavapa'
     DB_PASS = '1234567890'
     
 class Development(Config):
     DEBUG = True
-    DB_HOST = 'mysql.dev.srv.hon.ar.internal'
+    DB_HOST = 'localhost'
     DB_USER = 'app_mavapa'
     DB_PASS = '1234567890'
 
