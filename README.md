@@ -13,7 +13,8 @@ Accounts Management
 ### Debian/Ubuntu
 
 ```
-#~ sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-virtualenv
+#~ sudo apt install build-essential libsasl2-dev ldap-utils 
+                    libldap2-dev libmysqlclient-dev python-virtualenv
 #~
 ```
 
