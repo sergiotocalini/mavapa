@@ -7,6 +7,7 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'WYmpcUG1UA2ORJgRJoYt'
     APPLICATION_ROOT = ''
+    #CDN_EXTRAS = ''
     CDN_BOOTSTRAP = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.7"
     CDN_FONTAWESOME = "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0"
     #CDN_COMMON = ''

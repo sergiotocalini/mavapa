@@ -94,6 +94,7 @@
 	</div>
 	{% endfor%}
       </div>
+      {% block modals %}{% endblock %}
     </div>
 
     {% block footer %}
@@ -101,10 +102,10 @@
       <div class="content-bar">
 	<ul class="links">
 	  <span>
-	    <small>©&nbsp; 2015-2016</small>
+	    <small>©&nbsp; 2015-2018</small>
 	  </span>
 	  <li>
-	    <a href="http://developers.corpam.com.ar"><small>Developers</small></a>
+	    <a href="{{ url_for('developers') }}"><small>Developers</small></a>
 	  </li>
 	  <li>
 	    <a href="{{ url_for('support') }}"><small>Support</small></a>
@@ -121,7 +122,7 @@
     {% endblock %}
   </body>
 
-  <script src="{{ config['CDN_COMMON'] }}/js/jquery.min.js"></script>
+  <script src="{{ config['CDN_JQUERY'] }}/jquery.min.js"></script>
   <script src="{{ config['CDN_BOOTSTRAP'] }}/js/bootstrap.min.js"></script>
   <script src="{{ config['CDN_MAVAPA'] }}/mavapa.js"></script>
   {% block scripts %}

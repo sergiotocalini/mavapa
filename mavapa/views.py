@@ -19,9 +19,16 @@ from mavapa_server import mavapa_server
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object(os.environ['APP_SETTINGS'])
+
+
+if not app.config.has_key('CDN_LOCAL'):
+    app.config['CDN_LOCAL'] = '%s/static' %app.config.get('APPLICATION_ROOT', '')
+
+if not app.config.has_key('CDN_EXTRAS'):
+    app.config['CDN_EXTRAS'] = app.config['CDN_LOCAL']
+    
 if not app.config.has_key('CDN_MAVAPA'):
-    CDN_MAVAPA = app.config.get('APPLICATION_ROOT', '')
-    app.config['CDN_MAVAPA'] = '%s/static' %CDN_MAVAPA
+    app.config['CDN_MAVAPA'] = '%s/static' %(app.config.get('APPLICATION_ROOT', ''))
 
 if app.config['DB_TYPE'] == 'mysql':
     db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
@@ -341,7 +348,7 @@ def index():
 @db_session
 def admin(mod):
     if mod == 'users':
-        return render_template('admin_users.html')
+        return render_template('admin/users/index.html')
     elif mod == "apps":
         return render_template('admin_apps.html')
     elif mod == "notify":
@@ -538,6 +545,7 @@ def api_backends():
     else:
         content = request.get_json(silent=True)
         if content and is_admin():
+            print(content)
             if not qfilter:
                 Backend(**content)
             else:

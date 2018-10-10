@@ -57,11 +57,11 @@ class User(db.Entity):
    @db_session
    def avatar(self, size=256):
       CDN_AVATAR = get(o for o in Config if o.key == 'CDN_AVATAR')
+      PHOTO = md5(self.email.encode('utf-8')).hexdigest()
       if CDN_AVATAR:
-         PHOTO = md5(self.email.encode('utf-8')).hexdigest()
-         return '%s/%s?&s=%d' % (CDN_AVATAR.value, PHOTO, size)
+         return '%s/%s?s=%d' % (CDN_AVATAR.value, PHOTO, size)
       else:
-         return '/static/img/avatar.jpg'
+         return '//s.gravatar.com/avatar/%s?s=%d' % (PHOTO, size)
 
 class Session(db.Entity):
    _table_ = "sessions"

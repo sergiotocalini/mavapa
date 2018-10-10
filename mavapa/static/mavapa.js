@@ -9,11 +9,12 @@ function makeMenu(apps){
 	li = li.replace(/{name}/g, app['name']);
 	html += li;
     }
-    html += '<a class="more" arial-label="More Mavapa apps" href="https://accounts.corpam.com.ar/apps" target="_blank" aria-expanded="false" aria-hidden="false">More</a>';
+    html += '<a class="more" arial-label="More Mavapa apps" href="/mavapa/apps" target="_blank" aria-expanded="false" aria-hidden="false">More</a>';
     return html;
-}
+};
+
 $(document).ready(function(){
-    var mavapa_url = 'https://accounts.corpam.com.ar/api/apps?favorites=True';
+    var mavapa_url = '/mavapa/api/apps?favorites=True';
     $.ajax({
 	url: mavapa_url,
 	type: 'GET',

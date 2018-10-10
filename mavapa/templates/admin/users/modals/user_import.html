@@ -1,0 +1,61 @@
+<div id="ModalUserImport" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content" style="padding-bottom: 1%; width:75%;">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body" style="height: 500px;">
+	  <form id="toolbar-user-search" class="form-inline"
+		role="form" onsubmit="return user_search()">
+	    <input type="text" class="form-control" id="mail"
+		   name="mail" placeholder="Email">
+	    <button class="btn btn-default" type="submit"
+		    aria-haspopup="true" aria-expanded="false">
+	      <i class="fa fa-fw fa-search"></i>
+	    </button>
+	  </form>
+	  <table id="table-users-search"
+		 data-show-toggle="false" data-show-export="false"
+		 data-show-columns="true" data-show-multi-sort="true"
+		 data-sort-name="display" data-pagination="true"
+		 data-toggle="table" data-search="false"
+		 data-toolbar="#toolbar-user-search"
+		 data-show-footer="false" data-page-size="50"
+		 data-escape="false"
+		 class="table-hover table-striped table-compact
+			table-condensed table-autosize">
+	    <thead>
+	      <tr>
+		<th data-field="name">
+		  <i class="fa fa-sort-amount-desc fa-fw"></i>
+		  Name
+		</th>
+		<th data-field="email">
+		  <i class="fa fa-envelope fa-fw"></i>
+		  Email
+		</th>
+		<th data-field="backend" data-align="center">
+		  <i class="fa fa-server fa-fw"></i>
+		  Backend
+		</th>
+		<th data-field="actions" data-align="center">
+		  <i class="fa fa-cogs fa-fw"></i>
+		  Actions
+		</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	    </tbody>
+	  </table>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
