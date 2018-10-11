@@ -22,6 +22,7 @@ Accounts Management
 ```
 #~ git clone https://github.com/sergiotocalini/mavapa
 #~ cd mavapa
+#~ pip install -r requirements.txt
 #~ APP_SETTINGS=mavapa.config.Local python run.py
 #~
 ```
