@@ -1,131 +1,251 @@
 <div id="ModalUser" class="modal fade" tabindex="-1" role="dialog"
-     aria-labelledby="ModalLabel" aria-hidden="true">
+     aria-labelledby="ModalLabel" aria-hidden="true" style="overflow: hidden;">
   <div class="modal-content" style="height:60%;width:50%">
     <div class="modal-header"
-	 style="background-color: #337ab7; color: #fff;max-height: 12%;">
+	 style="background-color: #337ab7; color: #fff;height:10%">
       <button type="button" class="close"
-	      style="position:relative;top:45%;
+	      style="position:relative;top:50%;
 		     transform:translateY(-50%);z-index: 100"
 	      data-dismiss="modal" aria-hidden="true">
 	&times;
       </button>
       <h4 class="modal-title"
-	  style="position:relative;top:45%;transform: translateY(-50%);">New</h4>
+	  style="position:relative;top:45%;transform:translateY(-50%);float:left">New</h4>
     </div>
-    <div class="modal-body" style="height:75%;padding:2%;">
-      <img id="avatar" class="img-circle"
-	   style="float:left;width:28%;padding:0% 1%;
-		  top:50%;position:relative;transform:translateY(-50%);"/>
-      <form style="float:left;top:50%;position:relative;width:72%;
-		   transform:translateY(-50%);"
-	    role="form" method="POST">
-	<fieldset>
-	  <div class="row" style="margin:0px">
-	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="userid">
-		<i class="fa fa-fw fa-key"></i>
-		ID
-	      </label>
-	      <input type="text" class="form-control"
-		     id="userid" name="userid" readonly>
+    <div class="modal-body" style="height:80%;padding:2%;">
+      <div class="user-menu" style="position: relative;
+				    height: 100%;
+				    width: 25%;
+				    float: left;">
+	<div class="user-avatar" style="position: relative;
+					height: 50%;
+					width: 100%;">
+	  <img id="avatar" class="img-circle"
+	       style="width: auto;
+		      padding: 0% 1%;
+		      left: 50%;
+		      top: 50%;
+		      position: relative;
+		      transform: translateX(-50%) translateY(-50%);
+		      height: auto;
+		      max-width: 85%;
+		      max-height: 85%;"/>
+	</div>
+	<ul id="user-menu-context" style="overflow-y:auto;max-height:50%;position:absolute;bottom:0px;width:100%;
+					  padding:0px;margin-bottom:0px;cursor: pointer;">
+	  <li href="#user-form-basic" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
+	    Basic
+	  </li>
+	  <li href="#user-form-backend" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-database" aria-hidden="true"></i>
+	    Backend
+	  </li>
+	  <li href="#user-form-settings" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
+	    Settings
+	  </li>
+	</ul>
+      </div>
+      <div class="user-content tab-content" style="width: 75%;
+						   position: relative;
+						   height: 100%;
+						   float: left;">
+	<div id="user-form-basic" class="tab-subcontent tab-pane fade in active" style="position: relative;
+											width: 100%;
+											height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="userid">
+		    <i class="fa fa-fw fa-key"></i>
+		    ID
+		  </label>
+		  <input type="text" class="form-control"
+			 id="userid" name="userid" readonly>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="backend">
+		    <i class="fa fa-fw fa-database"></i>
+		    Backend
+		  </label>
+		  <select class="selectpicker show-tick form-control"
+			  id="backends" name="backends" title="...">
+		  </select>
+		</div>	
+	      </div>
+	      <div class="row" style="margin:0px">
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="email">
+		    <i class="fa fa-fw fa-envelope"></i>
+		    Email
+		  </label>
+		  <input type="text" class="form-control"
+			 id="email" name="email" readonly>
+		</div>
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="recovery">
+		    <i class="fa fa-fw fa-envelope"></i>
+		    Email Recovery
+		  </label>
+		  <input type="text" class="form-control"
+			 id="recovery" name="recovery" placeholder="Email">
+		</div>	    
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="mobile">
+		    <i class="fa fa-fw fa-mobile"></i>
+		    Mobile
+		  </label>
+		  <input type="text" class="form-control"
+			 id="mobile" name="mobile" placeholder="Mobile">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="language">
+		    <i class="fa fa-fw fa-language"></i>
+		    Language
+		  </label>
+		  <select class="selectpicker show-tick form-control"
+			  id="lang" name="lang">
+		    <option value="English" data-tokens="English"
+			    data-content="<span class='flag-icon flag-icon-us'></span> English">
+		      English
+		    </option>
+		    <option value="German" data-tokens="German"
+			    data-content="<span class='flag-icon flag-icon-de'></span> German">
+		      German
+		    </option>
+		    <option value="Italian" data-tokens="Italian"
+			    data-content="<span class='flag-icon flag-icon-it'></span> Italian">
+		      Italian
+		    </option>
+		    <option value="Portuguese" data-tokens="Portuguese"
+			    data-content="<span class='flag-icon flag-icon-pt'></span> Portuguese">
+		      Portuguese
+		    </option>
+		    <option value="Spanish" data-tokens="Spanish"
+			    data-content="<span class='flag-icon flag-icon-es'></span> Spanish">
+		      Spanish
+		    </option>
+		  </select>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-venus-mars"></i>
+		    Genre
+		  </label>
+		  <select class="selectpicker show-tick form-control"
+			  id="genre" name="genre" title="...">
+		    <option value="Female"
+			    data-content="<i class='fa fa-fw fa-venus'></i>
+					  Female"
+			    data-tokens="Female">
+		      Female
+		    </option>
+		    <option value="Male"
+			    data-content="<i class='fa fa-fw fa-mars'></i>
+					  Male"
+			    data-tokens="Male">
+		      Male
+		    </option>
+		  </select>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-clock"></i>
+		    Timezone
+		  </label>
+		  <select class="selectpicker show-tick form-control"
+			  id="timezone" name="timezone" data-live-search="true">
+		    <option value="America/Argentina/Buenos_Aires"
+			    data-tokens="Buenos Aires"
+			    data-content="<span class='flag-icon flag-icon-ar'></span> America/Argentina/Buenos_Aires">
+		      America/Argentina/Buenos_Aires
+		    </option>
+		    <option value="Europe/Warsaw"
+			    data-tokens="Warsaw"
+			    data-content="<span class='flag-icon flag-icon-pl'></span> Europe/Warsaw">
+		      Europe/Warsaw
+		    </option>		    
+		    <option value="Europe/Zurich"
+			    data-tokens="Zurich"
+			    data-content="<span class='flag-icon flag-icon-ch'></span> Europe/Zurich">
+		      Europe/Zurich
+		    </option>
+		  </select>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Admin
+		  </label>
+		  <div>
+		    <input id="user-form-basic-admin" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
+			    data-width="100%" data-onstyle="warning" data-offstyle="primary">
+		  </div>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-slash"></i>
+		    Status
+		  </label>
+		  <div>
+		    <input id="user-form-basic-status" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
+			   data-width="100%" data-onstyle="success" data-offstyle="danger">
+		  </div>
+		</div>
+	      </div>	      
+	    </fieldset>
+	  </form>
+	</div>
+	<div id="user-form-backend" class="tab-subcontent tab-pane fade in" style="position: relative;
+										   width: 100%;
+										   height: 100%;">
+	  <div style="height: 100%;position: relative;width:98%; float:right">
+	    <div id="user-form-backend-table-toolbar" class="toolbar"
+		 style="max-height:10%;padding:0.5% 0%;">
+	      <button class="btn btn-primary" type="button" id="filter-add" style="outline:none">
+		<i class="fa fa-fw fa-plus"></i>
+	      </button>
 	    </div>
-	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="backend">
-		<i class="fa fa-fw fa-database"></i>
-		Backend
-	      </label>
-	      <select class="selectpicker show-tick form-control"
-		      id="backends" name="backends" title="...">
-	      </select>
-	    </div>	
+	    <table id="user-form-backend-table"
+		   data-toggle="table" data-search="false"
+		   data-show-footer="false" data-escape="false"
+		   data-show-header="false" data-toolbar="#user-form-backend-table-toolbar"
+		   data-toolbar-align="right"
+		   class="table-hover table-striped table-compact table-responsive
+			  table-condensed table-autosize">
+	      <thead>
+		<tr>
+		  <th data-field="attr" data-valign="middle"
+		      data-align="left" data-sortable="false">
+		  </th>
+		  <th data-field="value" data-valign="middle"
+		      data-align="left" data-sortable="false">
+		  </th>
+		</tr>
+		<tbody></tbody>
+	    </table>
 	  </div>
-	  <div class="row" style="margin:0px">
-    	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="email">
-		<i class="fa fa-fw fa-envelope"></i>
-		Email
-	      </label>
-	      <input type="text" class="form-control"
-		     id="email" name="email" readonly>
-	    </div>
-    	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="recovery">
-		<i class="fa fa-fw fa-envelope-o"></i>
-		Recovery
-	      </label>
-	      <input type="text" class="form-control"
-		     id="recovery" name="recovery" placeholder="Email">
-	    </div>	    
-	  </div>
-	  <div class="row" style="margin:0px">
-	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="mobile">
-		<i class="fa fa-fw fa-mobile"></i>
-		Mobile
-	      </label>
-	      <input type="text" class="form-control"
-		     id="mobile" name="mobile" placeholder="Mobile">
-	    </div>
-	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="language">
-		<i class="fa fa-fw fa-language"></i>
-		Language
-	      </label>
-	      <select class="selectpicker show-tick form-control"
-		      id="lang" name="lang" disabled>
-		<option value="English" data-tokens="English">
-		  English
-		</option>
-		<option value="Spanish" data-tokens="Spanish">
-		  Spanish
-		</option>
-	      </select>
-	    </div>
-	  </div>
-	  <div class="row" style="margin:0px">
-	    <div class="col-md-6">
-	      <label class="control-label" for="genre">
-		<i class="fa fa-fw fa-venus-mars"></i>
-		Genre
-	      </label>
-	      <select class="selectpicker show-tick form-control"
-		      id="genre" name="genre" title="...">
-		<option value="Female"
-			data-content="<i class='fa fa-fw fa-venus'></i>
-				      Female"
-			data-tokens="Female">
-		  Female
-		</option>
-		<option value="Male"
-			data-content="<i class='fa fa-fw fa-mars'></i>
-				      Male"
-			data-tokens="Male">
-		  Male
-		</option>
-	      </select>
-	    </div>
-	    <div class="col-md-6 form-group">
-	      <label class="control-label" for="timezone">
-		<i class="fa fa-fw fa-clock-o"></i>
-		Timezone
-	      </label>
-	      <select class="selectpicker show-tick form-control"
-		      id="timezone" name="timezone" data-live-search="true"
-		      disabled>
-		<option value="America/Argentina/Buenos_Aires"
-			data-tokens="Buenos Aires">
-		  Argentina - Buenos Aires
-		</option>
-	      </select>
-	    </div>
-	  </div>
-	</fieldset>
-      </form>
+	</div>
+      </div>
     </div>
-    <div class="modal-footer" style="height: 13%;">
-      <div class="pull-left">
+    <div class="modal-footer" style="height:10%">
+      <div class="pull-left" style="top:50%;transform:translateY(-50%);position:relative;height:100%">
 	<a id="user-profile" target="_blank"
-	   style="outline: none;text-decoration: none;cursor: pointer;">
+	   style="outline: none;text-decoration: none;cursor: pointer;height:100%;position:absolute">
 	  <i class="fa fa-fw fa-2x fa-info" aria-hidden="true"></i>
 	</a>
       </div>
@@ -134,7 +254,7 @@
 		data-dismiss="modal">
 	  Close
 	</button>
-	<button type="button" class="btn btn-primary" id="update-user">
+	<button type="button" class="btn btn-primary" id="user-update">
 	  Save
 	</button>
       </div>

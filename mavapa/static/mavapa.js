@@ -1,5 +1,4 @@
-function makeMenu(apps){
-    console.log(apps);
+function makeMenu(apps) {
     var html = "";
     for (var x in apps){
 	var app = apps[x];

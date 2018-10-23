@@ -22,10 +22,10 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 
 
 if not app.config.has_key('CDN_LOCAL'):
-    app.config['CDN_LOCAL'] = '%s/static' %app.config.get('APPLICATION_ROOT', '')
+    app.config['CDN_LOCAL'] = '%s/static/app' %app.config.get('APPLICATION_ROOT', '')
 
 if not app.config.has_key('CDN_EXTRAS'):
-    app.config['CDN_EXTRAS'] = app.config['CDN_LOCAL']
+    app.config['CDN_EXTRAS'] = '%s/static/extras' %app.config.get('APPLICATION_ROOT', '')
     
 if not app.config.has_key('CDN_MAVAPA'):
     app.config['CDN_MAVAPA'] = '%s/static' %(app.config.get('APPLICATION_ROOT', ''))
@@ -553,6 +553,7 @@ def api_backends():
             commit()
     return jsonify(datetime=datetime.now())
 
+
 @app.route('/api/notify/agents', methods=['GET', 'POST', 'DELETE'])
 @db_session
 def api_notify_agents():
@@ -579,38 +580,78 @@ def api_notify_agents():
                     NotifyAgent(**content)
                     commit()
     return jsonify(datetime=datetime.now())
-            
-@app.route('/api/search/users', methods=['GET'])
+
+
+@app.route('/api/users/search', methods=['GET'])
 @db_session
-def api_search_users():
+def api_users_search():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
-    yes = ["yes", "true", "t", "1"]
+    only_backend = ['id', 'name', 'type', 'desc']
     data = []
-    exist = args.get('exist', 't').lower() in yes
-    if not exist and qfilter:
-        data = backends_search_users(exist=exist, **qfilter)
+    if not qfilter:
+        for i in get_data('User'):
+            user = i.to_dict(exclude=['passwd'])
+            user['backend'] = i.backend.to_dict(only=only_backend) if i.backend else None
+            user['displayname'] = i.displayname
+            user['avatar'] = i.avatar()
+            data.append(user)
     else:
-        if not qfilter:
-            for i in get_data('User'):
-                user = i.to_dict(exclude=['passwd'])
-                user['displayname'] = user['displayname'].format(
-                    firstname=i.firstname,
-                    lastname=i.lastname
-                )
-                user['avatar'] = i.avatar()
-                data.append(user)
-        else:
-            res = get_data('User', **qfilter)
-            if res:
-                user = res.to_dict(exclude=['passwd'])
-                user['displayname'] = user['displayname'].format(
-                    firstname=res.firstname,
-                    lastname=res.lastname
-                )
-                user['avatar'] = res.avatar()
-                data.append(user)
-    return jsonify(datetime=datetime.now(), users=data)
+        res = get_data('User', **qfilter)
+        if res:
+            user = res.to_dict(exclude=['passwd'])
+            user['backend'] = i.backend.to_dict(only=only_backend) if i.backend else None
+            user['displayname'] = res.displayname
+            user['avatar'] = res.avatar()
+            data.append(user)
+    return jsonify(datetime=datetime.now(), data=data)
+
+
+@app.route('/api/backends/search/users', methods=['GET'])
+@db_session
+def api_backends_search_users():
+    args = request.args.to_dict()
+    qfilter = dict((x, args[x]) for x in args if x in ['email', 'filter', 'only'])
+    qfilter.setdefault('email', '*')
+    qfilter.setdefault('filter', '(ObjectClass=person)')
+    qfilter.setdefault('only', 'all')
+    data = []
+    for i in select(o for o in Backend):
+        if i.type in ['LDAP', 'AD']:
+            oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
+            query = oa.query(
+                filter = '(&(%s=%s)%s)' %(i.login, qfilter['email'], qfilter['filter']),
+                attrs = ['givenname', 'sn', 'mail', 'mobile', 'mailRecovery'],
+                basedn = i.basedn,
+                limit = 1
+            )
+            if query:
+                for dn, x in query:
+                    info = {}
+                    for attr in x:
+                        info[attr] = [e.encode('utf-8').lower() for e in x[attr]]
+                    info['exist'] = True if get_data('User', email=info['mail'][0]) else False
+                    if qfilter['only'] not in ['all', 'ALL']:
+                        if qfilter['only'] == 'exist' and not info['exist']:
+                            continue
+                        elif qfilter['only'] == 'noexist' and info['exist']:
+                            continue
+                    fname = x['givenName'][0].decode('utf-8').title()
+                    lname = x['sn'][0].decode('utf-8').title()
+                    info['backend'] = i.to_dict(only=['id', 'name', 'type', 'desc'])
+                    info['firstname'] = fname
+                    info['lastname'] = lname
+                    info['mobile'] = ''
+                    info['mailrecovery'] = ''
+                    if x.has_key('mobile'):
+                        mobile = x['mobile'][0].decode('utf-8')
+                        info['mobile'] = mobile
+                    if x.has_key('mailRecovery'):
+                        recover = x['mailRecovery'][0].decode('utf-8')
+                        info['mailrecovery'] = recover
+                    data.append(info)
+    return jsonify(datetime=datetime.now(), data=data)
+
 
 @app.route('/api/users', methods=['GET', 'POST'])
 @db_session
@@ -623,13 +664,11 @@ def api_users():
             if user:
                 if session.get('mavapa_session'):
                     data = user.to_dict(exclude=['passwd'])
-                    data['displayname'] = data['displayname'].format(
-                        firstname=user.firstname,
-                        lastname=user.lastname
-                    )
+                    data['backend'] = user.backend.to_dict(only=['id', 'name', 'type', 'desc'])
                 else:
                     only = ['id', 'email', 'firstname', 'lastname']
                     data = user.to_dict(only)
+                data['displayname'] = user.displayname
                 data['avatar'] = user.avatar()
                 return jsonify(datetime=datetime.now(), users=[data])
         else:
@@ -645,6 +684,57 @@ def api_users():
                     User(**content)
                 commit()
     return jsonify(datetime=datetime.now())
+
+
+@app.route('/api/users/all', methods=['GET'])
+@db_session
+def api_users_all():
+    args = request.args.to_dict()
+    args.setdefault('type', None)
+    args.setdefault('filter', None)
+    args.setdefault('sort', 'name')
+    args.setdefault('order', 'asc')
+    args.setdefault('search', None)
+    args.setdefault('offset', 0)
+    args.setdefault('limit', 50)
+    args.setdefault('status', None)
+    only_user = ['id', 'userid', 'displayname', 'email', 'avatar',
+                 'status', 'title', 'created_on', 'last_seen']
+    only_backend = ['id', 'name', 'type', 'desc']
+    data = []
+    raw = get_data('User')
+        
+    if args['search']:
+        raw = raw.filter(lambda o: args['search'].lower() in o.firstname.lower() or args['search'].lower() in o.lastname.lower())
+
+    if args['status']:
+        raw = raw.filter(lambda o: args['status'] == o.status)
+
+    if args['sort'] == 'displayname':
+        args['sort'] = 'lastname'
+        
+    if getattr(User, args['sort'], None):
+        if args['order'] == 'desc':
+            raw = raw.order_by(lambda o: desc(getattr(o, args['sort'])))
+        else:
+            raw = raw.order_by(lambda o: getattr(o, args['sort']))
+
+    total = count(raw)
+    if args['limit'] not in ["no", "false", "f", "-1", "None"]:
+        raw = raw.limit(int(args['limit']), offset=int(args['offset']))
+        
+    for i in raw:
+        row = i.to_dict(related_objects=False)
+        row['displayname'] = i.displayname
+        row['avatar'] = i.avatar()
+        row['backend'] = i.backend.to_dict(only=only_backend) if i.backend else None
+        # if args['filter'] != 'team' and i.team:
+        #     team = i.team.to_dict(only_team)
+        #     team['manager'] = i.team.manager.to_dict(only_user)
+        #     row['team'] = team
+        data.append(row)
+    return jsonify(datetime=datetime.now(), data=data, total=total)
+
 
 @app.route('/profile', defaults={'userid': 'me'})
 @app.route('/profile/<userid>')

@@ -35,7 +35,7 @@ class User(db.Entity):
    passwd = Optional(unicode, nullable=True)
    firstname = Optional(unicode)
    lastname = Optional(unicode)
-   displayname = Optional(unicode, default="{lastname}, {firstname}")
+   dname = Optional(unicode, default="{lastname}, {firstname}", column="displayname")
    mobile = Optional(unicode)
    mailrecovery = Optional(unicode)
    admin = Required(bool, default=False)
@@ -49,11 +49,12 @@ class User(db.Entity):
    apps = Set("App")
    retrieves = Set("Retrieve")
    sessions = Set('Session')
-   
+
+   @property
    @db_session
-   def get_displayname(self):
-      return self.displayname.format(**self.to_dict())
-   
+   def displayname(self):
+      return self.dname.format(**self.to_dict())
+
    @db_session
    def avatar(self, size=256):
       CDN_AVATAR = get(o for o in Config if o.key == 'CDN_AVATAR')
