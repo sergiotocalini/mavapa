@@ -1,14 +1,13 @@
-from flask import Blueprint, render_template, abort, redirect, current_app, request, jsonify, session, url_for, g
-from jinja2 import TemplateNotFound
-from lib import *
-from forms import *
-import requests
-import json
+#!/usr/bin/env python
+#from jinja2 import TemplateNotFound
+#import requests
 import urllib
 import random
-from datetime import datetime, timedelta
 import string
-import pprint
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, abort, redirect, request, jsonify, session, url_for
+from lib import *
+from forms import *
 
 MAVAPA_URL = ''
 AUTH_URL = MAVAPA_URL + '/auth?response_type=code'
@@ -31,12 +30,12 @@ def get_data(table, **kwargs):
 
 @db_session
 def save_code(app, user, code):
-    """ 
+    """
     Save code in TokenTable, make the relationship with
-    a client_id and a user. 
+    a client_id and a user.
     """
     start = datetime.now()
-    end = start + timedelta(days=30)    
+    end = start + timedelta(days=30)
     token = Token(code=code, user=user.id, app=app.id,
                   created_on=start, expired_on=end,
                   session=session['mavapa_session'])
@@ -53,10 +52,12 @@ def who_im():
         if token.status and token.expired_on > datetime.now():
             user = token.user.to_dict()
             user['avatar'] = token.user.avatar()
-            user['displayname'] = token.user.get_displayname()
-            keys = ['id', 'firstname', 'lastname', 'displayname', 'avatar',
-                    'gender', 'email', 'page', 'profile', 'lang', 'tz',
-                    'site']
+            user['displayname'] = token.user.displayname
+            keys = [
+                'id', 'firstname', 'lastname', 'displayname', 'avatar',
+                'gender', 'email', 'page', 'profile', 'lang', 'timezone',
+                'site'
+            ]
             data = {}
             for key in keys:
                 data[key] = user.get(key, '')
@@ -73,7 +74,9 @@ def token():
     client_id = request.form.get('client_id')
     client_secret = request.form.get('client_secret')
     data = {"error": "invalid_request"}
-    app = get_data('App', client_id=client_id, redirect_uri=redirect_uri, client_secret=client_secret)
+    app = get_data(
+        'App', client_id=client_id, redirect_uri=redirect_uri, client_secret=client_secret
+    )
     if app:
         token = get_data('Token', code=code)
         if token:
@@ -88,7 +91,7 @@ def token():
 def accept_app():
     user = session.get('mavapa_account')
     auth_url = session.get('auth_url')
-    auth_url= urllib.unquote(auth_url)
+    auth_url = urllib.unquote(auth_url)
     client_id = session.get('client_id')
     redirect_uri = session.get('redirect_uri')
     redirect_uri = urllib.unquote(redirect_uri)
@@ -113,13 +116,13 @@ def accept_app():
 @mavapa_server.route('/auth')
 @db_session
 def auth():
+    """ Check if account is related to app """
     user = session.get('mavapa_account')
     if not user:
         login_url = url_for('login')
         session['next_url'] = request.url
         return redirect(login_url)
     account = get_data('User', email=user)
-    """ Check if account is related to app """
     response_type = request.args.get('response_type')
     client_id = request.args.get('client_id')
     redirect_uri = request.args.get('redirect_uri')
@@ -146,7 +149,4 @@ def auth():
         'scopes': scopes,
     }
     return jsonify(data)
-
-if __name__ == "__main__":
-    app.run()
 

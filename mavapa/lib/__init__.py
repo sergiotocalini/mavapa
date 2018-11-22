@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-from .Models import *
-from .Backends import *
+from .models import *
+from .backends import *

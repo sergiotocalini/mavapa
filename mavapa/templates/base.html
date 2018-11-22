@@ -3,14 +3,15 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ config['CDN_MAVAPA'] }}/img/favicon.ico" type="image/x-icon"/>    
-    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/img/favicon.ico" type="image/x-icon"/>
+   
+    <link  href="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link  href="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
     
-    <link href="{{ config['CDN_FONTAWESOME'] }}/css/fontawesome-all.css" rel="stylesheet">
+    <link  href="{{ config['CDN_EXTRAS'] }}/fontawesome/5.0.13/css/fontawesome-all.min.css" rel="stylesheet">
     
-    <link href="{{ config['CDN_MAVAPA'] }}/style.css" rel="stylesheet">
-    <link href="{{ config['CDN_MAVAPA'] }}/mavapa.css" rel="stylesheet">
+    <link href="{{ config['CDN_LOCAL'] }}/css/style.css"  rel="stylesheet">
+    <link href="{{ config['CDN_LOCAL'] }}/css/mavapa.css" rel="stylesheet">    
   </head>
   <body>
 
@@ -19,7 +20,7 @@
       <div class="content-bar">
 	<div class="logo navbar-header">
 	  <a href="{{ url_for('index') }}"></a>
-	  <img src="{{ config['CDN_MAVAPA'] }}/img/logo.png" alt="">
+	  <img src="{{ config['CDN_LOCAL'] }}/img/logo.png" alt="">
 	</div>
 	
 	{% if session.mavapa_session %}
@@ -123,10 +124,11 @@
     </div>
     {% endblock %}
   </body>
-
-  <script src="{{ config['CDN_JQUERY'] }}/jquery.min.js"></script>
-  <script src="{{ config['CDN_BOOTSTRAP'] }}/js/bootstrap.min.js"></script>
-  <script src="{{ config['CDN_MAVAPA'] }}/mavapa.js"></script>
+  
+  <script src="{{ config['CDN_EXTRAS'] }}/jquery/3.1.1/jquery.min.js"></script>
+  <script src="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="{{ config['CDN_LOCAL']  }}/js/scripts.js"></script>
+  <script src="{{ config['CDN_LOCAL']  }}/js/mavapa.js"></script>
   {% block scripts %}
   {% endblock%}
 </html>

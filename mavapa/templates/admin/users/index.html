@@ -1,7 +1,8 @@
-{% extends "admin.html" %}
-{% set snactive = "users" %}
+{% extends "admin/base.html" %}
 
-{% block title %}Administration - Users{% endblock %}
+{% block title %}Administration: Users{% endblock %}
+
+{% set snactive = "users" %}
 
 {% block container %}
 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
@@ -11,16 +12,16 @@
       Users
     </a>
   </li>
-  <li>
+  <li class="disabled">
     <a data-toggle="tab" href="#groups">
       <i class="fa fa-fw fa-users"></i>
       Groups
     </a>
   </li>
-  <li>
-    <a data-toggle="tab" href="#backends">
-      <i class="fa fa-fw fa-database"></i>
-      Backends
+  <li class="disabled">
+    <a data-toggle="tab" href="#roles">
+      <i class="fa fa-fw fa-user-shield"></i>
+      Roles
     </a>
   </li>
 </ul>
@@ -71,8 +72,8 @@
 	    <i class="fa fa-envelope fa-fw"></i>
 	    Email
 	  </th>
-	  <th data-valign="middle" data-align="right" data-field="last_seen"
-	      data-halign="center" data-sortable="true" data-formatter="UsersFormatterDate">
+	  <th data-valign="middle" data-align="center" data-field="last_seen"
+	      data-halign="center" data-sortable="true" data-formatter="UsersFormatterDateAgo">
 	    <i class="fa fa-calendar fa-fw"></i>
 	    Last seen
 	  </th>
@@ -146,20 +147,20 @@
       <tbody></tbody>
     </table>
   </div>
-  <div id="backends" class="tab-pane fade">
-    <div id="toolbar-backend">
+  <div id="roles" class="tab-pane fade">
+    <div id="toolbar-roles">
       <button class="btn btn-default" type="button" data-toggle="modal"
-	      data-target="#ModalBackend" aria-haspopup="true"
+	      data-target="#ModalRole" aria-haspopup="true"
 	      aria-expanded="false">
 	<i class="fa fa-plus fa-fw"></i>
       </button>
     </div>
-    <table id="table-backends" data-show-toggle="false"
+    <table id="table-roles" data-show-toggle="false"
 	   data-show-export="false"
 	   data-show-columns="true" data-show-multi-sort="true"
 	   data-sort-name="display" data-pagination="true"
 	   data-toggle="table" data-search="true"
-	   data-toolbar="#toolbar-backend"
+	   data-toolbar="#toolbar-roles"
 	   data-show-footer="false" data-page-size="50" data-escape="false"
 	   class="table table-hover table-striped table-compact table-condensed table-autosize">
       <thead>
@@ -193,44 +194,13 @@
 	  </th>	  
 	</tr>
       </thead>
-      <tbody>
-	{% for backend in data('Backend') %}
-	<tr>
-	  <td></td>
-	  <td>{{ backend.id }}</td>
-	  <td>
-	    <i class="fa fa-fw fa-shield-alt"></i>
-	    {{ backend.name }}
-	  </td>
-	  <td>
-	    {% if backend.type == 'AD' %}
-	    <i class="fa fa-windows fa-fw"></i>
-	    Active Directory
-	    {% elif backend.type == 'LDAP' %}
-	    <i class="fa fa-book fa-fw"></i>
-	    {{ backend.type }}
-	    {% else %}
-	    <i class="fa fa-globe fa-fw"></i>
-	    {% endif %}
-	  </td>
-	  <td>{{ backend.host }}</td>
-	  <td>{{ backend.users.count() }}</td>
-	  <td>
-	    <a class="backend-edit" data-toggle="confirmation"
-	       data-id="{{ backend.id }}" href="#">
-	      <i class="fa fa-fw fa-pencil-alt"></i>
-	    </a>
-	  </td>
-	</tr>
-	{% endfor %}
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 </div>
 {% endblock %}
 
 {% block modals %}
-{% include "admin/users/modals/backend.html" %}
 {% include "admin/users/modals/user.html" %}
 {% include "admin/users/modals/user_import.html" %}
 {% endblock %}
@@ -238,7 +208,7 @@
 {% block scripts%}
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 
-<link  href="//cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css" rel="stylesheet">
+<link  href="{{ config['CDN_EXTRAS'] }}/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet">
 
 <link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
 <script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
@@ -250,223 +220,13 @@
 <script src="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
 <script>
-$(document).ready(function () {
-    autosize_tables();
-    $(window).resize(function () {
-	autosize_tables();
-    });
-    $('.modal').on('hidden.bs.modal', function(){
-	$('.modal').find('.modal-title').html('New');
-	var forms = $(this).find('form');
-	forms.each(function(row){
-	    forms[row].reset();
-	});
-	var selectpickers = $(this).find('.selectpicker');
-	selectpickers.each(function(row){
-	    $(selectpickers[row]).selectpicker('refresh');
-	});
-    });
-    jqlisteners();
-});
-
-{% include "admin/users/modals/backend.js" %}
+{% include "admin/users/index.js" %}
 {% include "admin/users/modals/user.js" %}
 {% include "admin/users/modals/user_import.js" %}
 
 function jqlisteners() {
-    $(".user-import").unbind();
-    $(".user-import").click(function(e) {
-	e.preventDefault();
-	var user = USER_FOUND[$(this).data('id')];
-	var url = "{{ url_for('api_users') }}?email=" + user['mail'][0];
-	$.ajax({
-	    async: true,
-	    url: url,
-	    type: 'POST',
-	    data: JSON.stringify({
-		'email': user['mail'][0],
-		'firstname': user['firstname'],
-		'lastname': user['lastname'],
-		'mobile': user['mobile'],
-		'mailrecovery': user['mailrecovery'],
-		'backend': user['backend']['id'],
-		'admin': false,
-	    }),
-	    contentType: "application/json",
-	    success: function(e) {
-		var listdel = {'field': 'email', 'values': [user['mail'][0]] };
-		$('#table-users-search').bootstrapTable('remove', listdel);
-		$('#table-users').bootstrapTable('refresh');
-	    }
-	});
-    });
-    $(".backend-edit").unbind();
-    $(".backend-edit").click(function(e) {
-	e.preventDefault();
-	var modal = '#ModalBackend';
-	var backend = $(this).data('id');
-	var url = "{{ url_for('api_backends') }}?id=" + backend;
-	$.ajax({
-	    async: true,
-	    url: url,
-	    type: 'GET',
-	    success: function(e) {
-		$(modal).find('.modal-title').html(e['backends'][0]['name']);
-		$(modal).find('#backend_id').val(e['backends'][0]['id']);
-		$(modal).find('#name').val(e['backends'][0]['name']);
-		$(modal).find('#type').selectpicker('val', e['backends'][0]['type']);
-		$(modal).find('#host').val(e['backends'][0]['host']);
-		$(modal).find('#timeout').val(e['backends'][0]['timeout']);
-		$(modal).find('#account').val(e['backends'][0]['binddn']);
-		$(modal).find('#password').val(e['backends'][0]['bindpw']);
-		$(modal).find('#search').val(e['backends'][0]['basedn']);
-		$(modal).find('#filter').val(e['backends'][0]['filter']);
-		$(modal).modal('show');
-	    }
-	});
-    });
-    $("#user-add").unbind();
-    $("#user-add").click(function(e){
-	e.preventDefault();
-	var modal = '#ModalUser';
-	console.log("Adding user");
-    });
-    $(".user-edit").unbind();
-    $(".user-edit").click(function(e){
-	e.preventDefault();
-	var modal = '#ModalUser';
-	var userid = $(this).data('id');
-	$.ajax({
-	    async: true,
-	    url: "{{ url_for('api_users') }}?id=" + userid,
-	    type: 'GET',
-	    success: function(e) {
-		var data = e['users'][0];
-		var profile = '{{ url_for("profile") }}/' + data['id'];
-		var display = data['lastname'] + ', ' + data['firstname'];
-		$(modal).find('.modal-title').html(display);
-		$(modal).find('#avatar').attr('src', data['avatar']);
-		$(modal).find('#userid').val(data['id']);
-		$(modal).find('#email').val(data['email']);
-		$(modal).find('#recovery').val(data['mailrecovery']);
-		$(modal).find('#mobile').val(data['mobile']);
-		$(modal).find('#user-profile').attr('href', profile);
-		$(modal).find('#genre').selectpicker('val', data['genre']);
-		$(modal).find('#lang').selectpicker('val', data['lang']);
-		$(modal).find('#timezone').selectpicker('val', data['timezone']);
-		$(modal).find('#user-form-basic-status').prop('checked', true).change();
-		$(modal).find('#user-form-basic-admin').prop('checked', data['admin']).change();
-		$.ajax({
-		    async: true,
-		    url: "{{ url_for('api_backends') }}",
-		    type: 'GET',
-		    success: function(e2) {
-			var backends = e2['backends']
-			if (data['backend']) {
-			    html = '<option value="0">Local</option>'
-			} else {
-			    html = '<option value="0" selected="selected">Local</option>'
-			}
-			for(i in backends) {
-			    if (data['backend'] == backends[i]['id']) {
-				html += '<option selected="selected" '
-				html += 'value="' + backends[i]['id'] + '">';
-				html += backends[i]['name'] +'</option>';
-			    } else {
-				html += '<option value="' + backends[i]['id'];
-				html += '">' + backends[i]['name'] + '</option>';
-			    }
-			}
-			$(modal).find('#backends').html(html);
-			$(modal).find('#backends').selectpicker('refresh');
-		    }
-		});
-		$(modal).modal('show');
-	    }
-	});
-    });
+    jqlisteners_users();
     jqlisteners_modal_user();
-    jqlisteners_modal_backend();
 };
-function autosize_tables() {
-    var tables = $('body').find(".table-autosize");
-    tables.each(function(row){
-	var selector = $(tables[row]).attr('id');
-	selector = '#' + selector;
-	$(selector).on('post-body.bs.table', function () {
-	    jqlisteners();
-	});
-	$(selector).bootstrapTable({
-	    height: table_height(selector),
-	});
-	$(selector).bootstrapTable('resetView', {
-	    height: table_height(selector),
-	});	    
-    });
-}
-function table_height(table) {
-    var parent = $(table).parent().parent().parent().parent();
-    return parent.height();
-};
-
-function UsersParams(params) {
-    return params
-}
-function UsersResponseHandler(res) {
-    var data = [];
-    for(r in res.data) {
-	var row = res.data[r];
-	var doc = {
-	    id: row.id,
-	    displayname: row.displayname,
-	    avatar: row.avatar,
-	    backend: row.backend,
-	    email: row.email,
-	    created_at: row.created_at,
-	    last_seen: row.last_seen,
-	    admin: row.admin,
-	};
-	data.push(doc);
-    };
-    return {
-	total: res.total,
-	rows: data,
-    }
-}
-function UsersFormatterName(value, row) {
-    var html = ""
-    html += '<img class="fa fa-fw img-circle" src="';
-    html += row.avatar + '"/> ';
-    html += row.displayname;
-    if (row.admin) {
-	html += '<i class="fa fa-fw fa-user-shield pull-right"></i>'
-    }
-    return html;
-}
-function UsersFormatterBackend(value, row) {
-    var html = ""
-    html += '<i class="fa fa-fw fa-database"></i> ';
-    if (row.backend) {
-	html += row.backend.name;
-    } else {
-	html += 'Local';
-    }
-    return html;
-}
-function UsersFormatterActions(value, row) {
-    var html = ""
-    html += '<a class="user-edit" data-toggle="confirmation" ';
-    html += 'data-id="' + row.id + '" href="#">';
-    html += '<i class="fa fa-fw fa-pencil-alt"></i>';
-    html += '</a>';
-    // html += '<a class="user-open" data-toggle="confirmation" ';
-    // html += 'data-id="' + row.id + '" href="#">';
-    // html += '<i class="fa fa-fw fa-info"></i>';
-    // html += '</a>';
-    return html;
-}
-function UsersFormatterDate(value, row) {
-    return moment(Date.parse(value)).format("YYYY-MM-DD hh:mm");
-}
 </script>
 {% endblock %}

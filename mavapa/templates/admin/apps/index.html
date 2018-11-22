@@ -1,0 +1,557 @@
+{% extends "admin/base.html" %}
+{% block title %}Administration: Applications{% endblock %}
+
+{% set snactive = "apps" %}
+
+{% block container %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#apps">
+      <i class="fa fa-cogs fa-fw"></i>
+      Applications
+    </a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#sessions">
+      <i class="fa fa-user-secret fa-fw"></i>
+      Sessions
+    </a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#tokens">
+      <i class="fa fa-key fa-fw"></i>
+      Tokens
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="apps" class="tab-pane fade in active">
+    <div id="toolbar-apps">
+      <button class="btn btn-default" type="button"
+	      data-toggle="modal" data-target="#ModalApp"
+	      aria-haspopup="true" aria-expanded="false">
+	<i class="fa fa-plus fa-fw"></i>
+      </button>      
+    </div>
+    <table id="table-apps" data-show-toggle="false"
+	   data-show-export="false" data-toolbar="#toolbar-apps"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="display" data-pagination="true"
+	   data-toggle="table" data-search="true"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+	<tr>
+	  <th data-field="name">
+	    <i class="fa fa-sort-amount-asc fa-fw"></i>
+	    Name
+	  </th>
+	  <th data-visible="false">
+	    <i class="fa fa-key fa-fw"></i>
+	    ID
+	  </th>
+	  <th data-visible="false">
+	    <i class="fa fa-key fa-fw"></i>
+	    Secret
+	  </th>
+	  <th>
+	    <i class="fa fa-calendar fa-fw"></i>
+	    Created on
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-users fa-fw"></i>
+	    Users
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-tag fa-fw"></i>
+	    Tag
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-cogs fa-fw"></i>
+	    Actions
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for app in data('App') %}
+	<tr>
+	  <td>
+	    <img class="fa fa-fw" src="{{ app.icon }}" alt="">
+	    {{ app.name }}
+            </img>
+	  </td>
+	  <td>{{ app.client_id }}</td>
+	  <td>{{ app.client_secret }}</td>
+	  <td>{{ ago(app.created_at) }}</td>
+	  <td>{{ app.users.count() }}</td>
+	  <td>{{ app.tags if app.tags != '' else 'General' }}</td>
+	  <td>
+	    <a class="app-open" data-id="{{ app.id }}"
+	       style="outline: none; text-decoration: none">
+	      <i class="fa fa-pencil fa-fw"></i>
+	    </a>
+	    <a href="{{ app.url }}" target="_blank">
+	      <i class="fa fa-external-link fa-fw"></i>
+	    </a>
+	  </td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div id="sessions" class="tab-pane fade">
+    <table id="table-sessions" data-show-toggle="false"
+	   data-show-export="false" data-row-style="rowStyle"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="status" data-sort-order="desc"
+	   data-pagination="true"
+	   data-toggle="table" data-search="true" data-toolbar="#toolbar"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+      	<tr>
+	  <th data-field="status" data-visible="false" data-checkbox="true">
+	    <i class="fa fa-fw fa-question"></i>
+	    Status
+	  </th>
+      	  <th data-field="id" data-visible="false">
+	    <i class="fa fa-fw fa-key"></i>
+	    ID
+	  </th>
+	  <th data-align="left" data-valign="middle" data-field="account"
+	      data-sortable="true">
+	    <i class="fa fa-fw fa-user"></i>
+	    Account
+	  </th>
+      	  <th>
+	    <i class="fa fa-fw fa-calendar"></i>
+	    Created
+	  </th>
+      	  <th>
+	    <i class="fa fa-fw fa-calendar"></i>
+	    Expired
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-fw fa-globe"></i>
+	    IP Address
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-fw fa-terminal"></i>
+	    OS
+	  </th>
+	  <th data-align="center">
+	    <i class="fa fa-fw fa-bars"></i>
+	    Browser
+	  </th>
+      	</tr>
+      </thead>
+      <tbody>
+      	{% for msid in data('Session') %}
+	{% if msid.id == session.mavapa_session %}
+      	<tr class="mysession">
+	{% else %}
+	<tr>
+        {% endif %}
+	  <td>{{ msid.status }}</td>
+      	  <td>{{ msid.id }}</td>
+	  <td>
+	    <img class="img-circle fa fa-fw"
+		 src="{{ msid.user.avatar(48) }}">
+	    {% if msid.id == session.mavapa_session %}
+	    {{ msid.user.lastname }}, {{ msid.user.firstname }} (current)
+	    {% else %}
+	    {{ msid.user.lastname }}, {{ msid.user.firstname }}
+	    {% endif %}
+	    </img>
+	  </td>
+	  <td>{{ ago(msid.created_on) }}</td>
+	  <td>
+	    {{ ago(msid.expired_on) if msid.expired_on != None else '-' }}
+	  </td>
+	  <td>{{ msid.agent_address }}</td>
+	  <td>{{ msid.agent_platform.title() }}</td>
+	  <td>{{ msid.agent_browser.title() }}</td>
+      	</tr>
+      	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div id="tokens" class="tab-pane fade">
+    <table id="table-tokens" data-show-toggle="false"
+	   data-show-export="false" data-row-style="rowStyle"
+	   data-show-columns="true" data-show-multi-sort="true"
+	   data-sort-name="status" data-sort-order="desc"
+	   data-pagination="true"
+	   data-toggle="table" data-search="true" data-toolbar="#toolbar"
+	   data-show-footer="false" data-page-size="50" data-escape="false"
+	   class="table table-hover table-striped table-compact 
+		  table-condensed table-autosize">
+      <thead>
+      	<tr>
+	  <th data-field="status" data-visible="false" data-checkbox="true">
+	    <i class="fa fa-fw fa-question"></i>
+	    Status
+	  </th>
+      	  <th data-field="token" data-visible="false">
+	    <i class="fa fa-fw fa-key"></i>
+	    Token
+	  </th>
+	  <th>
+	    <i class="fa fa-fw fa-user"></i>
+	    Account
+	  </th>
+      	  <th>
+	    <i class="fa fa-fw fa-calendar"></i>
+	    Created
+	  </th>
+      	  <th>
+	    <i class="fa fa-fw fa-calendar"></i>
+	    Expired
+	  </th>
+	  <th>
+	    <i class="fa fa-fw fa-cog"></i>
+	    Application
+	  </th>
+      	</tr>
+      </thead>
+      <tbody>
+      	{% for token in data('Token') %}
+	{% if token.session.id == session.mavapa_session %}
+      	<tr class="mysession">
+	{% else %}
+	<tr>
+        {% endif %}
+          <td>{{ token.status }}</td>
+      	  <td>{{ token.code }}</td>
+	  <td>
+	    <img class="img-circle fa fa-fw"
+		 src="{{ token.user.avatar(48) }}" alt="">
+	    {{ token.user.lastname }}, {{ token.user.firstname }}
+	    </img>
+	  </td>
+	  <td>{{ ago(token.created_on) }}</td>
+	  <td>
+	    {{ ago(token.expired_on) if token.expired_on != None else 'Never' }}
+	  </td>
+	  <td>
+	    <img class="fa fa-fw" src="{{ token.app.icon }}" alt="">
+	    {{ token.app.name }}
+	    </img>
+	  </td>
+      	</tr>
+      	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div id="ModalApp" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body">
+	  <form role="form" method="POST">
+	    <fieldset id="fieldset">
+	      <input class="form-control-static hidden" id="aid">
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="name">
+		    Name
+		  </label>
+		  <input type="text" class="form-control" id="name"/>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="desc">
+		    Description
+		  </label>
+		  <input type="text" class="form-control" id="desc"/>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="icon">
+		    Icon
+		  </label>
+		  <input type="text" class="form-control" id="icon"/>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="url">
+		    URL
+		  </label>
+		  <input type="text" class="form-control" id="url"/>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="client_id">
+		    Client ID
+		  </label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="client_id" readonly/>
+		    <span class="input-group-addon">
+		      <a class="gen-code" data-modal="#ModalApp"
+			 data-attr="#client_id"
+			 style="outline: none; cursor: pointer">
+			<i class="fa fa-fw fa-sync-alt"></i>
+		      </a>
+		    </span>
+		  </div>
+		</div>
+		<div class="col-md-6 from-group">
+		  <label for="client_secret">
+		    Client Secret
+		  </label>
+		  <div class="input-group">
+		    <input type="text" class="form-control"
+			   id="client_secret" readonly/>
+		    <span class="input-group-addon">
+		      <a class="gen-code" data-modal="#ModalApp"
+			 data-attr="#client_secret"
+			 style="outline: none; cursor: pointer">
+			<i class="fa fa-fw fa-sync-alt"></i>
+		      </a>
+		    </span>
+		  </div>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="redirect_uri">
+		    Redirect URI
+		  </label>
+		  <input type="text" class="form-control" id="redirect_uri"/>
+		</div>
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="tags">
+		    Tags
+		  </label>
+		  <input type="text" class="form-control" id="tags"/>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+	<div class="modal-footer">
+	  <div class="pull-left hidden">
+	    <a class="app-delete"
+	       style="outline: none;text-decoration: none;cursor: pointer;">
+	      <i class="fa fa-fw fa-2x fa-trash" aria-hidden="true"></i>
+	    </a>
+	    <a class="app-visible"
+	       style="outline: none;text-decoration: none;cursor: pointer">
+	      <i class="fa fa-fw fa-2x" aria-hidden="true"></i>
+	    </a>
+	  </div>
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-default"
+		    data-dismiss="modal">
+	      Close
+	    </button>
+	    <button type="button" class="app-edit btn btn-primary">
+	      Save
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
+
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	    $('.modal').find('.modal-footer').find('.pull-left').addClass('hidden');
+	});
+	jqlisteners();
+    });
+function rowStyle(row, index) {
+    if ( row['status'] == 'False' ) {
+    	return {
+    	    css: {"text-decoration": "line-through"}
+	};
+    } else {
+	return {
+	    css: {"text-decoration": "none"}
+	};
+    };
+}
+function jqlisteners() {
+    $(".gen-code").click(function(e) {
+	var modal = $(this).data('modal');
+	var attr = $(this).data('attr');
+	var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	var code = "";
+	for(var i = 0; i < 24; i++) {
+	    code += chars.charAt(Math.floor(Math.random() * chars.length));
+	}
+	$(modal).find(attr).val(code);
+    });
+    $(".app-edit").click(function(e) {
+	e.preventDefault();
+	var modal = '#ModalApp';
+	var aid = $(modal).find('#aid').val();
+	var url = "{{ url_for('api_apps') }}?id=" + aid;
+	var data = {'name': $(modal).find('#name').val(),
+		    'desc': $(modal).find('#desc').val(),
+		    'icon': $(modal).find('#icon').val(),
+		    'url':  $(modal).find('#url').val(),
+		    'client_id': $(modal).find('#client_id').val(),
+		    'client_secret': $(modal).find('#client_secret').val(),
+		    'redirect_uri': $(modal).find('#redirect_uri').val(),
+		    'tags': $(modal).find('#tags').val()};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify(data),
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).modal('hide');
+	    }
+	});
+    });
+    $(".app-open").click(function(e) {
+	e.preventDefault();
+	var modal = '#ModalApp';
+	var aid = $(this).data('id');
+	var url = "{{ url_for('api_apps') }}?id=" + aid;
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'GET',
+	    success: function(e) {
+		var data = e['data'][0];
+		var tag = $(modal).find('.app-visible').find('i');
+		if ( data['hidden'] == true ) {
+		    tag.addClass('fa-eye-slash');
+		} else {
+		    tag.addClass('fa-eye');
+		};
+		$(modal).find('.modal-footer').find('.pull-left').removeClass('hidden');
+		$(modal).find('.modal-title').html(data['name']);
+		$(modal).find('#aid').val(data['id']);
+		$(modal).find('#name').val(data['name']);
+		$(modal).find('#desc').val(data['desc']);
+		$(modal).find('#icon').val(data['icon']);
+		$(modal).find('#url').val(data['url']);
+		$(modal).find('#client_id').val(data['client_id']);
+		$(modal).find('#client_secret').val(data['client_secret']);
+		$(modal).find('#redirect_uri').val(data['redirect_uri']);
+		$(modal).find('#tags').val(data['tags']);
+		$(modal).modal('show');
+	    }
+	});
+    });
+    $(".app-visible").click(function(e) {
+	e.preventDefault();
+	var modal = '#ModalApp';
+	var aid = $(modal).find('#aid').val();
+	var url = "{{ url_for('api_apps') }}?id=" + aid;
+	var tag = $(modal).find('.app-visible').find('i');
+	if ( tag.hasClass('fa-eye-slash') ) {
+	    var active = false;
+	    tag.removeClass('fa-eye-slash');
+	    tag.addClass('fa-spinner fa-pulse')
+	} else if (tag.hasClass('fa-eye') ) {
+	    var active = true;
+	    tag.removeClass('fa-eye');
+	    tag.addClass('fa-spinner fa-pulse');
+	} else {
+	    return;
+	};
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'POST',
+	    data: JSON.stringify({'hidden': active}),
+	    contentType: "application/json",
+	    success: function(e) {
+		tag.removeClass('fa-spinner fa-pulse');
+		if ( active == true ) {
+		    tag.addClass('fa-eye-slash');
+		} else {
+		    tag.addClass('fa-eye');
+		}
+	    },
+	    error: function(e) {
+		tag.removeClass('fa-spinner fa-pulse');
+		tag.addClass('fa-exclamation');
+	    }
+	}); 	
+    });
+    $(".app-delete").click(function(e) {
+	e.preventDefault();
+	var modal = '#ModalApp';
+	var aid = $(modal).find('#aid').val();
+	var url = "{{ url_for('api_apps') }}?id=" + aid;
+	var tag = $(modal).find('.app-delete').find('i');
+	tag.removeClass('fa-trash');
+	tag.addClass('fa-spinner fa-pulse')	
+	$.ajax({
+	    async: true,
+	    url: url,
+	    type: 'DELETE',
+	    success: function(e) {
+		var deleteable = {'field': 'aid', 'values': [aid] };
+		$('#table-apps').bootstrapTable('remove', deleteable);
+		$(modal).modal('hide');
+	    },
+	    error: function(e) {
+		tag.removeClass('fa-spinner fa-pulse');
+		tag.addClass('fa-exclamation');
+	    }
+	}); 	
+    });
+}
+function autosize_tables() {
+    var tables = $('body').find(".table-autosize");
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+	    height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+	    height: table_height(selector),
+	});	    
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};
+</script>
+{% endblock %}
+

@@ -1,6 +1,6 @@
 <div id="ModalUser" class="modal fade" tabindex="-1" role="dialog"
      aria-labelledby="ModalLabel" aria-hidden="true" style="overflow: hidden;">
-  <div class="modal-content" style="height:60%;width:50%">
+  <div class="modal-content" style="height:75%;width:60%">
     <div class="modal-header"
 	 style="background-color: #337ab7; color: #fff;height:10%">
       <button type="button" class="close"
@@ -64,12 +64,12 @@
 	    <fieldset>
 	      <div class="row" style="margin:0px">
 		<div class="col-md-6 form-group">
-		  <label class="control-label" for="userid">
+		  <label class="control-label" for="user-form-basic-id">
 		    <i class="fa fa-fw fa-key"></i>
 		    ID
 		  </label>
 		  <input type="text" class="form-control"
-			 id="userid" name="userid" readonly>
+			 id="user-form-basic-id" name="userid" readonly>
 		</div>
 		<div class="col-md-6 form-group">
 		  <label class="control-label" for="backend">
@@ -77,7 +77,7 @@
 		    Backend
 		  </label>
 		  <select class="selectpicker show-tick form-control"
-			  id="backends" name="backends" title="...">
+			  id="user-form-basic-backends" name="backends" title="...">
 		  </select>
 		</div>	
 	      </div>
@@ -88,7 +88,7 @@
 		    Email
 		  </label>
 		  <input type="text" class="form-control"
-			 id="email" name="email" readonly>
+			 id="user-form-basic-email" name="email" readonly>
 		</div>
     		<div class="col-md-6 form-group">
 		  <label class="control-label" for="recovery">
@@ -96,7 +96,7 @@
 		    Email Recovery
 		  </label>
 		  <input type="text" class="form-control"
-			 id="recovery" name="recovery" placeholder="Email">
+			 id="user-form-basic-emailrecovery" name="recovery" placeholder="Email">
 		</div>	    
 	      </div>
 	      <div class="row" style="margin:0px">
@@ -106,7 +106,7 @@
 		    Mobile
 		  </label>
 		  <input type="text" class="form-control"
-			 id="mobile" name="mobile" placeholder="Mobile">
+			 id="user-form-basic-mobile" name="mobile" placeholder="Mobile">
 		</div>
 		<div class="col-md-6 form-group">
 		  <label class="control-label" for="language">
@@ -114,7 +114,7 @@
 		    Language
 		  </label>
 		  <select class="selectpicker show-tick form-control"
-			  id="lang" name="lang">
+			  id="user-form-basic-lang" name="lang">
 		    <option value="English" data-tokens="English"
 			    data-content="<span class='flag-icon flag-icon-us'></span> English">
 		      English
@@ -145,7 +145,7 @@
 		    Genre
 		  </label>
 		  <select class="selectpicker show-tick form-control"
-			  id="genre" name="genre" title="...">
+			  id="user-form-basic-genre" name="genre" title="...">
 		    <option value="Female"
 			    data-content="<i class='fa fa-fw fa-venus'></i>
 					  Female"
@@ -166,7 +166,7 @@
 		    Timezone
 		  </label>
 		  <select class="selectpicker show-tick form-control"
-			  id="timezone" name="timezone" data-live-search="true">
+			  id="user-form-basic-timezone" name="timezone" data-live-search="true">
 		    <option value="America/Argentina/Buenos_Aires"
 			    data-tokens="Buenos Aires"
 			    data-content="<span class='flag-icon flag-icon-ar'></span> America/Argentina/Buenos_Aires">
@@ -185,28 +185,6 @@
 		  </select>
 		</div>
 	      </div>
-	      <div class="row" style="margin:0px">
-		<div class="col-md-6">
-		  <label class="control-label" for="genre">
-		    <i class="fa fa-fw fa-user-shield"></i>
-		    Admin
-		  </label>
-		  <div>
-		    <input id="user-form-basic-admin" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
-			    data-width="100%" data-onstyle="warning" data-offstyle="primary">
-		  </div>
-		</div>
-		<div class="col-md-6 form-group">
-		  <label class="control-label" for="timezone">
-		    <i class="fa fa-fw fa-user-slash"></i>
-		    Status
-		  </label>
-		  <div>
-		    <input id="user-form-basic-status" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
-			   data-width="100%" data-onstyle="success" data-offstyle="danger">
-		  </div>
-		</div>
-	      </div>	      
 	    </fieldset>
 	  </form>
 	</div>
@@ -214,31 +192,69 @@
 										   width: 100%;
 										   height: 100%;">
 	  <div style="height: 100%;position: relative;width:98%; float:right">
-	    <div id="user-form-backend-table-toolbar" class="toolbar"
-		 style="max-height:10%;padding:0.5% 0%;">
-	      <button class="btn btn-primary" type="button" id="filter-add" style="outline:none">
-		<i class="fa fa-fw fa-plus"></i>
-	      </button>
-	    </div>
 	    <table id="user-form-backend-table"
 		   data-toggle="table" data-search="false"
 		   data-show-footer="false" data-escape="false"
-		   data-show-header="false" data-toolbar="#user-form-backend-table-toolbar"
+		   data-show-header="true"
 		   data-toolbar-align="right"
 		   class="table-hover table-striped table-compact table-responsive
 			  table-condensed table-autosize">
 	      <thead>
 		<tr>
-		  <th data-field="attr" data-valign="middle"
+		  <th data-field="key" data-valign="middle"
 		      data-align="left" data-sortable="false">
+		    <i class="fa fa-fw fa-sort-alpha-down"></i>
+		    Attribute
 		  </th>
 		  <th data-field="value" data-valign="middle"
-		      data-align="left" data-sortable="false">
+		      data-align="left" data-sortable="false"
+		      data-formatter="UserBackendFormatterValue">
+		    <i class="fa fa-fw fa-info"></i>
+		    Value		    
 		  </th>
 		</tr>
-		<tbody></tbody>
+	      </thead>
+	      <tbody></tbody>
 	    </table>
 	  </div>
+	</div>
+	<div id="user-form-settings" class="tab-subcontent tab-pane fade in" style="position: relative;
+										    width: 100%;
+										    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Administrator
+		  </label>
+		  <div>
+		    <input id="user-form-settings-admin" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
+			   data-width="100%" data-onstyle="warning" data-offstyle="primary">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-slash"></i>
+		    Status
+		  </label>
+		  <div>
+		    <input id="user-form-settings-status" type="checkbox" data-toggle="toggle" data-on="Active" data-off="Blocked"
+			   data-width="100%" data-onstyle="success" data-offstyle="danger">
+		  </div>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
 	</div>
       </div>
     </div>

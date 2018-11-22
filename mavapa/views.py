@@ -1,56 +1,56 @@
 #!/usr/bin/env python
-import os
 from hashlib import md5
+from functools import wraps, update_wrapper
+import os
 import datetime
-import arrow
-import requests
 import urllib
+import requests
+import arrow
+import pony
 import json
-import string
-import random
-from functools import wraps
-#from werkzeug.datastructures import CallbackDict
-from flask import Flask, request, render_template, g, jsonify
-from flask import url_for, abort, flash, redirect, session
-#from flask.sessions import SessionInterface, SessionMixin
+from flask import Flask, request, render_template, g, jsonify, current_app
+from flask import url_for, abort, flash, redirect, session, make_response
 from forms import *
 from lib import *
 from mavapa_server import mavapa_server
+from datetime import timedelta
 
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object(os.environ['APP_SETTINGS'])
-
+app = Flask(__name__, instance_relative_config=False)
+app.config.from_object(os.environ.get('APP_SETTINGS', None))
+app.register_blueprint(mavapa_server)
 
 if not app.config.has_key('CDN_LOCAL'):
     app.config['CDN_LOCAL'] = '%s/static/app' %app.config.get('APPLICATION_ROOT', '')
 
 if not app.config.has_key('CDN_EXTRAS'):
     app.config['CDN_EXTRAS'] = '%s/static/extras' %app.config.get('APPLICATION_ROOT', '')
-    
+
 if not app.config.has_key('CDN_MAVAPA'):
     app.config['CDN_MAVAPA'] = '%s/static' %(app.config.get('APPLICATION_ROOT', ''))
 
 if app.config['DB_TYPE'] == 'mysql':
-    db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
-            port=app.config['DB_PORT'], db=app.config['DB_NAME'],
-            user=app.config['DB_USER'], passwd=app.config['DB_PASS'])
-    db.generate_mapping(create_tables=True)
+    db.bind(
+        provider=app.config['DB_TYPE'], host=app.config['DB_HOST'],
+        port=app.config['DB_PORT'], db=app.config['DB_NAME'],
+        user=app.config['DB_USER'], passwd=app.config['DB_PASS']
+    )
 else:
-    print('Database doesn\'t tested')
     exit(0)
-app.register_blueprint(mavapa_server)
-sql_debug(app.config['DB_DEBUG'])
+
+db.generate_mapping(create_tables=True)
+pony.orm.sql_debug(app.config['DB_DEBUG'])
 
 def get_from_backend(**kwargs):
     qfilter = dict((x, kwargs[x]) for x in kwargs if x in ['id', 'email'])
     if qfilter:
         account = get_data('User', **qfilter)
         if account:
-            uinfo= {'lastname': account.lastname,
-                    'firstname': account.firstname,
-                    'avatar': account.avatar(),
-                    'mobile': account.mobile,
-                    'mail': account.email
+            uinfo = {
+                'lastname': account.lastname,
+                'firstname': account.firstname,
+                'avatar': account.avatar(),
+                'mobile': account.mobile,
+                'mail': account.email
             }
             if not account.backend:
                 return uinfo
@@ -59,13 +59,15 @@ def get_from_backend(**kwargs):
                 provider = LDAP(**backend)
                 qfilter = '(&(%s=%s)%s)' %(backend['login'], account.email,
                                            backend['filter'])
-                only=['description', 'title', 'idNumber', 'birthDate',
-                      'postalAddress', 'o', 'ou', 'telephoneNumber']
+                only = [
+                    'description', 'title', 'idNumber', 'birthDate',
+                    'postalAddress', 'o', 'ou', 'telephoneNumber'
+                ]
                 query = provider.query(filter=qfilter, attrs=only,
                                        basedn=backend['basedn'], limit=1)
                 if query[0][1].has_key('description'):
                     uinfo['description'] = query[0][1]['description'][0]
-                if query[0][1].has_key('title'):                
+                if query[0][1].has_key('title'):
                     uinfo['title'] = query[0][1]['title'][0]
                 if query[0][1].has_key('idNumber'):
                     uinfo['idNumber'] = query[0][1]['idNumber'][0]
@@ -80,25 +82,27 @@ def get_from_backend(**kwargs):
                 return uinfo
     return None
 
-@db_session
+
+@db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
         return eval(table).get(**kwargs)
     else:
         return select(o for o in eval(table))
-    
+
+
 @app.context_processor
 def custom_tools():
     def time_age(datetime, endword='years'):
         born = arrow.get(datetime)
         today = arrow.now()
         age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        return '%i %s' %(age,endword)
-        
+        return '%i %s' %(age, endword)
+
     def time_generalize(datetime, fmt='MMMM D, YYYY'):
         local = arrow.get(datetime, 'YYYYMMDDHHmmss')
         return local.format(fmt)
-    
+
     def time_humanize(dt):
         dtutc = datetime.utcfromtimestamp(float(dt.strftime('%s')))
         local = arrow.Arrow.fromdatetime(dtutc)
@@ -112,7 +116,7 @@ def custom_tools():
         return stremail
 
     def encrypt_telephone(number, last=4):
-        show  = number[0:3]
+        show = number[0:3]
         show += ''.join(['x' for i in xrange(len(number) - last - 3)])
         show += number[len(number) - last:len(number)]
         return show
@@ -121,7 +125,7 @@ def custom_tools():
                 age=time_age, encrypt_email=encrypt_email,
                 encrypt_telephone=encrypt_telephone)
 
-@db_session
+@db_session(retry=3)
 def backends_search_users(email, passwd=None, exist=False):
     users = []
     for i in select(o for o in Backend):
@@ -156,7 +160,8 @@ def backends_search_users(email, passwd=None, exist=False):
                     users.append(info)
     return users
 
-@db_session
+
+@db_session(retry=3)
 def session_create(account):
     sid = Session(user=get_data('User', id=account), status=True,
                   agent_address=request.access_route[0],
@@ -167,7 +172,8 @@ def session_create(account):
     commit()
     return sid.to_dict()
 
-@db_session
+
+@db_session(retry=3)
 def session_destroy():
     mavapa_session = session.get('mavapa_session', None)
     if mavapa_session:
@@ -184,7 +190,8 @@ def session_destroy():
     session.pop('mavapa_account', None)
     session.pop('mavapa_expired', None)
 
-@db_session
+
+@db_session(retry=3)
 def user_onfly(user, passwd):
     for i in select(o for o in Backend if o.onfly == True):
         if i.type in ['LDAP', 'AD']:
@@ -209,7 +216,7 @@ def user_onfly(user, passwd):
                         if query[0][1].has_key('mailRecovery'):
                             recover = query[0][1]['mailRecovery'][0]
                             info['mailrecovery'] = recover.decode('utf-8')
-                            
+                        
                         account = User(**info)
                         commit()
                         return account
@@ -217,7 +224,7 @@ def user_onfly(user, passwd):
                         return match
     return False
 
-@db_session
+@db_session(retry=3)
 def user_login(user, passwd):
     account = get_data('User', email=user)
     attrs = ['givenName', 'sn', 'mobile', 'mailRecovery']
@@ -257,7 +264,7 @@ def user_login(user, passwd):
         return user_onfly(user, passwd)
     return False
 
-@db_session
+@db_session(retry=3)
 def user_changepwd(user, passwd):
     account = get_data('User', email=user)
     if account:
@@ -283,6 +290,47 @@ def user_changepwd(user, passwd):
                                 {'unicodePwd':'*'})
     return False
 
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+        
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+    
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+            
+            h = resp.headers
+            
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+        
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+
 def login_required(f):
     @wraps(f)
     def decorated_func(*args, **kwargs):
@@ -293,7 +341,7 @@ def login_required(f):
 
 def admin_required(f):
     @wraps(f)
-    @db_session    
+    @db_session(retry=3)    
     def decorated_func(*args, **kwargs):
         if not g.user.admin:
             return redirect(url_for('index'))
@@ -312,9 +360,10 @@ def roles_required(*roles):
 
 def is_admin():
     return g.user.admin
-    
+
+
 @app.before_request
-@db_session
+@db_session(retry=3)
 def before_request():
     mavapa_session = session.get('mavapa_session', None)
     mavapa_account = session.get('mavapa_account', None)
@@ -332,33 +381,37 @@ def before_request():
                 expire.delete()
                 commit()
         redirect(url_for('logout'))
-        
+
+
 @app.route('/')
 @app.route('/index')
 @login_required
-@db_session
+@db_session(retry=3)
 def index():
-    print(request.remote_addr, request.access_route)
     return render_template('index.html')
+
 
 @app.route('/admin', defaults={'mod': 'dash'})
 @app.route('/admin/<mod>')
 @login_required
 @admin_required
-@db_session
+@db_session(retry=3)
 def admin(mod):
     if mod == 'users':
         return render_template('admin/users/index.html')
     elif mod == "apps":
-        return render_template('admin_apps.html')
+        return render_template('admin/apps/index.html')
     elif mod == "notify":
-        return render_template('admin_notify.html')
+        return render_template('admin/notify/index.html')
+    elif mod == "orgs":
+        return render_template('admin/orgs/index.html')    
     else:
-        return render_template('admin_dash.html')
+        return render_template('admin/index.html')
+
 
 @app.route('/apps')
 @login_required
-@db_session
+@db_session(retry=3)
 def apps():
     apps = {}
     for i in get_data('App'):
@@ -366,15 +419,15 @@ def apps():
             continue
         tag = 'General'
         if i.tags:
-            tag  = i.tags
+            tag = i.tags
         if tag not in apps:
-          apps[tag] = []
+            apps[tag] = []
         apps[tag].append(i)
     return render_template('apps.html', apps_list=apps)
     
 @app.route('/developers')
 def developers():
-    return redirect('http://developers.corpam.com.ar/')
+    return render_template('developers.html')
 
 @app.route('/favicon.ico')
 def favicon():
@@ -418,14 +471,58 @@ def login():
                 next_url = url_for('index')
         return redirect(urllib.unquote(next_url))
 
+
 @app.route('/logout')
-@db_session
+@db_session(retry=3)
 def logout():
     session_destroy()
     return redirect(request.args.get("next") or url_for('login'))
 
+
+@app.route('/profile', defaults={'userid': 'me'})
+@app.route('/profile/<userid>')
+@login_required
+@db_session(retry=3)
+def profile(userid):
+    if userid == 'me':
+        qfilter = {'email': session['mavapa_account']}
+    else:
+        qfilter = {'id': userid}
+    account = get_from_backend(**qfilter)
+    return render_template('profile.html', account=account)
+
+
+@app.route('/reset', methods=['GET', 'POST'])
+@db_session(retry=3)
+def reset():
+    form = Reset(request.form)
+    account = None
+    change = None
+    if request.method == 'POST' and form.validate():
+        account = get_data('User', email=form.email.data)
+        if any(True for i in ['submit', 'change'] if i in request.form):
+            token = get_data('Retrieve', user=account.id, code=form.code.data)
+            if token:
+                if 'submit' in request.form:
+                    change = True
+                else:
+                    user_changepwd(account.email, form.passwd.data)
+                    token.used_on = datetime.now()
+                    commit()
+                    return redirect(url_for('login'))
+            else:
+                flash('Error code', 'danger')
+    return render_template('reset.html', form=form,
+                           user=account, reset=change)
+
+
+@app.route('/support')
+def support():
+    return render_template('index.html')
+
+
 @app.route('/api/notify/code', methods=['POST'])
-@db_session
+@db_session(retry=3)
 def api_code():
     content = request.get_json(silent=True)
     if content:
@@ -441,7 +538,7 @@ def api_code():
                 else:
                     token = Retrieve(user=user, methods=content['type'])
 
-                if not content['type'] in token.methods.split(','):
+                if content['type'] not in token.methods.split(','):
                     methods = [x for x in token.methods.split(',') if x]
                     token.methods = ','.join(methods + [content['type']])
                 else:
@@ -457,7 +554,7 @@ def api_code():
                     if content['type'] == 'sms':
                         text = "Your account verification code is {code}."
                         content['number'] = user.mobile.replace('-', '')
-                        content['text'] =  text.format(code=token.code)
+                        content['text'] = text.format(code=token.code)
                     elif content['type'] == 'email':
                         content['to'] = user.mailrecovery
                         content['subject'] = """
@@ -471,8 +568,9 @@ def api_code():
                     print(user.email, token.code)
     return jsonify(datetime=datetime.now())
 
-@app.route('/api/apps', methods=['GET', 'POST', 'DELETE'])
-@db_session
+@app.route('/api/apps', methods=['GET', 'POST', 'DELETE', 'OPTIONS'])
+@db_session(retry=3)
+#@crossdomain(origin='*')
 def api_apps():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in ['id', 'name'] if args.get(x))
@@ -525,7 +623,7 @@ def api_apps():
     return jsonify(datetime=datetime.now())
 
 @app.route('/api/backends', methods=['GET', 'POST'])
-@db_session
+@db_session(retry=3)
 def api_backends():
     only = ['name', 'type', 'id']
     args = request.args.to_dict()
@@ -545,7 +643,6 @@ def api_backends():
     else:
         content = request.get_json(silent=True)
         if content and is_admin():
-            print(content)
             if not qfilter:
                 Backend(**content)
             else:
@@ -555,7 +652,7 @@ def api_backends():
 
 
 @app.route('/api/notify/agents', methods=['GET', 'POST', 'DELETE'])
-@db_session
+@db_session(retry=3)
 def api_notify_agents():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'name'])
@@ -583,7 +680,7 @@ def api_notify_agents():
 
 
 @app.route('/api/users/search', methods=['GET'])
-@db_session
+@db_session(retry=3)
 def api_users_search():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
@@ -607,64 +704,119 @@ def api_users_search():
     return jsonify(datetime=datetime.now(), data=data)
 
 
+@app.route('/api/backends/tree', methods=['GET'])
+@db_session(retry=3)
+def api_backends_tree():
+    args = request.args.to_dict()
+    qfilter = dict((x, args[x]) for x in args if x in ['backend', 'type'])
+    qfilter.setdefault('type', 'items')
+    data = []
+    if qfilter['type'] == 'items':
+        basedn = '{0}'
+        attrs = ['dn']
+        scope = 2
+    elif qfilter['type'] == 'schemas':
+        basedn = 'cn=subschema'
+        attrs = ['*', '+']
+        scope = 0
+    else:
+        abort(404)
+    
+    backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    for i in backend:
+        if i.type in ['LDAP', 'AD']:
+            oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
+            data = oa.tree(attrs=attrs, basedn=basedn.format(i.basedn), scope=scope)
+    return jsonify(datetime=datetime.now(), data=data, title=qfilter)
+
+
+@app.route('/api/backends/search', methods=['GET'])
+@db_session(retry=3)
+def api_backends_search():
+    args = request.args.to_dict()
+    qfilter = dict((x, args[x]) for x in args if x in ['backend', 'type', 'dn'])
+    qfilter.setdefault('type', 'items')
+    data = []
+    if qfilter['type'] == 'items':
+        basedn = '{0}'
+        attrs = ['dn']
+        scope = 2
+    elif qfilter['type'] == 'schemas':
+        basedn = 'cn=subschema'
+        attrs = ['*', '+']
+        scope = 0
+    else:
+        abort(404)
+    
+    backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    for i in backend:
+        if i.type in ['LDAP', 'AD']:
+            oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
+            data = oa.tree(attrs=attrs, basedn=basedn.format(i.basedn), scope=scope)
+    return jsonify(datetime=datetime.now(), data=data, title="API")
+
 @app.route('/api/backends/search/users', methods=['GET'])
-@db_session
+@db_session(retry=3)
 def api_backends_search_users():
     args = request.args.to_dict()
-    qfilter = dict((x, args[x]) for x in args if x in ['email', 'filter', 'only'])
+    qfilter = dict((x, args[x]) for x in args if x in ['email', 'filter', 'only', 'backend'])
     qfilter.setdefault('email', '*')
     qfilter.setdefault('filter', '(ObjectClass=person)')
     qfilter.setdefault('only', 'all')
+    qfilter.setdefault('include', '*')
+    qfilter.setdefault('exclude', 'jpegPhoto,photo')
+    qfilter.setdefault('backend', None)
     data = []
-    for i in select(o for o in Backend):
+    backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    for i in backend:
         if i.type in ['LDAP', 'AD']:
             oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
             query = oa.query(
-                filter = '(&(%s=%s)%s)' %(i.login, qfilter['email'], qfilter['filter']),
-                attrs = ['givenname', 'sn', 'mail', 'mobile', 'mailRecovery'],
-                basedn = i.basedn,
-                limit = 1
+                filter='(&(%s=%s)%s)' %(i.login, qfilter['email'], qfilter['filter']),
+                attrs=[a for a in qfilter['include'].split(',')],
+                basedn=i.basedn, limit=1
             )
             if query:
                 for dn, x in query:
                     info = {}
-                    for attr in x:
-                        info[attr] = [e.encode('utf-8').lower() for e in x[attr]]
-                    info['exist'] = True if get_data('User', email=info['mail'][0]) else False
+                    info['exist'] = True if get_data('User', email=x['mail'][0]) else False
                     if qfilter['only'] not in ['all', 'ALL']:
                         if qfilter['only'] == 'exist' and not info['exist']:
                             continue
                         elif qfilter['only'] == 'noexist' and info['exist']:
                             continue
-                    fname = x['givenName'][0].decode('utf-8').title()
-                    lname = x['sn'][0].decode('utf-8').title()
-                    info['backend'] = i.to_dict(only=['id', 'name', 'type', 'desc'])
-                    info['firstname'] = fname
-                    info['lastname'] = lname
-                    info['mobile'] = ''
-                    info['mailrecovery'] = ''
-                    if x.has_key('mobile'):
-                        mobile = x['mobile'][0].decode('utf-8')
-                        info['mobile'] = mobile
-                    if x.has_key('mailRecovery'):
-                        recover = x['mailRecovery'][0].decode('utf-8')
-                        info['mailrecovery'] = recover
+                    info['backend'] = i.to_dict(only=['id', 'name', 'type', 'desc'])                        
+                    for attr in x:
+                        info[attr] = [e.decode('utf-8') for e in x[attr] if attr not in qfilter['exclude'].split(',')]
                     data.append(info)
     return jsonify(datetime=datetime.now(), data=data)
 
 
+@app.route('/api/configs/locales', methods=['GET'])
+@db_session(retry=3)
+def api_configs_locales():
+    return jsonify(datetime=datetime.now())
+
+
+@app.route('/api/configs/timezones', methods=['GET'])
+@db_session(retry=3)
+def api_configs_timezones():
+    return jsonify(datetime=datetime.now())
+
+
 @app.route('/api/users', methods=['GET', 'POST'])
-@db_session
+@db_session(retry=3)
 def api_users():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
+    only_backend = ['id', 'name', 'type', 'desc']
     if qfilter:
         user = get_data('User', **qfilter)
         if request.method == 'GET':
             if user:
                 if session.get('mavapa_session'):
                     data = user.to_dict(exclude=['passwd'])
-                    data['backend'] = user.backend.to_dict(only=['id', 'name', 'type', 'desc'])
+                    data['backend'] = user.backend.to_dict(only=only_backend) if user.backend else False
                 else:
                     only = ['id', 'email', 'firstname', 'lastname']
                     data = user.to_dict(only)
@@ -687,7 +839,7 @@ def api_users():
 
 
 @app.route('/api/users/all', methods=['GET'])
-@db_session
+@db_session(retry=3)
 def api_users_all():
     args = request.args.to_dict()
     args.setdefault('type', None)
@@ -698,8 +850,10 @@ def api_users_all():
     args.setdefault('offset', 0)
     args.setdefault('limit', 50)
     args.setdefault('status', None)
-    only_user = ['id', 'userid', 'displayname', 'email', 'avatar',
-                 'status', 'title', 'created_on', 'last_seen']
+    only_user = [
+        'id', 'userid', 'displayname', 'email', 'avatar',
+        'status', 'title', 'created_on', 'last_seen'
+    ]
     only_backend = ['id', 'name', 'type', 'desc']
     data = []
     raw = get_data('User')
@@ -735,45 +889,6 @@ def api_users_all():
         data.append(row)
     return jsonify(datetime=datetime.now(), data=data, total=total)
 
-
-@app.route('/profile', defaults={'userid': 'me'})
-@app.route('/profile/<userid>')
-@login_required
-@db_session
-def profile(userid):
-    if userid == 'me':
-        qfilter = {'email': session['mavapa_account']}
-    else:
-        qfilter = {'id': userid}
-    account = get_from_backend(**qfilter)
-    return render_template('profile.html', account=account)
-
-@app.route('/reset', methods=['GET', 'POST'])
-@db_session
-def reset():
-    form = Reset(request.form)
-    account = None
-    change = None
-    if request.method == 'POST' and form.validate():
-        account = get_data('User', email=form.email.data)
-        if any(True for i in ['submit', 'change'] if i in request.form):
-            token = get_data('Retrieve',user=account.id,code=form.code.data)
-            if token:
-                if 'submit' in request.form:
-                    change = True
-                else:
-                    user_changepwd(account.email, form.passwd.data)
-                    token.used_on = datetime.now()
-                    commit()
-                    return redirect(url_for('login'))
-            else:
-                flash('Error code', 'danger')
-    return render_template('reset.html', form=form,
-                           user=account, reset=change)
-
-@app.route('/support')
-def support():
-    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run('0.0.0.0', 7001)

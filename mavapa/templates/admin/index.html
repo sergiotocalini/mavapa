@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% block title %}Administration{% endblock %}
+
+{% set snactive = "dash" %}
+
+{% block container %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="active">
+    <a data-toggle="tab" href="#general">
+      <i class="fa fa-home fa-fw"></i>General
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="general" class="tab-pane fade in active">
+  </div>
+</div>
+{% endblock %}
+
+
