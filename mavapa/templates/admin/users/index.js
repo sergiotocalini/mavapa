@@ -25,31 +25,6 @@ function jqlisteners_users() {
 	    }
 	});
     });
-    $(".backend-edit").unbind();
-    $(".backend-edit").click(function(e) {
-	e.preventDefault();
-	var modal = '#ModalBackend';
-	var backend = $(this).data('id');
-	var url = "{{ url_for('api_backends') }}?id=" + backend;
-	$.ajax({
-	    async: true,
-	    url: url,
-	    type: 'GET',
-	    success: function(e) {
-		$(modal).find('.modal-title').html(e['backends'][0]['name']);
-		$(modal).find('#backend_id').val(e['backends'][0]['id']);
-		$(modal).find('#name').val(e['backends'][0]['name']);
-		$(modal).find('#type').selectpicker('val', e['backends'][0]['type']);
-		$(modal).find('#host').val(e['backends'][0]['host']);
-		$(modal).find('#timeout').val(e['backends'][0]['timeout']);
-		$(modal).find('#account').val(e['backends'][0]['binddn']);
-		$(modal).find('#password').val(e['backends'][0]['bindpw']);
-		$(modal).find('#search').val(e['backends'][0]['basedn']);
-		$(modal).find('#filter').val(e['backends'][0]['filter']);
-		$(modal).modal('show');
-	    }
-	});
-    });
     $("#user-add").unbind();
     $("#user-add").click(function(e){
 	e.preventDefault();

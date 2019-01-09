@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+{% block title %}Accounts - Register{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block body %}
+<div class="login-form panel panel-default">
+  <div class="panel-heading text-center">
+    <big><strong>Register</strong></big>
+  </div>
+  
+  <div class="panel-body">	
+    <div class="steps clearfix center-block">
+      
+      <ul class="list-inline" role="tablist" data-tabs="tabs"
+	  style="display: -webkit-flex; justify-content: center;
+		 list-style: none;
+		 padding-left: 0;">
+	<li data-toggle="tab" href="#first" class="list-group-item active"
+	    style="outline: none; margin: 0% 5%; display: inline-block;
+		   width: 48px;
+		   height: 48px; cursor: pointer;
+		   border-radius: 50%;
+		   -o-border-radius: 50%;
+		   -ms-border-radius: 50%;
+		   -moz-border-radius: 50%;
+		   -webkit-border-radius: 50%;
+		   background: #ccc;
+		   position: relative;
+		   outline: none;">
+	  <span class="title" style="position: absolute;
+				     top: 50%;
+				     left: 50%;
+				     transform: translate(-50%, -50%);
+				     -o-transform: translate(-50%, -50%);
+				     -ms-transform: translate(-50%, -50%);
+				     -moz-transform: translate(-50%, -50%);
+				     -webkit-transform: translate(-50%, -50%);
+				     color: #fff;
+				     font-size: 18px;
+				     font-weight: 600;
+				     font-family: 'Muli', sans-serif;">1</span>
+	</li>
+	<li data-toggle="tab" href="#second" class="list-group-item"
+	    style="outline: none; margin: 0% 5%; display: inline-block;
+		   width: 48px;
+		   height: 48px; cursor: pointer;
+		   border-radius: 50%;
+		   -o-border-radius: 50%;
+		   -ms-border-radius: 50%;
+		   -moz-border-radius: 50%;
+		   -webkit-border-radius: 50%;
+		   background: #ccc;
+		   position: relative;
+		   outline: none;">
+	  <span class="title" style="position: absolute;
+				     top: 50%;
+				     left: 50%;
+				     transform: translate(-50%, -50%);
+				     -o-transform: translate(-50%, -50%);
+				     -ms-transform: translate(-50%, -50%);
+				     -moz-transform: translate(-50%, -50%);
+				     -webkit-transform: translate(-50%, -50%);
+				     color: #fff;
+				     font-size: 18px;
+				     font-weight: 600;
+				     font-family: 'Muli', sans-serif;">2</span>
+	</li>
+	<li data-toggle="tab" href="#third" class="list-group-item"
+	    style="outline: none;margin: 0% 5%;display: inline-block;
+		   width: 48px;
+		   height: 48px; cursor: pointer;
+		   border-radius: 50%;
+		   -o-border-radius: 50%;
+		   -ms-border-radius: 50%;
+		   -moz-border-radius: 50%;
+		   -webkit-border-radius: 50%;
+		   background: #ccc;
+		   position: relative;
+		   outline: none;">
+	    <span class="title" style="position: absolute;
+				       top: 50%;
+				       left: 50%;
+				       transform: translate(-50%, -50%);
+				       -o-transform: translate(-50%, -50%);
+				       -ms-transform: translate(-50%, -50%);
+				       -moz-transform: translate(-50%, -50%);
+				       -webkit-transform: translate(-50%, -50%);
+				       color: #fff;
+				       font-size: 18px;
+				       font-weight: 600;
+				       font-family: 'Muli', sans-serif;">3</span>
+	</li>
+	<li data-toggle="tab" href="#last" class="list-group-item"
+	    style="outline: none;margin: 0% 5%;display: inline-block;
+		   width: 48px;
+		   height: 48px; cursor: pointer;
+		   border-radius: 50%;
+		   -o-border-radius: 50%;
+		   -ms-border-radius: 50%;
+		   -moz-border-radius: 50%;
+		   -webkit-border-radius: 50%;
+		    background: #ccc;
+		    position: relative;
+		    outline: none;">
+	  <span class="title" style="position: absolute;
+				     top: 50%;
+				     left: 50%;
+				     transform: translate(-50%, -50%);
+				     -o-transform: translate(-50%, -50%);
+				     -ms-transform: translate(-50%, -50%);
+				     -moz-transform: translate(-50%, -50%);
+				     -webkit-transform: translate(-50%, -50%);
+				     color: #fff;
+				     font-size: 18px;
+				     font-weight: 600;
+				     font-family: 'Muli', sans-serif;">4</span>
+	</li>
+      </ul>
+    </div>
+    <div class="tab-content clearfix">
+      <div id="first" class="tab-pane fade in active">
+	<i class="fa fa-7x fa-user-circle" style="left: 50%;
+					position: relative;
+					transform: translateX(-50%);
+					-webkit-transform: translateX(-50%);
+					-moz-transform: translateX(-50%);
+					-ms-transform: translateX(-50%);
+					-o-transform: translateX(-50%);
+					margin-bottom: 2%;color: #337ab7;
+					background: -webkit-linear-gradient(#337ab7, #265a88);
+					-webkit-background-clip: text;
+					-webkit-text-fill-color: transparent;"></i>
+	<form role="form" method="POST">
+	  <div class="col-md-12">
+	    <div class="form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-user"></i>
+		</span>
+		<input id="username" class="form-control" autofocus="on"
+		       name="username" autocomplete="off"
+		       placeholder="Username" type="text" required="required">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-check-circle" style="color:green"></i>
+		</span>	      
+	      </div>
+	    </div>
+	  </div>
+	  <div class="col-md-12">
+	    <div class="form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-envelope fa-fw"></i>
+		</span>
+		<input id="email" class="form-control" autofocus="off"
+		       name="email" autocomplete="off"
+		       placeholder="Email" type="text" required="required">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-check-circle" style="color:green"></i>
+		</span>	      
+	      </div>
+	    </div>
+	  </div>
+	  <div class="col-md-12">
+	    <div class="form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-lock fa-fw"></i>
+		</span>
+		<input id="password" class="form-control" autofocus="off"
+		       name="password" placeholder="Password"
+		       type="password" required="required">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-check-circle" style="color:green"></i>
+		</span>	      
+	      </div>
+	    </div>
+	  </div>
+	  <div class="col-md-12">	    
+	    <div class="form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-lock fa-fw"></i>
+		</span>
+		<input id="confirm" class="form-control" autofocus="off"
+		       name="confirm" placeholder="Confirm Password"
+		       type="password" required="required">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-check-circle" style="color:green"></i>
+		</span>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="col-md-12">	    
+	    <div class="form-group form-check">
+	      <input class="form-check-input" type="checkbox" id="terms">
+	      <label class="form-check-label" for="terms"
+		     style="font-weight:normal !important;">
+		I Agree to the <a href="{{url_for('terms')}}">Terms and Conditions</a>
+	      </label>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12" style="text-align:center;margin-top:5%">
+	      <span id="first-button-next"
+		    class="far fa-3x fa-arrow-alt-circle-right"
+		    style="opacity:0.2;">
+	      </span>
+	    </div>
+	  </div>	  
+	</form>
+      </div>
+      <div id="second" class="tab-pane fade in">
+	
+	<i class="fa fa-7x fa-user-circle" style="left: 50%;
+						   position: relative;
+						   transform: translateX(-50%);
+						   -webkit-transform: translateX(-50%);
+						   -moz-transform: translateX(-50%);
+						   -ms-transform: translateX(-50%);
+						   -o-transform: translateX(-50%);
+						   margin-bottom: 2%; color: #337ab7;
+						   background: -webkit-linear-gradient(#337ab7, #265a88);
+						   -webkit-background-clip: text;
+						   -webkit-text-fill-color: transparent;"></i>
+	<form role="form" method="POST">
+	  <div class="form-row">
+	    <div class="col-md-12 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-align-left"></i>
+		</span>
+		<input id="firstname" class="form-control" autofocus="on"
+		       name="firstname"
+		       placeholder="First Name" type="text" required="required">
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-align-left"></i>
+		</span>
+		<input id="lastname" class="form-control" autofocus="off"
+		       name="lastname"
+		       placeholder="Last Name" type="text" required="required">
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-mobile"></i>
+		</span>
+		<input type="text" class="form-control"
+		       id="mobile" name="mobile" placeholder="Mobile">
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-venus-mars"></i>
+		</span>
+		<select class="selectpicker show-tick form-control" data-container="body"
+			data-tick-icon="fa fa-fw fa-check" title="Gender"
+			id="gender" name="genre">
+		  <option value="Female"
+			  data-content="<i class='fa fa-fw fa-venus'></i> Female"
+			  data-tokens="Female">
+		    Female
+		  </option>
+		  <option value="Male"
+			  data-content="<i class='fa fa-fw fa-mars'></i> Male"
+			  data-tokens="Male">
+		    Male
+		  </option>
+		</select>		
+	      </div>
+	    </div>
+	  </div>
+
+	  <div class="form-row">
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-calendar"></i>
+		</span>
+		<input type="text" class="form-control select-date"
+		       id="birthday" name="birthday">
+	      </div>
+	    </div>
+
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-language"></i>
+		</span>
+		<select class="selectpicker show-tick form-control" data-container="body"
+			data-tick-icon="fa fa-fw fa-check" title="Nationalities" data-live-search="true"
+			id="nationalities" name="nationalities" multiple data-selected-text-format="count">
+		  <option value="Argentina" data-tokens="Argentina"
+			  data-content="<span class='flag-icon flag-icon-ar'></span> Argentina">
+		    Argentina
+		  </option>
+		  <option value="Germany" data-tokens="Germany"
+			  data-content="<span class='flag-icon flag-icon-de'></span> Germany">
+		    Germany
+		  </option>
+		  <option value="Italy" data-tokens="Italy"
+			  data-content="<span class='flag-icon flag-icon-it'></span> Italy">
+		    Italy
+		  </option>
+		  <option value="Portugal" data-tokens="Portugal"
+			  data-content="<span class='flag-icon flag-icon-pt'></span> Portugal">
+		    Portugal
+		  </option>
+		  <option value="Switzerland" data-tokens="Switzerland"
+			  data-content="<span class='flag-icon flag-icon-ch'></span> Switzerland">
+		    Switzerland
+		  </option>
+		</select>		
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12" style="text-align:center;margin-top:5%">
+	      <span id="second-button-back"
+		    class="far fa-3x fa-arrow-alt-circle-left"
+		    style="opacity:0.2;">
+	      </span>
+	      <span id="second-button-next"
+		    class="far fa-3x fa-arrow-alt-circle-right"
+		    style="opacity:0.2;">
+	      </span>
+	    </div>
+	  </div>	    
+	</form>
+      </div>
+      <div id="third" class="tab-pane fade in">
+	<i class="fa fa-7x fa-user-circle" style="left: 50%;
+						position: relative;
+						transform: translateX(-50%);
+						-webkit-transform: translateX(-50%);
+						-moz-transform: translateX(-50%);
+						-ms-transform: translateX(-50%);
+						-o-transform: translateX(-50%);
+						margin-bottom: 2%; color: #337ab7;
+						background: -webkit-linear-gradient(#337ab7, #265a88);
+						-webkit-background-clip: text;
+						-webkit-text-fill-color: transparent;"></i>
+	<form role="form" method="POST">
+	  <div class="form-row">
+	    <div class="col-md-12 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-envelope"></i>
+		</span>
+		<input id="recovery-email" class="form-control" autofocus="on"
+		       name="recovery-email"
+		       placeholder="Recovery Email" type="text" required="required">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-check-circle" style="color:green"></i>
+		</span>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-mobile"></i>
+		</span>
+		<input type="text" class="form-control"
+		       id="recovery-mobile" name="recovery-mobile" placeholder="Recovery Mobile">
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-clock"></i>
+		</span>
+		<select class="selectpicker show-tick form-control" data-container="body"
+			data-tick-icon="fa fa-fw fa-check" title="Timezone"
+			id="timezone" name="timezone" data-live-search="true">
+		  <optgroup label="America">
+		    <option value="America/Argentina/Buenos_Aires"
+			    data-tokens="Buenos Aires"
+			    data-content="<span class='flag-icon flag-icon-ar'></span> Argentina/Buenos Aires">
+		      America/Argentina/Buenos_Aires
+		    </option>
+		  </optgroup>
+		  <optgroup label="Europe">
+		    <option value="Europe/Warsaw"
+			    data-tokens="Warsaw"
+			    data-content="<span class='flag-icon flag-icon-pl'></span> Warsaw">
+		      Europe/Warsaw
+		    </option>		    
+		    <option value="Europe/Zurich"
+			    data-tokens="Zurich"
+			    data-content="<span class='flag-icon flag-icon-ch'></span> Zurich">
+		      Europe/Zurich
+		    </option>
+		  </optgroup>
+		</select>
+	      </div>
+	    </div>
+	    <div class="col-md-6 form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		  <i class="fa fa-fw fa-language"></i>
+		</span>
+		<select class="selectpicker show-tick form-control" data-container="body"
+			data-tick-icon="fa fa-fw fa-check"
+			id="locale" name="locale">
+		  <option value="English" data-tokens="English"
+			  data-content="<span class='flag-icon flag-icon-us'></span> English">
+		    English
+		  </option>
+		  <option value="German" data-tokens="German"
+			  data-content="<span class='flag-icon flag-icon-de'></span> German">
+		    German
+		  </option>
+		  <option value="Italian" data-tokens="Italian"
+			  data-content="<span class='flag-icon flag-icon-it'></span> Italian">
+		    Italian
+		  </option>
+		  <option value="Portuguese" data-tokens="Portuguese"
+			  data-content="<span class='flag-icon flag-icon-pt'></span> Portuguese">
+		    Portuguese
+		  </option>
+		  <option value="Spanish" data-tokens="Spanish"
+			  data-content="<span class='flag-icon flag-icon-es'></span> Spanish">
+		    Spanish
+		  </option>
+		</select>		
+	      </div>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12" style="text-align:center;margin-top:5%;">
+	      <span id="third-button-back"
+		    class="far fa-3x fa-arrow-alt-circle-left"
+		    style="opacity:0.2;">
+	      </span>
+	      <span id="third-button-next"
+		    class="far fa-3x fa-arrow-alt-circle-right"
+		    style="opacity:0.2;">
+	      </span>
+	    </div>
+	  </div>
+
+	</form>
+      </div>
+      <div id="last" class="tab-pane fade in">
+	<i class="fa fa-7x fa-flag-checkered"
+	   style="left: 50%;
+		  position: relative;
+		  transform: translateX(-50%);
+		  -webkit-transform: translateX(-50%);
+		  -moz-transform: translateX(-50%);
+		  -ms-transform: translateX(-50%);
+		  -o-transform: translateX(-50%);
+		  margin-bottom: 2%; color: #337ab7;
+		  background: -webkit-linear-gradient(#337ab7, #265a88);
+		  -webkit-background-clip: text;
+		  -webkit-text-fill-color: transparent;">
+	</i>
+	<form role="form" method="POST">
+	  <div class="form-row">
+	    <p style="font-size:14px; margin-top:2%;" class="text-center">
+	      <strong>Enter Verification Code</strong>
+	    </p>
+	  </div>
+	  <div class="form-row" style="margin: 5% 0%">
+	    <div class="col-md-12">
+	      <input id="pincode" class="form-control" type="number" min="0" max="9"/>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <p style="margin: 2% 0%;" class="text-center">
+	      <small>
+		Enter the verification code sent to
+		<strong id="code-sent">ser***********@gmail.com</strong>
+	      </small>
+	    </p>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12 text-center">
+	      <a href="#code-resend">
+		<i class="fa fa-fw fa-redo"></i>
+		Send a new code
+	      </a>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12 text-center">
+	      <a href="#code-device">
+		<i class="fa fa-fw fa-mobile"></i>
+		Use mobile
+	      </a>
+	    </div>
+	  </div>
+	  <div class="form-row">
+	    <div class="col-md-12" style="text-align:center;margin-top:5%;">
+	      <span id="last-button-back"
+		    class="far fa-3x fa-arrow-alt-circle-left"
+		    style="opacity:0.2;">
+	      </span>
+	      <span id="last-button-next"
+		    class="far fa-3x fa-check-circle"
+		    style="opacity:0.2;">
+	      </span>
+	    </div>
+	  </div>
+
+	</form>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-footer text-center">
+    Already a member? <a href="{{ url_for('login') }}">Login</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+li.active {
+    background-image: -webkit-linear-gradient(top,#337ab7 0,#2b669a 100%) !important;
+    background-image: -o-linear-gradient(top,#337ab7 0,#2b669a 100%) !important;
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#337ab7),to(#2b669a)) !important;
+    background-image: linear-gradient(to bottom,#337ab7 0,#2b669a 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff337ab7', endColorstr='#ff2b669a', GradientType=0) !important;
+    background-repeat: repeat-x !important;
+}
+.pincode-input-container {
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet">
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+<link href="{{ config['CDN_EXTRAS'] }}/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+
+<link href="{{ config['CDN_EXTRAS'] }}/bootstrap-pincode-input/1.4.0/css/bootstrap-pincode-input.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-pincode-input/1.4.0/js/bootstrap-pincode-input.js"></script>
+
+<script>
+$(document).ready(function() {
+    $("#birthday").datetimepicker({
+        showClose: true,
+	showTodayButton: true,
+        date: new Date('1960/01/01'),
+	format: 'YYYY/MM/DD',
+	icons: {
+	    time: 'fa fa-clock',
+	    date: 'fa fa-calendar',
+	    up: 'fa fa-arrow-circle-up',
+	    down: 'fa fa-arrow-circle-down',
+	    previous: 'fa fa-arrow-circle-left',
+	    next: 'fa fa-arrow-circle-right',
+	    today: 'fa fa-crosshairs',
+	    clear: 'fa fa-trash',
+	    close: 'fa fa-calendar-times'
+        }
+    });
+    $('#pincode').pincodeInput({
+	inputs: 6,
+	hidedigits: false,
+	margin: 2,
+    });
+});
+  
+function jqlisteners() {
+   console.log("loading");
+}
+</script>
+{% endblock %}

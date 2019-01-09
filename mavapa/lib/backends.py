@@ -57,17 +57,17 @@ class LDAP():
         kwargs.setdefault('limit', -1)
         query = self.query(**kwargs)
         exporter = DictExporter()
-        root = Node(kwargs['basedn'])
+        root = Node(kwargs['basedn'], dn=kwargs['basedn'])
         if query:
             res = []
             for x in query:
                 if not kwargs['basedn'] == x[0]:
-                    entries = ldap.dn.explode_dn(x[0].replace(',%s' %(kwargs['basedn']), ''))
+                    entries = (x[0].replace(',%s' %(kwargs['basedn']), '')).split(',')
                     entries.reverse()
                     res.append(','.join(entries))
             res.sort()
             for dn in res:
-                entries = ldap.dn.explode_dn(dn)
+                entries = dn.split(',')
                 parent = root
                 for e in entries:
                     node = None
@@ -75,7 +75,7 @@ class LDAP():
                         if c.name == e:
                             node = c
                     if not node:
-                        node = Node(e, parent=parent)
+                        node = Node(e, parent=parent, dn=','.join([e, parent.dn]))
                     parent = node
         return exporter.export(root)
 
@@ -85,19 +85,23 @@ class LDAP():
         kwargs.setdefault('attrs', ['*'])
         kwargs.setdefault('scope', ldap.SCOPE_SUBTREE)
         kwargs.setdefault('limit', 25)
+        kwargs.setdefault('dn', False)
         try:
-            res = self.cstr.search(kwargs['basedn'], kwargs['scope'],
-                                   kwargs['filter'], kwargs['attrs'])
             rows = []
-            count = 0
-            while 1:
-                rtype, rdata = self.cstr.result(res, 0)
-                if (rdata == []):
-                    break
-                else:
-                    if rtype == ldap.RES_SEARCH_ENTRY:
-                        [rows.append(i) for i in rdata]
-                count += 1
+            if not kwargs['dn']:
+                res = self.cstr.search(kwargs['basedn'], kwargs['scope'],
+                                       kwargs['filter'], kwargs['attrs'])
+                while 1:
+                    rtype, rdata = self.cstr.result(res, 0)
+                    if (rdata == []):
+                        break
+                    else:
+                        if rtype == ldap.RES_SEARCH_ENTRY:
+                            [rows.append(i) for i in rdata]
+            else:
+                res = self.cstr.search_s(kwargs['filter'], kwargs['scope'])
+                for idx in res:
+                    rows.append(idx)
             return rows
         except ldap.LDAPError:
             print(ldap.LDAPError)

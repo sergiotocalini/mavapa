@@ -1,7 +1,6 @@
 {% extends "admin/base.html" %}
 {% block title %}Administration: Applications{% endblock %}
-
-{% set snactive = "apps" %}
+{% set snactive = "applications" %}
 
 {% block container %}
 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
@@ -135,7 +134,7 @@
 	  </th>
 	  <th data-align="center">
 	    <i class="fa fa-fw fa-globe"></i>
-	    IP Address
+	    Address
 	  </th>
 	  <th data-align="center">
 	    <i class="fa fa-fw fa-terminal"></i>
@@ -149,11 +148,7 @@
       </thead>
       <tbody>
       	{% for msid in data('Session') %}
-	{% if msid.id == session.mavapa_session %}
-      	<tr class="mysession">
-	{% else %}
-	<tr>
-        {% endif %}
+	<tr{% if msid.id == session.mavapa_session %} class="mysession"{% endif %}>
 	  <td>{{ msid.status }}</td>
       	  <td>{{ msid.id }}</td>
 	  <td>
@@ -171,8 +166,28 @@
 	    {{ ago(msid.expired_on) if msid.expired_on != None else '-' }}
 	  </td>
 	  <td>{{ msid.agent_address }}</td>
-	  <td>{{ msid.agent_platform.title() }}</td>
-	  <td>{{ msid.agent_browser.title() }}</td>
+	  <td>
+	    {% if msid.agent_platform == 'macos' %}
+	    <i class="fab fa-fw fa-apple"></i>
+	    {% elif msid.agent_platform == 'linux' %}
+	    <i class="fab fa-fw fa-linux"></i>
+	    {% elif msid.agent_platform == 'windows' %}
+	    <i class="fab fa-fw fa-windows"></i>
+	    {% else %}
+	    <i class="fa fa-fw fa-question"></i>
+	    {% endif %}
+	  </td>
+	  <td>
+	    {% if msid.agent_browser == 'chrome' %}
+	    <i class="fab fa-fw fa-chrome"></i>
+	    {% elif msid.agent_browser == 'firefox' %}
+	    <i class="fab fa-fw fa-firefox"></i>
+	    {% elif msid.agent_browser == 'explorer' %}
+	    <i class="fab fa-fw fa-internet-explorer"></i>
+	    {% else %}
+	    <i class="fa fa-fw fa-question"></i>
+	    {% endif %}	    
+	  </td>
       	</tr>
       	{% endfor %}
       </tbody>

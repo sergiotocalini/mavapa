@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Reset Password Account{% endblock %}
+{% block title %}Reset{% endblock %}
+
 {% block navbar %}
 {% endblock %}
+
 {% block body %}
 <div class="login-form reset-form panel panel-default">
   <div class="panel-heading text-center">
-    <big><strong>Reset your account</strong></big>
+    <big><strong>Reset</strong></big>
   </div>
   <div class="panel-body">
     {% if not user %}
-    <img class="img-circle" src="{{ config['CDN_MAVAPA'] }}/img/login.png" alt="">
+    <img class="img-circle" src="{{ config['CDN_LOCAL'] }}/img/login.png" alt="">
     {% else %}
     <img class="img-circle" src="{{ user.avatar(148) }}" alt="">
     <div class="displayname row text-center">
@@ -46,7 +48,7 @@
 	    <i class="fa fa-envelope fa-fw"></i>
 	    <strong>{{ encrypt_email(user.mailrecovery) }}</strong>
 	    <a href="#mail" id="sendmail" class="pull-right" data-userid="{{ user.userid }}">
-	      <i class="fa fa-fw fa-send"></i>
+	      <i class="fa fa-fw fa-paper-plane"></i>
 	    </a>
 	  </div>
 	</div>
@@ -57,7 +59,7 @@
 	    <i class="fa fa-mobile fa-fw"></i>
 	    <strong>{{ encrypt_telephone(user.mobile) }}</strong>
 	    <a href="#sms" id="sendsms" class="pull-right" data-userid="{{ user.userid }}">
-	      <i class="fa fa-fw fa-send"></i>
+	      <i class="fa fa-fw fa-paper-plane"></i>
 	    </a>
 	  </div>
 	</div>

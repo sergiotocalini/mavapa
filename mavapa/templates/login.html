@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Sign In{% endblock %}
+{% block title %}Accounts - Login{% endblock %}
 
 {% block navbar %}
 {% endblock %}
@@ -8,11 +8,11 @@
 {% block body %}
 <div class="login-form panel panel-default">
   <div class="panel-heading text-center">
-    <big><strong>Login to your account</strong></big>
+    <big><strong>Login</strong></big>
   </div>
   
   <div class="panel-body">	
-    <img src="{{ config['CDN_MAVAPA'] }}/img/login.png" alt="">
+    <img src="{{ config['CDN_LOCAL'] }}/img/login.png" alt="">
     <form role="form" method="POST" action="">
       <fieldset>
 	<div class="col-md-offset-1 col-sm-12 col-md-10">
@@ -35,13 +35,16 @@
 	  <div class="form-group">
 	    {{ form.submit(class="btn btn-primary btn-block") }}
 	  </div>
+	  <div class="text-center">
+	    <a href="{{ url_for('reset') }}">Forgot password?</a>
+	  </div>
 	</div>
       </fieldset>
     </form>
   </div>
   
   <div class="panel-footer text-center">
-    <a href="{{ url_for('reset') }}">Forgot your password?</a>
+    Don't have an account? <a href="{{ url_for('register') }}">Sign Up</a>
   </div>
 </div>
 {% endblock %}

@@ -1,26 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Accounts Administration{% endblock %}
+{% block title %}Administration{% endblock %}
 
 {% block body %}
 <div id="admin">
-  {% set snactive = snactive|default('dash') -%}
+  {% set snactive = snactive|default('d') -%}
   <div class="sidebar">
     <h3>Menu</h3>
     <ul class="sidebar-nav nav nav-pills nav-stacked">
-      <li{% if snactive == 'dash' %} class="active"{% endif %}>
+      <li{% if snactive == 'overview' %} class="active"{% endif %}>
 	<a href="{{ url_for('admin') }}">
 	  <i class="fa fa-fw fa-chart-pie"></i>
-	  Dashboard
+	  Overview
 	</a>
       </li>
-      <li{% if snactive == 'apps' %} class="active"{% endif %}>
-	<a href="{{ url_for('admin', mod='apps') }}">
+      <li{% if snactive == 'applications' %} class="active"{% endif %}>
+	<a href="{{ url_for('admin', mod='applications') }}">
 	  <i class="fa fa-fw fa-cogs"></i>
 	  Applications
 	</a>
       </li>
-      <li{% if snactive == 'notify' %} class="active"{% endif %}>
-	<a href="{{ url_for('admin', mod='notify') }}">
+      <li{% if snactive == 'notifications' %} class="active"{% endif %}>
+	<a href="{{ url_for('admin', mod='notifications') }}">
 	  <i class="fa fa-fw fa-bell"></i>
 	  Notifications
 	</a>
@@ -31,12 +31,18 @@
 	  Users
 	</a>
       </li>
-      <li{% if snactive == 'orgs' %} class="active"{% endif %}>
-	<a href="{{ url_for('admin', mod='orgs') }}">
+      <li{% if snactive == 'organizations' %} class="active"{% endif %}>
+	<a href="{{ url_for('admin', mod='organizations') }}">
 	  <i class="fa fa-fw fa-sitemap"></i>
 	  Organizations
 	</a>
       </li>      
+      <li{% if snactive == 'security' %} class="active"{% endif %}>
+	<a href="{{ url_for('admin', mod='security') }}">
+	  <i class="fa fa-fw fa-shield-alt"></i>
+	  Security
+	</a>
+      </li>
     </ul>
   </div>
   <div class="content">

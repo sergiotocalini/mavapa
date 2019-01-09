@@ -1,0 +1,92 @@
+{% extends "admin/base.html" %}
+{% block title %}Administration: Security{% endblock %}
+{% set snactive = "security" %}
+
+{% block container %}
+<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+  <li class="disabled">
+    <a data-toggle="tab" href="#general">
+      <i class="fa fa-fw fa-shield-alt"></i>
+      General
+    </a>
+  </li>
+  <li class="active">
+    <a data-toggle="tab" href="#auth">
+      <i class="fa fa-fw fa-user-shield"></i>
+      Authentication
+    </a>
+  </li>
+</ul>
+<div class="tab-content" style="min-height: 80%">
+  <div id="general" class="tab-pane fade in">
+  </div>
+  <div id="auth" class="tab-pane fade in active">
+    <div class="auth-form" style="height: 90%;
+				  width: 100%;
+				  max-height: 90%;">
+      <form class="form-horizontal" role="form" method="POST"
+	    style="height: 100%;width: 100%;padding: 4% 2%;">
+	<div class="col-md-12 form-group " style="margin:0px">
+	  <label class="col-sm-4 offset-sm-2 control-label" for="user-registration">
+	    <i class="fa fa-fw fa-clipboard-check"></i>
+	    Registration
+	  </label>
+	  <div class="col-sm-4">
+	    <select class="selectpicker show-tick form-control"
+		    id="user-registration" name="auth-reg-activation">
+	      <option value="0" data-tokens="Disabled"
+		      data-icon="fa fa-fw fa-user-slash">
+		Disabled
+	      </option>
+	      <option value="1" data-tokens="Token"
+		      data-icon="fa fa-fw fa-user-cog">
+		Token
+	      </option>
+	      <option value="2" data-tokens="Administrator"
+		      data-icon="fa fa-fw fa-user-clock">
+		Administrator
+	      </option>
+	      <option value="3" data-tokens="Automatic"
+		      data-icon="fa fa-fw fa-user-shield">
+		Automatic
+	      </option>
+	    </select>
+	  </div>
+	</div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="toolbar-footer" style="max-height: 10%;
+				   width: 100%;
+				   height: auto;
+				   position: absolute;
+				   bottom: 0px;
+				   left: 0px;
+				   padding: 1%;">
+  <div class="pull-left">
+    <button type="button" class="btn btn-danger" id="filter-reset"
+	    style="outline:none">
+      Reset
+    </button>
+  </div>  
+  <div class="pull-right">
+    <button type="button" class="btn btn-primary" id="security-update">
+      Save
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+<script>
+{% include "admin/security/index.js" %}
+
+function jqlisteners() {
+    jqlisteners_index();
+}
+</script>
+{% endblock%}

@@ -1,0 +1,110 @@
+<div id="ModalBackend" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog">
+      <div class="modal-content">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body">
+	  <form role="form" method="POST">
+	    <fieldset>
+	      <input class="col-md-8 form-control-static hidden" id="backend-id">
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="name">Name</label>
+		  <input type="text" class="form-control"
+			 id="backend-name" name="backend-name" placeholder="Name">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-type">Type</label>
+		  <select class="selectpicker show-tick form-control"
+			  id="backend-type" name="backend-type">
+		    <option value="LDAP" data-icon="fa fa-book fa-fw"
+			    data-tokens="OpenLDAP">LDAP</option>
+		    <option value="AD" data-icon="fab fa-windows fa-fw"
+			    data-tokens="AD">Active Directory</option>
+		    <option value="Facebook" data-icon="fab fa-facebook fa-fw"
+			    data-tokens="Facebook" disabled="disabled">Facebook</option>
+		    <option value="Google" data-icon="fab fa-google fa-fw"
+			    data-tokens="Google" disabled="disabled">Google</option>
+		    <option value="Twitter" data-icon="fab fa-twitter fa-fw"
+			    data-tokens="Twitter" disabled="disabled">Twitter</option>
+		  </select>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="backend-url">Url</label>
+		  <input type="text" class="form-control"
+			 id="backend-url" name="backend-url">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-timeout">Timeout</label>
+		  <input type="text" class="form-control"
+			 id="backend-timeout" name="backend-timeout"
+			 placeholder="60">
+		</div>
+	      </div>
+	      <div class="row">
+    		<div class="col-md-6 form-group">
+		  <label for="backend-username">Username</label>
+		  <input type="text" class="form-control"
+			 id="backend-username" name="backend-username"
+			 placeholder="Username">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-password">Password</label>
+		  <input type="password" class="form-control"
+			 id="backend-password" name="backend-password"
+			 placeholder="Password">
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-md-6 form-group">
+		  <label for="backend-search">Search</label>
+		  <input type="text" class="form-control"
+			 id="backend-search" name="backend-search"
+			 placeholder="Search">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-onfly">On Fly</label>
+		  <input id="backend-onfly" type="checkbox" data-toggle="toggle" data-on="Yes" data-off="No"
+			 data-width="100%" data-onstyle="success" data-offstyle="primary">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-attribute">Login Attribute</label>
+		  <input type="text" class="form-control"
+			 id="backend-attribute" name="backend-attribute"
+			 placeholder="mail">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="backend-filter">Login Filter</label>
+		  <input type="text" class="form-control"
+			 id="backend-filter" name="backend-filter"
+			 placeholder="Filter">
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+	<div class="modal-footer">
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-default"
+		    data-dismiss="modal">
+	      Close
+	    </button>
+	    <button type="button" class="btn btn-primary"
+		    id="backend-save">
+	      Save
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>

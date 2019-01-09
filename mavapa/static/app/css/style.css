@@ -17,12 +17,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.modal-footer .pull-left,
-.modal-footer .pull-right {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
+/* .modal-footer .pull-left, */
+/* .modal-footer .pull-right { */
+/*     position: relative; */
+/*     top: 50%; */
+/*     transform: translateY(-50%); */
+/* } */
 #table-tokens tr.mysession,
 #table-sessions tr.mysession {
     font-weight: bold;
@@ -173,7 +173,7 @@ body {
     z-index: 2;
 }
 .footer-bar ul {
-    padding: 0%;
+    padding: 0px;
     margin: 0px;
     height: 100%;
     width: 100%;
@@ -194,11 +194,14 @@ body {
     -ms-transform: translateY(-50%);
     -o-transform: translateY(-50%);
 }
+.footer-bar ul span {
+    padding: 0px;
+}
 .login-form {
     position: relative;
     width: 40%;
     left: 30%;
-    top: 45%;
+    top: 50%;
     transform: translateY(-50%);
     -webkit-transform: translateY(-50%);
     -moz-transform: translateY(-50%);
@@ -426,13 +429,15 @@ body {
 .wrapper #admin .content .nav {
     position: relative;
     max-height: 10%;
+    height:auto;
 }
 .wrapper #admin .content .nav a {
     outline: 0;
 }
 .wrapper #admin .content .tab-content {
     position: relative;
-    height: 90%;
+    min-height: 90%;
+    height: auto;
 }
 .wrapper #admin .content .tab-content .active{
     visibility: visible !important;
@@ -536,7 +541,7 @@ table tr .text-ellipsis > * {
     font-size: 100px;
     position: absolute;
     top: 40%;
-    left: 40%;
+    left: 50%;
     transform: translateX(-50%) translateY(-50%);
     font-style: normal;
     font-weight: 900;

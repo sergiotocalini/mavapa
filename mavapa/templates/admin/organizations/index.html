@@ -1,0 +1,687 @@
+{% extends "admin/base.html" %}
+{% block title %}Administration: Organizations{% endblock %}
+{% set snactive = "organizations" %}
+
+{% block container %}
+<div class="section-header" style="height: 7%;
+				   text-shadow: none !important;
+				   height: 7%;
+				   width: 100%;
+				   position: relative;
+				   border-bottom: 1px solid #e7e7e7;">
+  <div class="section-title" style="float: left;
+				    font-size: 30px;
+				    margin: 0px;
+				    padding-left: 1%;
+				    position: relative;
+				    text-align: left;
+				    top: 50%;
+				    transform: translateY(-50%);
+				    width: 74%;">
+    <i class="fa fa-fw fa-sitemap" aria-hidden="true"></i>
+    Administration: Organizations
+  </div>
+  <div class="section-toolbar toolbar pull-right" style="max-width: 24%;
+							 max-height: 85%;
+							 float: left;
+							 text-align: right;
+							 padding: 0% 0.25%;
+							 margin: 0% 1%;
+							 top: 50%;
+							 position: relative;
+							 transform: translateY(-50%);
+							 border: 2px solid #b9b9b9;
+							 opacity: 0.6;">
+    <a data-init="true" href="#switch" data-click="section-switch"
+       aria-disabled="true" title="Switch" style="text-decoration: none;
+						  padding: 0px 5px;
+						  height: 100%;
+						  color: #dedede;
+						  position: relative;">
+      <i class="fa fa-2x fa-exchange-alt" style="padding: 2.5% 0%;"></i>
+    </a>
+    <a data-init="true" href="#fullscreen" data-click="section-fullscreen"
+       aria-disabled="true" title="Fullscreen" style="text-decoration: none;
+						   padding: 0px 5px;
+						   height: 100%;
+						   color: #dedede;
+						   position: relative;">
+      <i class="fa fa-2x fa-expand-arrows-alt" style="padding: 2.5% 0%;"></i>
+    </a>    
+  </div>
+</div>
+<div class="section-refresh fade in disabled"
+     style="width:100%;height:100%;opacity:0.7;background-color:#dedede;
+	    position:absolute;z-index:10;display:none">
+  <i class="fa fa-5x fa-spinner fa-spin"
+     style="top:48%;left:48%;transform: translateY(-50%) translateX(-50%);
+	    position:absolute"></i>
+</div>
+<div class="section-switch fade in" style="height: 93%;
+					   position: absolute;
+					   width: 100%;
+					   z-index: 10;
+					   background: #f1f2f7;">
+  <div id="orgs-list" class="list-group" style="width: 50%;
+						left: 50%;
+						position: relative;
+						transform: translateX(-50%) translateY(-50%);
+						top: 10%;">
+      
+    <button type="button" data-id="1" style="outline:none;"
+	    class="list-group-item list-group-item-action button-connection">
+      <div class="d-flex w-100 justify-content-between">
+	<h4 class="mb-1">
+	  <i class="fa fa-database"></i>
+	  Move Digital AG
+	</h4>
+	<div class="bt-group" style="position: absolute;
+				     right: 0px;
+				     top: 0px;
+				     margin: 1%;
+				     padding: 1.5% 3%;
+				     border-radius: 50%;">
+	  <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: gray;">
+	    <i class="fa fa-ellipsis-v"></i>
+	  </a>
+	  <ul class="dropdown-menu dropdown-menu-right">
+	    <li>
+	      <a href="#connect" data-click="connect">
+		<i class="fa fa-fw fa-plug"></i>
+		Connect
+	      </a>
+	    </li>
+	    <li>
+	      <a href="#edit" data-click="edit">
+		<i class="fa fa-fw fa-pencil-alt"></i>
+		Edit
+	      </a>
+	    </li>
+	    <li>
+	      <a href="#copy" data-click="copy">
+		<i class="fa fa-fw fa-copy"></i>
+		Copy
+	      </a>
+	    </li>
+	    <li role="separator" class="divider"></li>
+	    <li>
+	      <a href="#delete" data-click="delete">
+		<i class="fa fa-fw fa-trash"></i>
+		Delete
+	      </a>
+	    </li>
+	  </ul>
+	</div>
+      </div>
+
+      <div class="d-flex w-100 justify-content-between">
+	<p class="mb-1">
+	  OpenLDAP on Ubuntu
+	</p>
+      </div>
+      
+      <div class="d-flex w-100 justify-content-between">
+	<small class="mb-1">
+	  <i class="fa fa-fw fa-plug"></i>ldap://ldap.amana.vpn:389
+	</small>
+	<small class="pull-right">
+	  2 minutes ago
+	</small>
+      </div>
+    </button>
+    
+  </div>
+  <div class="switch-toolbar">
+    <div class="bt-group dropup" style="position: absolute;
+				 right: 0px;
+				 bottom: 0px;
+				 margin: 1%;
+				 padding: 12px 20px;
+				 border-radius: 50%;
+				 background: white;
+				 border-color: rgb(216, 216, 216) rgb(209, 209, 209) rgb(186, 186, 186);
+				 border: 1px solid #ddd;">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: gray;"><i class="fa fa-ellipsis-v"></i></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+	<li>
+	  <a href="#refresh" data-click="refresh">
+	    <i class="fa fa-fw fa-sync"></i>
+	    Refresh
+	  </a>
+	</li>
+	<li role="separator" class="divider"></li>
+	<li>
+	  <a href="#new" data-click="new">
+	    <i class="fa fa-fw fa-plus-square"></i>
+	    New
+	  </a>
+	</li>
+      </ul>
+      
+    </div>
+  </div>
+</div>
+<div class="section-content fade in hidden" style="height: 93%; padding: 0.5% 0.5% 0% 0.5%;">
+  <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+    <li class="active">
+      <a data-toggle="tab" href="#explore">
+	<i class="fa fa-fw fa-book-open"></i>
+	Explore
+      </a>
+    </li>
+    <li class="disabled">
+      <a data-toggle="tab" href="#schemas">
+	<i class="fa fa-fw fa-bookmark"></i>
+	Schemas
+      </a>
+    </li>
+    <li class="disabled">
+      <a data-toggle="tab" href="#mapping">
+	<i class="fa fa-fw fa-map"></i>
+	Mapping
+      </a>
+    </li>
+    <li>
+      <a data-toggle="tab" href="#terminal">
+	<i class="fa fa-fw fa-terminal"></i>
+	Terminal
+      </a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div id="explore" class="tab-pane fade in active">
+      <div class="explore-items" style="width:80%;height:100%;float:left">
+	<div id="toolbar-org-explore">
+	  <button id="org-item-add" type="button"
+		  class="btn btn-primary"
+		  aria-haspopup="true"
+		  aria-expanded="false">
+	    <i class="fa fa-fw fa-plus"></i>
+	  </button>
+	  <button id="org-item-save" type="button"
+		  class="btn btn-default"
+		  aria-haspopup="true"
+		  aria-expanded="false">
+	    <i class="fa fa-fw fa-save"></i>
+	  </button>
+	  <button id="org-item-dalete" type="button"
+		  class="btn btn-danger"
+		  aria-haspopup="true"
+		  aria-expanded="false">
+	    <i class="fa fa-fw fa-trash-alt"></i>
+	  </button>
+	  <button id="org-item-export" type="button"
+		  class="btn btn-warning"
+		  aria-haspopup="true"
+		  aria-expanded="false">
+	    <i class="fas fa-fw fa-file-code"></i>
+	  </button>
+	</div>
+	<table id="table-org-explore"
+               data-show-toggle="false" data-show-export="false"
+               data-show-columns="false"
+	       data-toolbar="#toolbar-org-explore"
+               data-sort-name="key" data-pagination="false"
+               data-toggle="table" data-search="false"
+               data-show-footer="false" data-page-size="100"
+               data-escape="false" data-side-pagination="server"
+	       data-show-refresh="false" data-row-style="rowStyle"
+	       class="table table-hover table-striped table-compact 
+		      table-condensed table-autosize">
+	  <thead>
+	    <tr>
+	      <th data-field="key" data-valign="middle"
+		  data-align="left" data-sortable="true">
+		<i class="fa fa-fw fa-sort-alpha-down"></i>
+		Attribute
+	      </th>
+	      <th data-field="input" data-valign="middle"
+		  data-align="left" data-sortable="false"
+		  data-formatter="OrgItemFormatterValue">
+		<i class="fa fa-fw fa-info"></i>
+		Value
+	      </th>
+	    </tr>
+	  </thead>
+	  <tbody></tbody>
+	</table>
+      </div>
+      <div class="explore-treeview" style="width:20%;height:100%;float:right">
+	<div id="treeview-org" style="padding: 2% 0% 0% 2%;overflow-y:auto;height:100%;width:100%"></div>
+      </div>
+    </div>
+    <div id="schemas" class="tab-pane fade">
+      <div id="toolbar-org-schemas">
+	<button class="btn btn-default" type="button" data-toggle="modal"
+		data-target="#Modal" aria-haspopup="true"
+		aria-expanded="false">
+	  <i class="fa fa-plus fa-fw"></i>
+	</button>
+      </div>
+      <table id="table-org-schemas" data-show-toggle="false"
+	     data-show-export="false"
+	     data-show-columns="true" data-show-multi-sort="true"
+	     data-sort-name="display" data-pagination="true"
+	     data-toggle="table" data-search="true"
+	     data-toolbar="#toolbar-org-schemas"
+	     data-show-footer="false" data-page-size="50" data-escape="false"
+	     class="table table-hover table-striped table-compact table-condensed table-autosize">
+	<thead>
+	  <tr>
+	    <th data-field="select" data-visible="true"
+		data-checkbox="true">
+	      <i class="fa fa-fw fa-check-square"></i>
+	    </th>
+	    <th data-valign="middle" data-visible="false">
+	      <i class="fa fa-key fa-fw"></i>
+	      ID
+	    </th>
+	    <th data-field="name" data-halign="center">
+	      <i class="fa fa-fw fa-database"></i>
+	      Name
+	    </th>
+	    <th data-halign="center">
+	      <i class="fa fa-filter fa-fw"></i>
+	      Type
+	    </th>
+	    <th data-align="center">
+	      <i class="fa fa-server fa-fw"></i>
+	      Host
+	    </th>
+	    <th data-align="center">
+	      <i class="fa fa-users fa-fw"></i>
+	      Users
+	    </th>
+	    <th data-valign="middle" data-align="center" data-field="actions">
+	      <i class="fa fa-fw fa-user-cog"></i>
+	    </th>	  
+	  </tr>
+	</thead>
+	<tbody></tbody>
+      </table>
+    </div>
+    <div id="mapping" class="tab-pane fade in"></div>
+    <div id="terminal" class="tab-pane fade in">
+      <table id="table-org-terminal" data-show-toggle="false"
+	     data-show-export="false" data-sort-name="uidNumber"
+	     data-show-columns="true" data-show-multi-sort="true"
+	     data-sort-name="uid" data-pagination="true"
+	     data-toggle="table" data-search="true" data-show-refresh="true"
+	     data-toolbar="#toolbar-org-terminal" data-side-pagination="server"
+	     data-show-footer="false" data-page-size="50" data-escape="false"
+	     data-url="{{ url_for('api_backends_search') }}?" data-response-handler="TerminalResponseHandler"
+	     data-query-params="TerminalParams"
+	     class="table table-hover table-striped table-compact table-condensed table-autosize">
+	<thead>
+	  <tr>
+	    <th data-field="select" data-visible="true"
+		data-checkbox="true">
+	      <i class="fa fa-fw fa-check-square"></i>
+	    </th>
+	    <th data-field="uidNumber" data-valign="middle" data-visible="true">
+	      <i class="fa fa-fw fa-sort-numeric-down"></i>
+	      UID
+	    </th>
+	    <th data-field="uid" data-halign="center">
+	      <i class="fa fa-fw fa-user-shield"></i>
+	      Username
+	    </th>
+	    <th data-field="gecos">
+	      <i class="fa fa-fw fa-sort-alpha-down"></i>
+	      Gecos
+	    </th>
+	    <th data-field="gidNumber">
+	      <i class="fa fa-fw fa-sort-numeric-down"></i>
+	      GID
+	    </th>
+	    <th data-field="homeDirectory">
+	      <i class="fa fa-fw fa-home"></i>
+	      Home
+	    </th>
+	    <th data-field="loginShell">
+	      <i class="fa fa-fw fa-terminal"></i>
+	      Shell
+	    </th>
+	    <th data-valign="middle" data-align="center" data-field="actions">
+	      <i class="fa fa-fw fa-user-cog"></i>
+	    </th>	  
+	  </tr>
+	</thead>
+	<tbody></tbody>
+      </table>      
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% include "admin/organizations/modals/backend.html" %}
+{% endblock %}
+
+{% block scripts%}
+<style>
+.wrapper #admin .content {
+   padding: 0px;
+}
+.treeview .list-group {
+   margin-bottom: 0px;
+   padding-right: 0.5%;
+}
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link  href="//cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css" rel="stylesheet">
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-treeview/1.2.0/css/bootstrap-treeview.css" rel="stylesheet">
+<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-treeview/1.2.0/js/bootstrap-treeview.js"></script>
+
+<script>
+var BACKEND_ID = null;
+
+$(document).ready(function () {
+    autosize_tables();
+    $(window).resize(function () {
+	autosize_tables();
+    });
+    $('.modal').on('hidden.bs.modal', function(){
+	$('.modal').find('.modal-title').html('New');
+	var forms = $(this).find('form');
+	forms.each(function(row){
+	    forms[row].reset();
+	});
+	var selectpickers = $(this).find('.selectpicker');
+	selectpickers.each(function(row){
+	    $(selectpickers[row]).selectpicker('refresh');
+	});
+    });
+
+    $(".section-toolbar a[data-click=section-switch]").on("click", function(a) {
+	a.preventDefault();
+	$(".section-switch").toggleClass("hidden");
+	$(".section-content").toggleClass("hidden");	
+	autosize_tables();
+    });
+    
+    $(".section-switch .button-connection").on("dblclick", function(a) {
+	a.preventDefault();
+	BACKEND_ID = $(this).data('id');
+	getTree();
+	$(".section-switch").addClass("hidden");
+	$(".section-content").removeClass("hidden");
+	autosize_tables();
+    });
+    
+    $(".section-switch a[data-click=connect]").on("click", function(a) {
+	a.preventDefault();
+	BACKEND_ID = $(this).parent().parent().parent().parent().parent().data('id');
+	getTree();
+	$(".section-switch").addClass("hidden");
+	$(".section-content").removeClass("hidden");
+	autosize_tables();
+    });
+
+    $(".section-switch a[data-click=delete]").on("click", function(a) {
+	a.preventDefault();
+	var backend = $(this).parent().parent().parent().parent().parent().data('id');
+	$.ajax({
+	    url: "{{ url_for('api_backends') }}?id=" + backend,
+	    type: 'DELETE',
+	    contentType: "application/json",
+	    success: function(e) {
+		console.log(e);
+	    }
+	});
+    });
+    
+    $(".section-switch a[data-click=edit]").on("click", function(a) {
+	a.preventDefault();
+	var backend = $(this).parent().parent().parent().parent().parent().data('id');
+	var modal = "#ModalBackend";
+	$.ajax({
+	    url: "{{ url_for('api_backends') }}?id=" + backend,
+	    type: 'GET',
+	    contentType: "application/json",
+	    success: function(e) {
+		$(modal).find('.modal-title').html(e['backends'][0]['name']);
+		$(modal).find('#backend-id').val(e['backends'][0]['id']);
+		$(modal).find('#backend-name').val(e['backends'][0]['name']);
+		$(modal).find('#backend-type').selectpicker('val', e['backends'][0]['type']);
+		$(modal).find('#backend-url').val(e['backends'][0]['host']);
+		$(modal).find('#backend-timeout').val(e['backends'][0]['timeout']);
+		$(modal).find('#backend-username').val(e['backends'][0]['binddn']);
+		$(modal).find('#backend-password').val(e['backends'][0]['bindpw']);
+		$(modal).find('#backend-search').val(e['backends'][0]['basedn']);
+		$(modal).find('#backend-filter').val(e['backends'][0]['filter']);
+		$(modal).find('#backend-attribute').val(e['backends'][0]['login']);
+		$(modal).find('#backend-onfly').prop('checked', e['backends'][0]['onfly']).change();
+		$(modal).modal('show');
+	    }
+	});
+    });
+    
+    $(".switch-toolbar a[data-click=new]").on("click", function(a) {
+	a.preventDefault();
+	$("#ModalBackend").modal("show");
+    });
+    
+    $(".nav-tabs a[data-toggle=tab]").on("click", function(e) {
+	if ($(this).parent().hasClass("disabled")) {
+	    e.preventDefault();
+	    return false;
+	}
+    });
+    $(document).on("click", "[data-click=section-switch]", function(a) {
+	a.preventDefault();
+	console.log("Rotate");
+    });
+    
+    jqlisteners();
+    // getTree();
+});
+
+{% include "admin/organizations/modals/backend.js" %}
+
+function TerminalParams(params) {
+    return { exclude: 'jpegPhoto,photo', backend: BACKEND_ID, filter: '(ObjectClass=posixAccount)' }
+}
+
+function TerminalResponseHandler(res) {
+    var data = [];
+    for (r in res.data) {
+	var row = res.data[r];
+	var doc = {
+	    'dn': row[0],
+	    'uidNumber': row[1]['uidNumber'] ? row[1]['uidNumber'][0] : null,
+	    'uid': row[1]['uid'] ? row[1]['uid'][0] : null,
+	    'gecos': row[1]['gecos'] ? row[1]['gecos'][0] : null,
+	    'gidNumber': row[1]['gidNumber'] ? row[1]['gidNumber'][0] : null,
+	    'homeDirectory': row[1]['homeDirectory'] ? row[1]['homeDirectory'][0] : null,
+	    'loginShell': row[1]['loginShell'] ? row[1]['loginShell'][0] : null
+	};
+	data.push(doc);
+    };
+    return {
+	total: res.total ? res.total : data.length,
+	rows: data
+    }
+}
+
+function getTerminal() {
+    var table = '#table-org-terminal';
+    $.ajax({
+	url: "{{ url_for('api_backends_search') }}",
+	type: 'GET',
+	contentType: "application/json",
+	data: { backend: BACKEND_ID, filter: '(ObjectClass=posixAccount)'},
+	success: function(e) {
+	    var selected = $(table).bootstrapTable('getAllSelections');
+	    $(table).bootstrapTable('removeAll');
+	    $(table).bootstrapTable('showLoading');
+	    $(table).parent().addClass('table-loading');
+	    var data = e['data'];
+	    for (item in data) {
+		$(table).bootstrapTable('append', {
+		    'dn': data[item][0],
+		    'uidNumber': data[item][1]['uidNumber'] ? data[item][1]['uidNumber'][0] : null,
+		    'uid': data[item][1]['uid'] ? data[item][1]['uid'][0] : null,
+		    'gecos': data[item][1]['gecos'] ? data[item][1]['gecos'][0] : null,
+		    'gidNumber': data[item][1]['gidNumber'] ? data[item][1]['gidNumber'][0] : null,
+		    'homeDirectory': data[item][1]['homeDirectory'] ? data[item][1]['homeDirectory'][0] : null,
+		    'loginShell': data[item][1]['loginShell'] ? data[item][1]['loginShell'][0] : null
+		});
+	    };
+	    $(table).parent().removeClass('table-loading');
+	    $(table).bootstrapTable('hideLoading');
+	}
+    });
+};
+
+function getTree() {
+    $.ajax({
+	url: "{{ url_for('api_backends_tree') }}",
+	type: 'GET',
+	contentType: "application/json",
+	data: { backend: BACKEND_ID, type: 'items' },
+	success: function(e) {
+	    var get_tree = function(item) {
+		var data = []
+		if (item.children) {
+		    for (child in item.children) {
+			data.push(get_tree(item.children[child]));
+		    }
+		} else {
+		    info = {text: item.name, dn: item.dn, backend: BACKEND_ID}
+		    if (item.name.startsWith("dc=")) {
+			info['icon'] = 'fa fa-fw fa-book'
+		    } else if (item.name.startsWith("ou=")) {
+			info['icon'] = 'fa fa-fw fa-cubes'
+		    } else {
+			info['icon'] = 'fa fa-fw fa-cube'
+		    }
+		    return info
+		}
+		info = {
+		    text: item.name, dn: item.dn, backend: BACKEND_ID,
+		    nodes: data, tags: [ data.length ]
+		}
+		if (item.name.startsWith("dc=")) {
+		    info['icon'] = 'fa fa-fw fa-book'
+		} else if (item.name.startsWith("ou=")) {
+		    info['icon'] = 'fa fa-fw fa-cubes'
+		} else {
+		    info['icon'] = 'fa fa-fw fa-cube'
+		}
+		return info
+	    };
+	    $('#treeview-org').treeview({
+		data: [get_tree(e['data'])],
+		showTags: true,
+	    });
+	    $('#treeview-org').on('searchComplete', function(event, data) {
+		// Your logic goes here
+		$(this).treeview('checkAll', { silent: true });
+		var nodes = $(this).treeview('getChecked');
+		var find_node_dep = function(nodeid) {
+		    var data = []
+		    var node = $('#treeview-org').treeview('getNode', nodeid);
+		    if (typeof node.parentId !== "undefined") {
+			data.push(find_node_dep(node['parentId']))
+		    } else {
+			return node['nodeId'];
+		    }
+		    data.push(node['nodeId']);
+		    return data;
+		}
+		var nodes_enable = []
+		for (e in data) {
+		    var enables = find_node_dep(data[e]['nodeId']);
+		    console.log(data[e]);
+		    nodes_enable.concat(enables);
+		}
+		console.log(nodes_enable);
+		for (c in nodes) {
+		    if ( ! nodes_enable.includes(nodes[c]['nodeId']) ) {
+			// var node = $(this).treeview('getNode', c);
+			$('li[data-nodeid=' + nodes[c]['nodeId'] + ']').addClass('hidden');
+		    }
+		}
+	    });
+	    $('#treeview-org').on('nodeSelected', function(event, data) {
+		var get_path = function(nodeid) {
+		    var data = []
+		    var node = $('#treeview-org').treeview('getNode', nodeid);
+		    if (typeof node.parentId !== "undefined") {
+			data.push(get_path(node['parentId']));
+		    } else {
+			return node['text'];
+		    }
+		    data.push(node['text']);
+		    data.reverse();
+		    return data.join(',');
+		};
+		// var dn = get_path(data['nodeId']);
+		var table = '#table-org-explore';
+		$(table).bootstrapTable('removeAll');
+		$(table).bootstrapTable('showLoading');
+		$(table).parent().addClass('table-loading');
+		$.ajax({
+		    url: "{{ url_for('api_backends_items') }}",
+		    type: 'GET',
+		    contentType: "application/json",
+		    data: { backend: data['backend'], dn: data['dn'] },
+		    success: function(e) {
+			var data = e['data'];
+			for (user in data) {
+			    $(table).bootstrapTable('append', {
+				'key': 'dn',
+				'value': data[user][0],
+				'input': data[user][0],				
+			    });
+			    for (key in data[user][1]) {
+				for (value in data[user][1][key]) {
+				    $(table).bootstrapTable('append', {
+					'key': key,
+					'value': data[user][1][key][value],
+					'input': data[user][1][key][value],
+				    });
+				};
+			    };
+			};
+			$(table).parent().removeClass('table-loading');
+			$(table).bootstrapTable('hideLoading');
+		    },
+		    error: function(e) {
+			$(table).parent().removeClass('table-loading');
+			$(table).bootstrapTable('hideLoading');
+		    }
+		});
+	    });
+	    $('#treeview-org').treeview('selectNode', [ 0 ]);	    
+	}
+    });
+};
+
+function jqlisteners() {
+    console.log("Loading");
+    jqlisteners_modal_backend();
+};
+
+function OrgItemFormatterValue(value, row) {
+    var html = ""
+    html += '<div class="text-ellipsis">'
+    html +=  '<span>' + value + '</span>';
+    html += '</div>'
+    return html;
+};
+
+</script>
+{% endblock %}

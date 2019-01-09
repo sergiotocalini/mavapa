@@ -18,7 +18,7 @@ function user_search() {
                 html+= '<i class="fa fa-fw fa-plus"></i>';
                 html+= '</a>';
 		$(table).bootstrapTable('append', {
-		    'name': user['lastname'] + ', ' + user['firstname'],
+		    'name': user['sn'] + ', ' + user['givenName'],
 		    'email': user['mail'][0],
 		    'backend': user['backend']['name'],
 		    'actions': html,
