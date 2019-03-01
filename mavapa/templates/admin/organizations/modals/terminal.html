@@ -1,0 +1,204 @@
+<div id="ModalTerminal" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="ModalLabel" aria-hidden="true" style="overflow: hidden;">
+  <div class="modal-content" style="height:75%;width:60%">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;height:10%">
+      <button type="button" class="close"
+	      style="position:relative;top:50%;
+		     transform:translateY(-50%);z-index: 100"
+	      data-dismiss="modal" aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title"
+	  style="position:relative;top:45%;transform:translateY(-50%);float:left"></h4>
+    </div>
+    <div class="modal-body" style="height:80%;padding:2%;">
+      <div class="terminal-menu" style="position: relative;
+					height: 100%;
+					width: 25%;
+					float: left;">
+	<div class="terminal-avatar" style="position: relative;
+					    height: 50%;
+					    width: 100%;">
+	  <img id="terminal-avatar" class="img-circle"
+	       style="width: auto;
+		      padding: 0% 1%;
+		      left: 50%;
+		      top: 50%;
+		      position: relative;
+		      transform: translateX(-50%) translateY(-50%);
+		      height: auto;
+		      max-width: 85%;
+		      max-height: 85%;"/>
+	</div>
+	<ul id="terminal-menu-context" style="overflow-y:auto;max-height:50%;
+					      position:absolute;bottom:0px;width:100%;
+					      padding:0px;margin-bottom:0px;
+					      cursor: pointer;">
+	  <li href="#terminal-form-basic" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
+	    Basic
+	  </li>
+	  <li href="#terminal-form-groups" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-users" aria-hidden="true"></i>
+	    Groups
+	  </li>
+	  <li href="#terminal-form-keys" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+	    Keys
+	  </li>	  
+	</ul>
+      </div>
+      <div class="terminal-content tab-content" style="width: 75%;
+						       position: relative;
+						       height: 100%;
+						       float: left;">
+	<div id="terminal-form-basic" class="tab-subcontent tab-pane fade in active"
+	     style="position: relative;
+		    width: 100%;
+		    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <input class="col-md-8 form-control-static hidden" id="terminal-dn">
+	      <input class="col-md-8 form-control-static hidden" id="terminal-backend">
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="terminal-uid">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Username
+		  </label>
+		  <input type="text" class="form-control"
+			 id="terminal-uid" name="terminal-uid"
+			 placeholder="Username">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="terminal-status">Status</label>
+		  <input id="terminal-status" type="checkbox"
+			 data-toggle="toggle" data-on="Yes" data-off="No"
+			 data-width="100%" data-onstyle="success"
+			 data-offstyle="danger">
+		</div>		
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="terminal-uidNumber">
+		    <i class="fa fa-fw fa-user"></i>
+		    UID
+		  </label>
+		  <input type="text" class="form-control"
+			 id="terminal-uidNumber" name="terminal-uidNumber"
+			 placeholder="UID">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="terminal-gidNumber">
+		    <i class="fa fa-fw fa-users"></i>
+		    GID
+		  </label>
+		  <input type="text" class="form-control"
+			 id="terminal-gidNumber" name="terminal-gidNumber"
+			 placeholder="GID">
+		</div>		
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-12 form-group">
+		  <label for="terminal-gecos">
+		    <i class="fa fa-fw fa-align-left"></i>
+		    Gecos
+		  </label>
+		  <input type="text" class="form-control"
+			 id="terminal-gecos" name="terminal-gecos"
+			 placeholder="Gecos">
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="terminal-home">
+		    <i class="fa fa-fw fa-home"></i>
+		    Home
+		  </label>
+		  <input type="text" class="form-control"
+			 id="terminal-homeDirectory" name="terminal-homeDirectory"
+			 placeholder="Home">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="terminal-loginShell">
+		    <i class="fa fa-fw fa-terminal"></i>
+		    Shell
+		  </label>
+		  <select class="selectpicker show-tick form-control"
+			  id="terminal-loginShell" name="terminal-shell">
+		    <option value="/bin/bash"
+			    data-tokens="/bin/bash">/bin/bash</option>
+		    <option value="/bin/sh"
+			    data-tokens="/bin/sh">/bin/sh</option>
+		    <option value="/bin/false"
+			    data-tokens="/bin/false">/bin/false</option>
+		  </select>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+	<div id="terminal-form-settings" class="tab-subcontent tab-pane fade in"
+	     style="position: relative;
+		    width: 100%;
+		    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Administrator
+		  </label>
+		  <div>
+		    <input id="user-form-settings-admin" type="checkbox"
+			   data-toggle="toggle"
+			   data-on="Yes" data-off="No" data-width="100%"
+			   data-onstyle="warning" data-offstyle="primary">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-slash"></i>
+		    Status
+		  </label>
+		  <div>
+		    <input id="user-form-settings-status" type="checkbox" data-toggle="toggle"
+			   data-on="Active" data-off="Blocked" data-width="100%" data-onstyle="success"
+			   data-offstyle="danger">
+		  </div>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="height:10%">
+      <div class="pull-right" style="position:relative;top:50%;transform:translateY(-50%)">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary" id="terminal-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>

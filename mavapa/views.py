@@ -729,7 +729,7 @@ def api_backends_tree():
     return jsonify(datetime=datetime.now(), data=data, title=qfilter)
 
 
-@app.route('/api/backends/items', methods=['GET'])
+@app.route('/api/backends/items', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @db_session(retry=3)
 def api_backends_items():
     args = request.args.to_dict()
@@ -744,10 +744,22 @@ def api_backends_items():
                     basedn=i.basedn, limit=1, scope=0, dn=True
                 )
                 for q in query:
-                    for attr in q[1]:
-                        if attr in ['jpegPhoto', 'photo']:
-                            q[1][attr] = [e.encode('base64') for e in q[1][attr]]
-                    data.append(q)
+                    if request.method == 'GET':
+                        for attr in q[1]:
+                            if attr in ['jpegPhoto', 'photo']:
+                                q[1][attr] = [e.encode('base64') for e in q[1][attr]]
+                        data.append(q)
+                    elif request.method == 'PUT':
+                        attrs_new = {}
+                        attrs_old = {}
+                        content = request.get_json(silent=True)
+                        for attr in content:
+                            if content[attr] != q[1].get(attr, [''])[0]:
+                                attrs_old[attr] = q[1].get(attr, ['*'])[0]
+                                attrs_new[attr] = content[attr].encode('utf-8')
+                        oa.modify(q[0], attrs_new, attrs_old)
+                        data.append((q[0], attrs_new, attrs_old))
+                    break
     return jsonify(datetime=datetime.now(), data=data)
 
 

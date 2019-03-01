@@ -44,11 +44,12 @@
            data-sort-name="displayname" data-pagination="true"
            data-toggle="table" data-search="true"
            data-show-footer="false" data-page-size="50"
-           data-escape="false" data-side-pagination="server"
-	   data-query-params="UsersParams" 
+           data-escape="false" data-maintain-selected="true"
 	   data-show-refresh="true" data-row-style="rowStyle"
 	   data-url="{{ url_for('api_users_all') }}?"
 	   data-response-handler="UsersResponseHandler"
+	   data-query-params="UsersParams"
+	   data-side-pagination="client"
 	   class="table table-hover table-striped table-compact 
 		  table-condensed table-autosize">
       <thead>

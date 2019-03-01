@@ -195,7 +195,7 @@ body {
     -o-transform: translateY(-50%);
 }
 .footer-bar ul span {
-    padding: 0px;
+    padding-left: 0px;
 }
 .login-form {
     position: relative;

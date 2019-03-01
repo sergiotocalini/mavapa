@@ -190,7 +190,7 @@
   </ul>
   <div class="tab-content">
     <div id="explore" class="tab-pane fade in active">
-      <div class="explore-items" style="width:80%;height:100%;float:left">
+      <div class="explore-items" style="width:75%;height:100%;float:left">
 	<div id="toolbar-org-explore">
 	  <button id="org-item-add" type="button"
 		  class="btn btn-primary"
@@ -246,8 +246,9 @@
 	  <tbody></tbody>
 	</table>
       </div>
-      <div class="explore-treeview" style="width:20%;height:100%;float:right">
-	<div id="treeview-org" style="padding: 2% 0% 0% 2%;overflow-y:auto;height:100%;width:100%"></div>
+      <div class="explore-treeview" style="width:25%;height:100%;float:right">
+	<div id="treeview-org"
+	     style="padding: 2% 0% 0% 2%;overflow-y:auto;height:100%;width:100%"></div>
       </div>
     </div>
     <div id="schemas" class="tab-pane fade">
@@ -302,16 +303,20 @@
     </div>
     <div id="mapping" class="tab-pane fade in"></div>
     <div id="terminal" class="tab-pane fade in">
-      <table id="table-org-terminal" data-show-toggle="false"
-	     data-show-export="false" data-sort-name="uidNumber"
-	     data-show-columns="true" data-show-multi-sort="true"
-	     data-sort-name="uid" data-pagination="true"
-	     data-toggle="table" data-search="true" data-show-refresh="true"
-	     data-toolbar="#toolbar-org-terminal" data-side-pagination="server"
-	     data-show-footer="false" data-page-size="50" data-escape="false"
-	     data-url="{{ url_for('api_backends_search') }}?" data-response-handler="TerminalResponseHandler"
+      <table id="table-org-terminal"
+	     data-toolbar="#toolbar-org-terminal"
+	     data-show-toggle="false" data-show-export="false"
+	     data-show-columns="false" data-show-multi-sort="true"
+	     data-sort-name="uidNumber" data-pagination="true"
+	     data-toggle="table" data-search="true"
+	     data-show-footer="false" data-page-size="50"
+	     data-escape="false" data-maintain-selected="true"
+	     data-show-refresh="true"
+	     data-response-handler="TerminalResponseHandler"
 	     data-query-params="TerminalParams"
-	     class="table table-hover table-striped table-compact table-condensed table-autosize">
+	     data-side-pagination="client"
+	     class="table table-hover table-striped table-compact
+		    table-condensed table-autosize">
 	<thead>
 	  <tr>
 	    <th data-field="select" data-visible="true"
@@ -342,7 +347,8 @@
 	      <i class="fa fa-fw fa-terminal"></i>
 	      Shell
 	    </th>
-	    <th data-valign="middle" data-align="center" data-field="actions">
+	    <th data-valign="middle" data-align="center" data-field="actions"
+		data-formatter="TerminalFormatterActions">
 	      <i class="fa fa-fw fa-user-cog"></i>
 	    </th>	  
 	  </tr>
@@ -356,6 +362,7 @@
 
 {% block modals %}
 {% include "admin/organizations/modals/backend.html" %}
+{% include "admin/organizations/modals/terminal.html" %}
 {% endblock %}
 
 {% block scripts%}
@@ -385,303 +392,8 @@
 <script src="{{ config['CDN_EXTRAS'] }}/bootstrap-treeview/1.2.0/js/bootstrap-treeview.js"></script>
 
 <script>
-var BACKEND_ID = null;
-
-$(document).ready(function () {
-    autosize_tables();
-    $(window).resize(function () {
-	autosize_tables();
-    });
-    $('.modal').on('hidden.bs.modal', function(){
-	$('.modal').find('.modal-title').html('New');
-	var forms = $(this).find('form');
-	forms.each(function(row){
-	    forms[row].reset();
-	});
-	var selectpickers = $(this).find('.selectpicker');
-	selectpickers.each(function(row){
-	    $(selectpickers[row]).selectpicker('refresh');
-	});
-    });
-
-    $(".section-toolbar a[data-click=section-switch]").on("click", function(a) {
-	a.preventDefault();
-	$(".section-switch").toggleClass("hidden");
-	$(".section-content").toggleClass("hidden");	
-	autosize_tables();
-    });
-    
-    $(".section-switch .button-connection").on("dblclick", function(a) {
-	a.preventDefault();
-	BACKEND_ID = $(this).data('id');
-	getTree();
-	$(".section-switch").addClass("hidden");
-	$(".section-content").removeClass("hidden");
-	autosize_tables();
-    });
-    
-    $(".section-switch a[data-click=connect]").on("click", function(a) {
-	a.preventDefault();
-	BACKEND_ID = $(this).parent().parent().parent().parent().parent().data('id');
-	getTree();
-	$(".section-switch").addClass("hidden");
-	$(".section-content").removeClass("hidden");
-	autosize_tables();
-    });
-
-    $(".section-switch a[data-click=delete]").on("click", function(a) {
-	a.preventDefault();
-	var backend = $(this).parent().parent().parent().parent().parent().data('id');
-	$.ajax({
-	    url: "{{ url_for('api_backends') }}?id=" + backend,
-	    type: 'DELETE',
-	    contentType: "application/json",
-	    success: function(e) {
-		console.log(e);
-	    }
-	});
-    });
-    
-    $(".section-switch a[data-click=edit]").on("click", function(a) {
-	a.preventDefault();
-	var backend = $(this).parent().parent().parent().parent().parent().data('id');
-	var modal = "#ModalBackend";
-	$.ajax({
-	    url: "{{ url_for('api_backends') }}?id=" + backend,
-	    type: 'GET',
-	    contentType: "application/json",
-	    success: function(e) {
-		$(modal).find('.modal-title').html(e['backends'][0]['name']);
-		$(modal).find('#backend-id').val(e['backends'][0]['id']);
-		$(modal).find('#backend-name').val(e['backends'][0]['name']);
-		$(modal).find('#backend-type').selectpicker('val', e['backends'][0]['type']);
-		$(modal).find('#backend-url').val(e['backends'][0]['host']);
-		$(modal).find('#backend-timeout').val(e['backends'][0]['timeout']);
-		$(modal).find('#backend-username').val(e['backends'][0]['binddn']);
-		$(modal).find('#backend-password').val(e['backends'][0]['bindpw']);
-		$(modal).find('#backend-search').val(e['backends'][0]['basedn']);
-		$(modal).find('#backend-filter').val(e['backends'][0]['filter']);
-		$(modal).find('#backend-attribute').val(e['backends'][0]['login']);
-		$(modal).find('#backend-onfly').prop('checked', e['backends'][0]['onfly']).change();
-		$(modal).modal('show');
-	    }
-	});
-    });
-    
-    $(".switch-toolbar a[data-click=new]").on("click", function(a) {
-	a.preventDefault();
-	$("#ModalBackend").modal("show");
-    });
-    
-    $(".nav-tabs a[data-toggle=tab]").on("click", function(e) {
-	if ($(this).parent().hasClass("disabled")) {
-	    e.preventDefault();
-	    return false;
-	}
-    });
-    $(document).on("click", "[data-click=section-switch]", function(a) {
-	a.preventDefault();
-	console.log("Rotate");
-    });
-    
-    jqlisteners();
-    // getTree();
-});
-
+{% include "admin/organizations/index.js" %}
 {% include "admin/organizations/modals/backend.js" %}
-
-function TerminalParams(params) {
-    return { exclude: 'jpegPhoto,photo', backend: BACKEND_ID, filter: '(ObjectClass=posixAccount)' }
-}
-
-function TerminalResponseHandler(res) {
-    var data = [];
-    for (r in res.data) {
-	var row = res.data[r];
-	var doc = {
-	    'dn': row[0],
-	    'uidNumber': row[1]['uidNumber'] ? row[1]['uidNumber'][0] : null,
-	    'uid': row[1]['uid'] ? row[1]['uid'][0] : null,
-	    'gecos': row[1]['gecos'] ? row[1]['gecos'][0] : null,
-	    'gidNumber': row[1]['gidNumber'] ? row[1]['gidNumber'][0] : null,
-	    'homeDirectory': row[1]['homeDirectory'] ? row[1]['homeDirectory'][0] : null,
-	    'loginShell': row[1]['loginShell'] ? row[1]['loginShell'][0] : null
-	};
-	data.push(doc);
-    };
-    return {
-	total: res.total ? res.total : data.length,
-	rows: data
-    }
-}
-
-function getTerminal() {
-    var table = '#table-org-terminal';
-    $.ajax({
-	url: "{{ url_for('api_backends_search') }}",
-	type: 'GET',
-	contentType: "application/json",
-	data: { backend: BACKEND_ID, filter: '(ObjectClass=posixAccount)'},
-	success: function(e) {
-	    var selected = $(table).bootstrapTable('getAllSelections');
-	    $(table).bootstrapTable('removeAll');
-	    $(table).bootstrapTable('showLoading');
-	    $(table).parent().addClass('table-loading');
-	    var data = e['data'];
-	    for (item in data) {
-		$(table).bootstrapTable('append', {
-		    'dn': data[item][0],
-		    'uidNumber': data[item][1]['uidNumber'] ? data[item][1]['uidNumber'][0] : null,
-		    'uid': data[item][1]['uid'] ? data[item][1]['uid'][0] : null,
-		    'gecos': data[item][1]['gecos'] ? data[item][1]['gecos'][0] : null,
-		    'gidNumber': data[item][1]['gidNumber'] ? data[item][1]['gidNumber'][0] : null,
-		    'homeDirectory': data[item][1]['homeDirectory'] ? data[item][1]['homeDirectory'][0] : null,
-		    'loginShell': data[item][1]['loginShell'] ? data[item][1]['loginShell'][0] : null
-		});
-	    };
-	    $(table).parent().removeClass('table-loading');
-	    $(table).bootstrapTable('hideLoading');
-	}
-    });
-};
-
-function getTree() {
-    $.ajax({
-	url: "{{ url_for('api_backends_tree') }}",
-	type: 'GET',
-	contentType: "application/json",
-	data: { backend: BACKEND_ID, type: 'items' },
-	success: function(e) {
-	    var get_tree = function(item) {
-		var data = []
-		if (item.children) {
-		    for (child in item.children) {
-			data.push(get_tree(item.children[child]));
-		    }
-		} else {
-		    info = {text: item.name, dn: item.dn, backend: BACKEND_ID}
-		    if (item.name.startsWith("dc=")) {
-			info['icon'] = 'fa fa-fw fa-book'
-		    } else if (item.name.startsWith("ou=")) {
-			info['icon'] = 'fa fa-fw fa-cubes'
-		    } else {
-			info['icon'] = 'fa fa-fw fa-cube'
-		    }
-		    return info
-		}
-		info = {
-		    text: item.name, dn: item.dn, backend: BACKEND_ID,
-		    nodes: data, tags: [ data.length ]
-		}
-		if (item.name.startsWith("dc=")) {
-		    info['icon'] = 'fa fa-fw fa-book'
-		} else if (item.name.startsWith("ou=")) {
-		    info['icon'] = 'fa fa-fw fa-cubes'
-		} else {
-		    info['icon'] = 'fa fa-fw fa-cube'
-		}
-		return info
-	    };
-	    $('#treeview-org').treeview({
-		data: [get_tree(e['data'])],
-		showTags: true,
-	    });
-	    $('#treeview-org').on('searchComplete', function(event, data) {
-		// Your logic goes here
-		$(this).treeview('checkAll', { silent: true });
-		var nodes = $(this).treeview('getChecked');
-		var find_node_dep = function(nodeid) {
-		    var data = []
-		    var node = $('#treeview-org').treeview('getNode', nodeid);
-		    if (typeof node.parentId !== "undefined") {
-			data.push(find_node_dep(node['parentId']))
-		    } else {
-			return node['nodeId'];
-		    }
-		    data.push(node['nodeId']);
-		    return data;
-		}
-		var nodes_enable = []
-		for (e in data) {
-		    var enables = find_node_dep(data[e]['nodeId']);
-		    console.log(data[e]);
-		    nodes_enable.concat(enables);
-		}
-		console.log(nodes_enable);
-		for (c in nodes) {
-		    if ( ! nodes_enable.includes(nodes[c]['nodeId']) ) {
-			// var node = $(this).treeview('getNode', c);
-			$('li[data-nodeid=' + nodes[c]['nodeId'] + ']').addClass('hidden');
-		    }
-		}
-	    });
-	    $('#treeview-org').on('nodeSelected', function(event, data) {
-		var get_path = function(nodeid) {
-		    var data = []
-		    var node = $('#treeview-org').treeview('getNode', nodeid);
-		    if (typeof node.parentId !== "undefined") {
-			data.push(get_path(node['parentId']));
-		    } else {
-			return node['text'];
-		    }
-		    data.push(node['text']);
-		    data.reverse();
-		    return data.join(',');
-		};
-		// var dn = get_path(data['nodeId']);
-		var table = '#table-org-explore';
-		$(table).bootstrapTable('removeAll');
-		$(table).bootstrapTable('showLoading');
-		$(table).parent().addClass('table-loading');
-		$.ajax({
-		    url: "{{ url_for('api_backends_items') }}",
-		    type: 'GET',
-		    contentType: "application/json",
-		    data: { backend: data['backend'], dn: data['dn'] },
-		    success: function(e) {
-			var data = e['data'];
-			for (user in data) {
-			    $(table).bootstrapTable('append', {
-				'key': 'dn',
-				'value': data[user][0],
-				'input': data[user][0],				
-			    });
-			    for (key in data[user][1]) {
-				for (value in data[user][1][key]) {
-				    $(table).bootstrapTable('append', {
-					'key': key,
-					'value': data[user][1][key][value],
-					'input': data[user][1][key][value],
-				    });
-				};
-			    };
-			};
-			$(table).parent().removeClass('table-loading');
-			$(table).bootstrapTable('hideLoading');
-		    },
-		    error: function(e) {
-			$(table).parent().removeClass('table-loading');
-			$(table).bootstrapTable('hideLoading');
-		    }
-		});
-	    });
-	    $('#treeview-org').treeview('selectNode', [ 0 ]);	    
-	}
-    });
-};
-
-function jqlisteners() {
-    console.log("Loading");
-    jqlisteners_modal_backend();
-};
-
-function OrgItemFormatterValue(value, row) {
-    var html = ""
-    html += '<div class="text-ellipsis">'
-    html +=  '<span>' + value + '</span>';
-    html += '</div>'
-    return html;
-};
-
+{% include "admin/organizations/modals/terminal.js" %}
 </script>
 {% endblock %}

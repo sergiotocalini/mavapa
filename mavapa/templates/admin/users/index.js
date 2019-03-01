@@ -109,6 +109,8 @@ function UsersResponseHandler(res) {
 	};
 	data.push(doc);
     };
+    console.log(data);
+    return data;
     return {
 	total: res.total,
 	rows: data,
