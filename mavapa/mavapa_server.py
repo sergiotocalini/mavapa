@@ -1,25 +1,31 @@
 #!/usr/bin/env python
-#from jinja2 import TemplateNotFound
-#import requests
+# from jinja2 import TemplateNotFound
+# import requests
 import urllib
 import random
 import string
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, abort, redirect, request, jsonify, session, url_for
-from lib import *
-from forms import *
+from flask import Blueprint, render_template, abort
+from flask import redirect, request, jsonify, session, url_for
+from pony.orm import commit
+from .lib import *
+from .forms import *
 
 MAVAPA_URL = ''
 AUTH_URL = MAVAPA_URL + '/auth?response_type=code'
 TOKEN_URL = MAVAPA_URL + '/token'
 USER_INFO_URL = MAVAPA_URL + '/who_im/'
 LOGOUT_URL = MAVAPA_URL + '/logout'
-mavapa_server = Blueprint('mavapa_server', __name__, template_folder='templates')
+mavapa_server = Blueprint(
+    'mavapa_server', __name__, template_folder='templates'
+)
+
 
 def make_rnd_str():
-    s = string.letters + string.digits
+    s = string.ascii_letters + string.digits
     r = ''.join([random.choice(s) for x in range(24)])
     return r
+
 
 @db_session
 def get_data(table, **kwargs):
@@ -28,6 +34,7 @@ def get_data(table, **kwargs):
     else:
         return select(o for o in eval(table))
 
+    
 @db_session
 def save_code(app, user, code):
     """
@@ -41,6 +48,7 @@ def save_code(app, user, code):
                   session=session['mavapa_session'])
     commit()
     return token
+
 
 @mavapa_server.route('/who_im/')
 @db_session
@@ -64,18 +72,20 @@ def who_im():
             return jsonify(data)
     return abort(403)
 
+
 @mavapa_server.route('/token', methods=['POST'])
 @db_session
 def token():
     grant_type = request.form.get('grant_type')
     code = request.form.get('code')
     redirect_uri = request.form.get('redirect_uri')
-    redirect_uri = urllib.unquote(redirect_uri)
+    redirect_uri = urllib.parse.unquote(redirect_uri)
     client_id = request.form.get('client_id')
     client_secret = request.form.get('client_secret')
     data = {"error": "invalid_request"}
     app = get_data(
-        'App', client_id=client_id, redirect_uri=redirect_uri, client_secret=client_secret
+        'App', client_id=client_id,
+        redirect_uri=redirect_uri, client_secret=client_secret
     )
     if app:
         token = get_data('Token', code=code)
@@ -85,6 +95,7 @@ def token():
             commit()
             data = {'access_token': tk}
     return jsonify(data)
+
 
 @mavapa_server.route('/accept_app/')
 @db_session
@@ -113,6 +124,7 @@ def accept_app():
     ctx = {'app_name': app.name, 'app_desc': app.desc, 'app_icon': app.icon}
     return render_template('accept_app.html', ctx=ctx)
 
+
 @mavapa_server.route('/auth')
 @db_session
 def auth():
@@ -126,7 +138,7 @@ def auth():
     response_type = request.args.get('response_type')
     client_id = request.args.get('client_id')
     redirect_uri = request.args.get('redirect_uri')
-    redirect_uri = urllib.unquote(redirect_uri)
+    redirect_uri = urllib.parse.unquote(redirect_uri)
     scopes = request.args.get('scopes')
     if scopes:
         scopes = scopes.split(',')

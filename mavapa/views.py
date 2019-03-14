@@ -3,30 +3,36 @@
 from hashlib import md5
 from functools import wraps, update_wrapper
 import os
-import datetime
+# import datetime
 import urllib
 import requests
 import arrow
 import pony
 from flask import Flask, request, render_template, g, jsonify, current_app
 from flask import url_for, abort, flash, redirect, session, make_response
-from forms import *
-from lib import *
-from mavapa_server import mavapa_server
-from datetime import timedelta
+from pony.orm import select, count, commit, desc
+from .forms import Login, Reset
+# from .lib import *
+from .lib.models import db, db_session
+from .lib.models import App, Token, User, Backend, Session, Retrieve
+from .lib.models import NotifyAgent
+from .lib.backends import LDAP
+from .mavapa_server import mavapa_server
+from datetime import datetime, timedelta
 
 app = Flask(__name__, instance_relative_config=False)
 app.config.from_object(os.environ.get('APP_SETTINGS', None))
 app.register_blueprint(mavapa_server)
 
+context = app.config.get('APPLICATION_ROOT', '')
 if 'CDN_LOCAL' not in app.config:
-    app.config['CDN_LOCAL'] = '%s/static/app' % app.config.get('APPLICATION_ROOT', '')
+    app.config['CDN_LOCAL'] = '%s/static/app' % context
 
 if 'CDN_EXTRAS' not in app.config:
-    app.config['CDN_EXTRAS'] = '%s/static/extras' % app.config.get('APPLICATION_ROOT', '')
+    app.config['CDN_EXTRAS'] = '%s/static/extras' % context
 
 if 'CDN_MAVAPA' not in app.config:
-    app.config['CDN_MAVAPA'] = '%s/static' % (app.config.get('APPLICATION_ROOT', ''))
+    app.config['CDN_MAVAPA'] = '%s/static' % context
 
 if app.config['DB_TYPE'] == 'mysql':
     db.bind(
@@ -75,7 +81,7 @@ def get_from_backend(**kwargs):
     return None
 
 
-@db_session(retry=3)
+# @db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
         return eval(table).get(**kwargs)
@@ -88,7 +94,8 @@ def custom_tools():
     def time_age(datetime, endword='years'):
         born = arrow.get(datetime)
         today = arrow.now()
-        age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
+        year = today.year - born.year
+        age = year - ((today.month, today.day) < (born.month, born.day))
         return '%i %s' % (age, endword)
 
     def time_generalize(datetime, fmt='MMMM D, YYYY'):
@@ -144,10 +151,10 @@ def backends_search_users(email, passwd=None, exist=False):
                     info['mobile'] = ''
                     info['mailrecovery'] = ''
                     info['exist'] = True if ondb else False
-                    if x.has_key('mobile'):
+                    if 'mobile' in x:
                         mobile = x['mobile'][0].decode('utf-8')
                         info['mobile'] = mobile
-                    if x.has_key('mailRecovery'):
+                    if 'mailRecovery' in x:
                         recover = x['mailRecovery'][0].decode('utf-8')
                         info['mailrecovery'] = recover
                     users.append(info)
@@ -186,7 +193,7 @@ def session_destroy():
 
 @db_session(retry=3)
 def user_onfly(user, passwd):
-    for i in select(o for o in Backend if o.onfly == True):
+    for i in select(o for o in Backend if o.onfly):
         if i.type in ['LDAP', 'AD']:
             qfilter = '(&(%s=%s)%s)' % (i.login, user, i.filter)
             attrs = ['givenname', 'sn', 'mail', 'mobile', 'mailRecovery']
@@ -245,11 +252,11 @@ def user_login(user, passwd):
                     lname = query[0][1]['sn'][0].decode('utf-8')
                     update = {'firstname': fname.title(),
                               'lastname': lname.title()}
-                    if query[0][1].has_key('mobile'):
+                    if 'mobile' in query[0][1]:
                         mobile = query[0][1]['mobile'][0].decode('utf-8')
                         update['mobile'] = mobile
 
-                    if query[0][1].has_key('mailRecovery'):
+                    if 'mailRecovery' in query[0][1]:
                         recover = query[0][1]['mailRecovery'][0]
                         update['mailrecovery'] = recover.decode('utf-8')
 
@@ -420,7 +427,7 @@ def admin(mod):
 def apps():
     apps = {}
     for i in get_data('App'):
-        if i.hidden == True:
+        if i.hidden is True:
             continue
         tag = 'General'
         if i.tags:
@@ -471,7 +478,7 @@ def login():
                     next_url = request.args.get("next")
                     if next_url is None:
                         next_url = url_for('index')
-                return redirect(urllib.unquote(next_url))
+                return redirect(urllib.parse.unquote(next_url))
         return render_template('login.html', form=form)
     else:
         next_url = session.pop('next_url', None)
@@ -479,7 +486,7 @@ def login():
             next_url = request.args.get("next")
             if next_url is None:
                 next_url = url_for('index')
-        return redirect(urllib.unquote(next_url))
+        return redirect(urllib.parse.unquote(next_url))
 
 
 @app.route('/logout')
@@ -557,7 +564,7 @@ def api_apps():
 
             if args.get('favorites', False):
                 user = get_data('User', email=session['mavapa_account'])
-                fav = [i.to_dict(only) for i in user.apps if i.hidden == False]
+                fav = [i.to_dict(only) for i in user.apps if not i.hidden]
 
             data = []
             keys = {}
@@ -598,7 +605,7 @@ def api_apps():
 def api_code():
     content = request.get_json(silent=True)
     if content:
-        if content.has_key('account'):
+        if 'account' in content:
             user = get_data('User', email=content['account'])
             if user:
                 send = True
@@ -618,7 +625,7 @@ def api_code():
                 commit()
 
                 NOTIFY_API = get_data('Config', key='NOTIFY_API')
-                if NOTIFY_API:
+                if NOTIFY_API and send:
                     URL = NOTIFY_API.value
                     NOTIFY_TOKEN = get_data('Config', key='NOTIFY_TOKEN')
                     if NOTIFY_TOKEN:
@@ -635,7 +642,7 @@ def api_code():
                         content['body'] = """
                         Code: %s
                         """ % token.code
-                    r = requests.post(URL, json=content, verify=False)
+                    requests.post(URL, json=content, verify=False)
                 else:
                     print(user.email, token.code)
     return jsonify(datetime=datetime.now())
@@ -723,11 +730,18 @@ def api_backends_tree():
     else:
         abort(404)
 
-    backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    if qfilter['backend']:
+        backend = filter(None, [get_data('Backend', id=qfilter['backend'])])
+    else:
+        backend = get_data('Backend')
     for i in backend:
         if i.type in ['LDAP', 'AD']:
             oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
-            data = oa.tree(attrs=attrs, basedn=basedn.format(i.basedn), scope=scope)
+            data = oa.tree(
+                attrs=attrs,
+                basedn=basedn.format(i.basedn),
+                scope=scope
+            )
     return jsonify(datetime=datetime.now(), data=data, title=qfilter)
 
 
@@ -736,29 +750,28 @@ def api_backends_tree():
 def api_backends_items():
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['backend', 'dn'])
+    only_conn = ['host', 'port', 'binddn', 'bindpw']
     data = []
-    if qfilter.has_key('backend') or qfilter.has_key('dn'):
+    if 'backend' in qfilter or 'dn' in qfilter:
         for i in [get_data('Backend', id=qfilter['backend'])]:
             if i.type in ['LDAP', 'AD']:
-                oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
+                oa = LDAP(**i.to_dict(only=only_conn))
                 query = oa.query(
                     filter=qfilter['dn'], attrs=['*'],
                     basedn=i.basedn, limit=1, scope=0, dn=True
                 )
-                for q in query:
-                    if request.method == 'GET':
-                        for attr in q[1]:
-                            if attr in ['jpegPhoto', 'photo']:
-                                q[1][attr] = [e.encode('base64') for e in q[1][attr]]
-                        data.append(q)
-                    elif request.method == 'PUT':
+
+                if request.method == 'GET':
+                    data = query
+                elif request.method == 'PUT':
+                    for q in query:
                         attrs_new = {}
                         attrs_old = {}
                         content = request.get_json(silent=True)
                         for attr in content:
                             if content[attr] != q[1].get(attr, [''])[0]:
                                 attrs_old[attr] = q[1].get(attr, ['*'])[0]
-                                attrs_new[attr] = content[attr].encode('utf-8')
+                                attrs_new[attr] = content[attr]
                         oa.modify(q[0], attrs_new, attrs_old)
                         data.append((q[0], attrs_new, attrs_old))
                     break
@@ -772,19 +785,29 @@ def api_backends_search():
     qfilter = dict((x, args[x]) for x in args)
     qfilter.setdefault('backend', None)
     qfilter.setdefault('exclude', '')
+    only_conn = ['host', 'port', 'binddn', 'bindpw']
+    only_backend = ['id', 'name', 'type', 'desc']
     data = []
-    if qfilter.has_key('filter'):
-        backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    if 'filter' in qfilter:
+        if qfilter['backend']:
+            backend = filter(
+                None, [get_data('Backend', id=qfilter['backend'])]
+            )
+        else:
+            backend = get_data('Backend')
+        qfilter['exclude'] = qfilter['exclude'].split(',')
         for i in backend:
+            conn = i.to_dict(only=only_backend)
             if i.type in ['LDAP', 'AD']:
-                oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
-                query = oa.query(filter=qfilter['filter'], basedn=i.basedn)
+                oa = LDAP(**i.to_dict(only=only_conn))
+                query = oa.query(
+                    filter=qfilter['filter'],
+                    basedn=i.basedn,
+                    exclude=qfilter['exclude']
+                )
                 for row in query:
-                    row[1]['backend'] = i.to_dict(only=['id', 'name', 'type', 'desc'])                        
-                    for attr in row[1]:
-                        if attr in ['jpegPhoto', 'photo']:
-                            row[1][attr] = [e.encode('base64') for e in row[1][attr]]
-                    data.append([row[0], dict((k, row[1][k]) for k in row[1] if k not in qfilter['exclude'].split(','))])
+                    row[1]['backend'] = conn
+                    data.append(row)
     return jsonify(datetime=datetime.now(), data=data)
 
 
@@ -792,7 +815,8 @@ def api_backends_search():
 @db_session(retry=3)
 def api_backends_search_users():
     args = request.args.to_dict()
-    qfilter = dict((x, args[x]) for x in args if x in ['email', 'filter', 'only', 'backend'])
+    required = ['email', 'filter', 'only', 'backend']
+    qfilter = dict((x, args[x]) for x in args if x in required)
     qfilter.setdefault('email', '*')
     qfilter.setdefault('filter', '(ObjectClass=person)')
     qfilter.setdefault('only', 'all')
@@ -800,30 +824,52 @@ def api_backends_search_users():
     qfilter.setdefault('exclude', 'jpegPhoto,photo')
     qfilter.setdefault('backend', None)
     data = []
-    backend = [get_data('Backend', id=qfilter['backend'])] if qfilter['backend'] else get_data('Backend')
+    qfilter['include'] = qfilter['include'].split(',')
+    qfilter['exclude'] = qfilter['exclude'].split(',')
+    if qfilter['backend']:
+        backend = filter(None, [get_data('Backend', id=qfilter['backend'])])
+    else:
+        backend = get_data('Backend')
     for i in backend:
+        conn = i.to_dict(only=['id', 'name', 'type', 'desc'])
         if i.type in ['LDAP', 'AD']:
             oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
             query = oa.query(
-                filter='(&(%s=%s)%s)' % (i.login, qfilter['email'], qfilter['filter']),
-                attrs=[a for a in qfilter['include'].split(',')],
-                basedn=i.basedn, limit=1
+                filter='(&(%s=%s)%s)' % (
+                    i.login, qfilter['email'], qfilter['filter']
+                ),
+                attrs=qfilter['include'], exclude=qfilter['exclude'],
+                basedn=i.basedn, limit=1,
             )
-            if query:
-                for dn, x in query:
-                    info = {}
-                    info['exist'] = True if get_data('User', email=x['mail'][0]) else False
-                    if qfilter['only'] not in ['all', 'ALL']:
-                        if qfilter['only'] == 'exist' and not info['exist']:
-                            continue
-                        elif qfilter['only'] == 'noexist' and info['exist']:
-                            continue
-                    info['backend'] = i.to_dict(
-                        only=['id', 'name', 'type', 'desc']
-                    )
-                    for attr in x:
-                        info[attr] = [e.decode('utf-8') for e in x[attr] if attr not in qfilter['exclude'].split(',')]
-                    data.append(info)
+            for row in query:
+                row[1]['exist'] = False
+                if get_data('User', email=row[1]['mail'][0]):
+                    row[1]['exist'] = True
+                if qfilter['only'] not in ['all', 'ALL']:
+                    if qfilter['only'] == 'exist' and not row[1]['exist']:
+                        continue
+                    elif qfilter['only'] == 'noexist' and row[1]['exist']:
+                        continue
+                row[1]['backend'] = conn
+                data.append(row)
+
+            # if query:
+            #     for dn, x in query:
+            #         info = {}
+            #         info['exist'] = False
+            #         if get_data('User', email=x['mail'][0]):
+            #             info['exist'] = True
+            #         if qfilter['only'] not in ['all', 'ALL']:
+            #             if qfilter['only'] == 'exist' and not info['exist']:
+            #                 continue
+            #             elif qfilter['only'] == 'noexist' and info['exist']:
+            #                 continue
+            #         info['backend'] = i.to_dict(
+            #             only=['id', 'name', 'type', 'desc']
+            #         )
+            #         for attr in x:
+            #             info[attr] = [e.decode('utf-8') for e in x[attr] if attr not in qfilter['exclude'].split(',')]
+            #         data.append(info)
     return jsonify(datetime=datetime.now(), data=data)
 
 
@@ -885,10 +931,10 @@ def api_users_all():
     args.setdefault('offset', 0)
     args.setdefault('limit', 50)
     args.setdefault('status', None)
-    only_user = [
-        'id', 'userid', 'displayname', 'email', 'avatar',
-        'status', 'title', 'created_on', 'last_seen'
-    ]
+    # only_user = [
+    #     'id', 'userid', 'displayname', 'email', 'avatar',
+    #     'status', 'title', 'created_on', 'last_seen'
+    # ]
     only_backend = ['id', 'name', 'type', 'desc']
     data = []
     raw = get_data('User')
@@ -936,21 +982,18 @@ def api_users_search():
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
     only_backend = ['id', 'name', 'type', 'desc']
     data = []
-    if not qfilter:
-        for i in get_data('User'):
-            user = i.to_dict(exclude=['passwd'])
-            user['backend'] = i.backend.to_dict(only=only_backend) if i.backend else None
-            user['displayname'] = i.displayname
-            user['avatar'] = i.avatar()
-            data.append(user)
+    if qfilter:
+        res = filter(None, [get_data('User', **qfilter)])
     else:
-        res = get_data('User', **qfilter)
-        if res:
-            user = res.to_dict(exclude=['passwd'])
-            user['backend'] = i.backend.to_dict(only=only_backend) if i.backend else None
-            user['displayname'] = res.displayname
-            user['avatar'] = res.avatar()
-            data.append(user)
+        res = get_data('User')
+
+    for i in res:
+        user = i.to_dict(exclude=['passwd'])
+        if i.backend:
+            user['backend'] = i.backend.to_dict(only=only_backend)
+        user['displayname'] = i.displayname
+        user['avatar'] = i.avatar()
+        data.append(user)
     return jsonify(datetime=datetime.now(), data=data)
 
 

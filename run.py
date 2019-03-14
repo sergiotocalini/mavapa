@@ -3,12 +3,17 @@ from werkzeug.serving import run_simple
 from werkzeug.wsgi import DispatcherMiddleware
 from mavapa import app
 
+
 def simple(env, resp):
-    """A wrapper of a prefix"""
-    resp(b'200 OK', [(b'Content-Type', b'text/plain')])
+    resp("200 OK", [("Content-Type", "text/plain")])
     return [b"Hello WSGI World"]
 
-dispatcher = DispatcherMiddleware(simple, {app.config.get('APPLICATION_ROOT', '/'): app}) # pylint: disable=I0011,C0103
+
+addr = app.config.get('BIND', '0.0.0.0')
+port = app.config.get('PORT', 7001)
+root = app.config.get('APPLICATION_ROOT', '/')
+disp = DispatcherMiddleware(simple, {root: app})
+
 
 if __name__ == "__main__":
-    run_simple(app.config.get('BIND', '0.0.0.0'), app.config.get('PORT', 7001), dispatcher)
+    run_simple(addr, port, disp)
