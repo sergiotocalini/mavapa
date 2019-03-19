@@ -1,4 +1,11 @@
 function jqlisteners_users() {
+    $("#user-add").unbind();
+    $("#user-add").click(function(e){
+	e.preventDefault();
+	var modal = '#ModalUser';
+	$(modal).find('#user-form-basic-avatar').attr('src', "{{ config['CDN_LOCAL'] }}/img/avatar.jpg");
+	$(modal).modal('show');
+    });
     $(".user-import").unbind();
     $(".user-import").click(function(e) {
 	e.preventDefault();
@@ -25,12 +32,6 @@ function jqlisteners_users() {
 	    }
 	});
     });
-    $("#user-add").unbind();
-    $("#user-add").click(function(e){
-	e.preventDefault();
-	var modal = '#ModalUser';
-	$(modal).modal('show');
-    });
     $(".user-edit").unbind();
     $(".user-edit").click(function(e){
 	e.preventDefault();
@@ -45,8 +46,7 @@ function jqlisteners_users() {
 		var profile = '{{ url_for("profile") }}/' + data['id'];
 		var display = data['lastname'] + ', ' + data['firstname'];
 		$(modal).find('.modal-title').html(display);
-		$(modal).find('#avatar').attr('src', data['avatar']);
-		$(modal).find('#user-profile').attr('href', profile);
+		$(modal).find('#user-form-basic-avatar').attr('src', data['avatar']);
 		$(modal).find('#user-form-basic-id').val(data['id']);
 		$(modal).find('#user-form-basic-email').val(data['email']);
 		$(modal).find('#user-form-basic-emailrecovery').val(data['mailrecovery']);
