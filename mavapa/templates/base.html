@@ -3,18 +3,12 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/img/favicon.ico" type="image/x-icon"/>
-   
-    <link  href="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link  href="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
-    
-    <link  href="{{ config['CDN_EXTRAS'] }}/fontawesome/5.0.13/css/fontawesome-all.min.css" rel="stylesheet">
-    
-    <link href="{{ config['CDN_LOCAL'] }}/css/style.css"  rel="stylesheet">
-    <link href="{{ config['CDN_LOCAL'] }}/css/mavapa.css" rel="stylesheet">    
+    {% include "__include__/jquery.html" %}
+    {% include "__include__/bootstrap.html" %}
+    {% include "__include__/fontawesome.html" %}    
+    {% include "__include__/mavapa.html" %}
   </head>
   <body>
-
     {% block navbar %}
     <nav class="header-bar navbar navbar-default navbar-static-top">
       <div class="content-bar">
@@ -124,11 +118,6 @@
     </div>
     {% endblock %}
   </body>
-  
-  <script src="{{ config['CDN_EXTRAS'] }}/jquery/3.1.1/jquery.min.js"></script>
-  <script src="{{ config['CDN_EXTRAS'] }}/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script src="{{ config['CDN_LOCAL']  }}/js/scripts.js"></script>
-  <script src="{{ config['CDN_LOCAL']  }}/js/mavapa.js"></script>
   {% block scripts %}
   {% endblock%}
 </html>

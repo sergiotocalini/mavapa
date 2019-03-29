@@ -164,6 +164,18 @@
 <div class="section-content fade in hidden" style="height: 93%; padding: 0.5% 0.5% 0% 0.5%;">
   <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
     <li class="active">
+      <a data-toggle="tab" href="#people">
+	<i class="fa fa-fw fa-address-card"></i>
+	People
+      </a>
+    </li>
+    <li class="disabled">
+      <a data-toggle="tab" href="#groups">
+	<i class="fa fa-fw fa-users"></i>
+	Groups
+      </a>
+    </li>
+    <li>
       <a data-toggle="tab" href="#explore">
 	<i class="fa fa-fw fa-book-open"></i>
 	Explore
@@ -181,15 +193,110 @@
 	Mapping
       </a>
     </li>
-    <li>
-      <a data-toggle="tab" href="#terminal">
-	<i class="fa fa-fw fa-terminal"></i>
-	Terminal
-      </a>
-    </li>
   </ul>
   <div class="tab-content">
-    <div id="explore" class="tab-pane fade in active">
+    <div id="people" class="tab-pane fade in active table-responsive-sm">
+      <div id="org-people-table-toolbar">
+	<div class="btn-group">
+	  <button class="btn btn-primary" type="button" data-toggle="modal" data-click="people-add"
+		  aria-haspopup="true" aria-expanded="false">
+	    <i class="fa fa-fw fa-plus"></i>
+	  </button>
+	  <button class="btn btn-default" type="button" data-toggle="modal" data-click="people-data-import"
+		  aria-haspopup="true" aria-expanded="false">
+	    <i class="fa fa-fw fa-clipboard-check"></i>
+	  </button>
+	</div>
+	<div class="btn-group" id="btn-selection">
+	  <button class="btn btn-success" type="button" data-toggle="modal" data-click="people-bulk-import"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+	    <i class="fa fa-fw fa-folder-plus"></i>
+	  </button>
+	  <button class="btn btn-warning" type="button" data-toggle="modal" data-click="people-bulk-update"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+	    <i class="fa fa-fw fa-pencil-alt"></i>
+	  </button>
+	  <button class="btn btn-danger" type="button" data-toggle="modal" data-click="people-bulk-delete"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+	    <i class="fa fa-fw fa-trash"></i>
+	  </button>
+	  <button class="btn btn-default" type="button" data-toggle="modal" data-click="people-data-export"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+	    <i class="fa fa-fw fa-file-download"></i>
+	  </button>
+	</div>
+      </div>
+      <table id="table-org-people"
+	     data-toolbar="#org-people-table-toolbar"
+	     data-show-toggle="false" data-show-export="false"
+	     data-show-columns="true" data-show-multi-sort="true"
+	     data-sort-name="lastname" data-pagination="true"
+	     data-toggle="table" data-search="true"
+	     data-show-footer="false" data-page-size="500"
+	     data-escape="false" data-maintain-selected="true"
+	     data-show-refresh="true" data-icon-size="md" data-show-fullscreen="true"
+	     data-response-handler="PeopleResponseHandler"
+	     data-query-params="PeopleParams"
+	     data-side-pagination="client"
+	     class="table table-hover table-striped table-compact table-sm
+		    table-condensed table-autosize">
+	<thead class="thead-light">
+	  <tr>
+	    <th data-field="select" data-visible="true"
+		data-checkbox="true">
+	      <i class="fa fa-fw fa-check-square"></i>
+	    </th>
+	    <th data-field="lastname" data-halign="center"
+		data-valign="middle" data-align="left" data-sortable="true"
+		data-formatter="PeopleFormatterName">
+	      <i class="fa fa-fw fa-id-badge"></i>
+	      Name
+	    </th>
+	    <th data-field="email" data-halign="center"
+		data-valign="middle" data-align="left" data-sortable="true"
+		data-formatter="PeopleFormatterEmail">
+	      <i class="fa fa-fw fa-envelope"></i>
+	      Email
+	    </th>
+	    <th data-field="uid" data-halign="center"
+		data-valign="middle" data-align="left" data-sortable="true"
+		data-formatter="PeopleFormatterUsername">
+	      <i class="fa fa-fw fa-user-shield"></i>
+	      Username
+	    </th>
+	    <th data-field="uidNumber" data-halign="center" data-visible="false"
+		data-valign="middle" data-align="center" data-sortable="true">
+	      <i class="fa fa-fw fa-hashtag"></i>
+	      UID
+	    </th>
+	    <th data-field="gidNumber" data-halign="center" data-visible="false"
+		data-valign="middle" data-align="center" data-sortable="true">
+	      <i class="fa fa-fw fa-hashtag"></i>
+	      GID
+	    </th>
+	    <th data-field="homeDirectory" data-halign="center" data-visible="false"
+		data-valign="middle" data-align="left" data-sortable="false">
+	      <i class="fa fa-fw fa-home"></i>
+	      Home
+	    </th>
+	    <th data-field="loginShell" data-halign="center" data-visible="false"
+		data-valign="middle" data-align="left" data-sortable="false">
+	      <span class="fa-stack" style="font-size: 0.60em;width:2em;">
+		<i class="fas fa-square fa-stack-2x" style="vertical-align: middle;"></i>
+		<i class="fas fa-terminal fa-stack-1x fa-inverse" style="vertical-align: middle;"></i>
+	      </span>
+	      Shell
+	    </th>
+	    <th data-valign="middle" data-align="center" data-field="actions"
+		data-formatter="PeopleFormatterActions">
+	      <i class="fa fa-fw fa-user-cog"></i>
+	    </th>	  
+	  </tr>
+	</thead>
+	<tbody></tbody>
+      </table>
+    </div>
+    <div id="explore" class="tab-pane fade in">
       <div class="explore-items" style="width:75%;height:100%;float:left">
 	<div id="toolbar-org-explore">
 	  <button id="org-item-add" type="button"
@@ -302,67 +409,13 @@
       </table>
     </div>
     <div id="mapping" class="tab-pane fade in"></div>
-    <div id="terminal" class="tab-pane fade in">
-      <table id="table-org-terminal"
-	     data-toolbar="#toolbar-org-terminal"
-	     data-show-toggle="false" data-show-export="false"
-	     data-show-columns="false" data-show-multi-sort="true"
-	     data-sort-name="uidNumber" data-pagination="true"
-	     data-toggle="table" data-search="true"
-	     data-show-footer="false" data-page-size="50"
-	     data-escape="false" data-maintain-selected="true"
-	     data-show-refresh="true"
-	     data-response-handler="TerminalResponseHandler"
-	     data-query-params="TerminalParams"
-	     data-side-pagination="client"
-	     class="table table-hover table-striped table-compact
-		    table-condensed table-autosize">
-	<thead>
-	  <tr>
-	    <th data-field="select" data-visible="true"
-		data-checkbox="true">
-	      <i class="fa fa-fw fa-check-square"></i>
-	    </th>
-	    <th data-field="uidNumber" data-valign="middle" data-visible="true">
-	      <i class="fa fa-fw fa-sort-numeric-down"></i>
-	      UID
-	    </th>
-	    <th data-field="uid" data-halign="center">
-	      <i class="fa fa-fw fa-user-shield"></i>
-	      Username
-	    </th>
-	    <th data-field="gecos">
-	      <i class="fa fa-fw fa-sort-alpha-down"></i>
-	      Gecos
-	    </th>
-	    <th data-field="gidNumber">
-	      <i class="fa fa-fw fa-sort-numeric-down"></i>
-	      GID
-	    </th>
-	    <th data-field="homeDirectory">
-	      <i class="fa fa-fw fa-home"></i>
-	      Home
-	    </th>
-	    <th data-field="loginShell">
-	      <i class="fa fa-fw fa-terminal"></i>
-	      Shell
-	    </th>
-	    <th data-valign="middle" data-align="center" data-field="actions"
-		data-formatter="TerminalFormatterActions">
-	      <i class="fa fa-fw fa-user-cog"></i>
-	    </th>	  
-	  </tr>
-	</thead>
-	<tbody></tbody>
-      </table>      
-    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block modals %}
 {% include "admin/organizations/modals/backend.html" %}
-{% include "admin/organizations/modals/terminal.html" %}
+{% include "admin/organizations/modals/person.html" %}
 {% endblock %}
 
 {% block scripts%}
@@ -375,25 +428,16 @@
    padding-right: 0.5%;
 }
 </style>
-<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
-
-<link  href="//cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css" rel="stylesheet">
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-treeview/1.2.0/css/bootstrap-treeview.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-treeview/1.2.0/js/bootstrap-treeview.js"></script>
+{% include "__include__/moment.js.html" %}
+{% include "__include__/flag-icon-css.html" %}
+{% include "__include__/bootstrap-table.html" %}
+{% include "__include__/bootstrap-select.html" %}
+{% include "__include__/bootstrap-toggle.html" %}
+{% include "__include__/bootstrap-treeview.html" %}
 
 <script>
-{% include "admin/organizations/index.js" %}
-{% include "admin/organizations/modals/backend.js" %}
-{% include "admin/organizations/modals/terminal.js" %}
+  {% include "admin/organizations/index.js" %}
+  {% include "admin/organizations/modals/backend.js" %}
+  {% include "admin/organizations/modals/person.js" %}
 </script>
 {% endblock %}

@@ -10,23 +10,24 @@ function jqlisteners_users() {
     $(".user-import").click(function(e) {
 	e.preventDefault();
 	var user = USER_FOUND[$(this).data('id')];
-	var url = "{{ url_for('api_users') }}?email=" + user['mail'][0];
+	var url = "{{ url_for('api_users') }}?email=" + user[1]['mail'][0];
+	console.log(user);
 	$.ajax({
 	    async: true,
 	    url: url,
 	    type: 'POST',
 	    data: JSON.stringify({
-		'email': user['mail'][0],
-		'firstname': user['firstname'],
-		'lastname': user['lastname'],
-		'mobile': user['mobile'],
-		'mailrecovery': user['mailrecovery'],
-		'backend': user['backend']['id'],
+		'email': user[1]['mail'][0],
+		'firstname': user[1]['givenName'][0],
+		'lastname': user[1]['sn'][0],
+		'mobile': user[1]['mobile'] ? user[1]['mobile'][0] : '',
+		'mailrecovery': user[1]['mailrecovery'] ? user[1]['mailrecovery'][0] : '',
+		'backend': user[1]['backend']['id'],
 		'admin': false,
 	    }),
 	    contentType: "application/json",
 	    success: function(e) {
-		var listdel = {'field': 'email', 'values': [user['mail'][0]] };
+		var listdel = {'field': 'email', 'values': [user[1]['mail'][0]] };
 		$('#table-users-search').bootstrapTable('remove', listdel);
 		$('#table-users').bootstrapTable('refresh');
 	    }
@@ -49,7 +50,7 @@ function jqlisteners_users() {
 		$(modal).find('#user-form-basic-avatar').attr('src', data['avatar']);
 		$(modal).find('#user-form-basic-id').val(data['id']);
 		$(modal).find('#user-form-basic-email').val(data['email']);
-		$(modal).find('#user-form-basic-emailrecovery').val(data['mailrecovery']);
+		$(modal).find('#user-form-basic-mailrecovery').val(data['mailrecovery']);
 		$(modal).find('#user-form-basic-mobile').val(data['mobile']);
 		$(modal).find('#user-form-basic-genre').selectpicker('val', data['genre']);
 		$(modal).find('#user-form-basic-lang').selectpicker('val', data['lang']);

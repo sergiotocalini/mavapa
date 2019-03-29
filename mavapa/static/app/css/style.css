@@ -540,8 +540,8 @@ table tr .text-ellipsis > * {
     font-family: "Font Awesome 5 Free";
     font-size: 100px;
     position: absolute;
-    top: 40%;
-    left: 50%;
+    top: 35%;
+    left: 45%;
     transform: translateX(-50%) translateY(-50%);
     font-style: normal;
     font-weight: 900;
@@ -553,5 +553,29 @@ table tr .text-ellipsis > * {
     z-index: 100;
     -webkit-animation: fa-spin 2s infinite linear;
     animation: fa-spin 2s infinite linear;
+}
+
+.img-circle {
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s ease-in-out;
+}
+
+.img-circle:hover {
+    -moz-transition: scale(1.5);
+    -webkit-transition: scale(1.5);
+    transform: scale(1.5);
+}
+
+.img-zoom-2x:hover {
+    -moz-transition: scale(2.5);
+    -webkit-transition: scale(2.5);
+    transform: scale(2.5);
+}
+
+.img-zoom-3x:hover {
+    -moz-transition: scale(3.5);
+    -webkit-transition: scale(3.5);
+    transform: scale(3.5);
 }
 

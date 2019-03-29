@@ -1,0 +1,362 @@
+<div id="ModalPerson" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="ModalLabel" aria-hidden="true" style="overflow: hidden;">
+  <div class="modal-content" style="height:75%;width:60%">
+    <div class="modal-header"
+	 style="background-color: #337ab7; color: #fff;height:10%">
+      <button type="button" class="close"
+	      style="position:relative;top:50%;
+		     transform:translateY(-50%);z-index: 100"
+	      data-dismiss="modal" aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title"
+	  style="position:relative;top:45%;transform:translateY(-50%);float:left"></h4>
+    </div>
+    <div class="modal-body" style="height:80%;padding:2%;">
+      <div class="person-menu" style="position: relative;
+					height: 100%;
+					width: 25%;
+					float: left;">
+	<div class="person-avatar" style="position: relative;
+					    height: 50%;
+					    width: 100%;">
+	  <img id="person-form-basic-avatar" class="img-circle"
+	       style="width: auto;
+		      padding: 0% 1%;
+		      left: 50%;
+		      top: 50%;
+		      position: relative;
+		      transform: translateX(-50%) translateY(-50%);
+		      height: auto;
+		      max-width: 85%;
+		      max-height: 85%;"/>
+	</div>
+	<ul id="person-menu-context" style="overflow-y:auto;max-height:50%;
+					    position:absolute;bottom:0px;width:100%;
+					    padding:0px;margin-bottom:0px;
+					    cursor: pointer;">
+	  <li href="#person-form-basic" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-address-card" aria-hidden="true"></i>
+	    Basic
+	  </li>
+	  <li href="#person-form-terminal" data-toggle="tab" class="list-group-item">
+	    <span class="fa-stack" style="font-size: 0.60em;width:2em;">
+	      <i class="fas fa-square fa-stack-2x" style="vertical-align: middle;"></i>
+	      <i class="fas fa-terminal fa-stack-1x fa-inverse" style="vertical-align: middle;"></i>
+	    </span>
+	    Terminal
+	  </li>
+	  <li href="#person-form-security" data-toggle="tab" class="list-group-item disabled">
+	    <i class="fa fa-fw fa-shield-alt" aria-hidden="true"></i>
+	    Security
+	  </li>
+	</ul>
+      </div>
+      <div class="person-content tab-content" style="width: 75%;
+						       position: relative;
+						       height: 100%;
+						       float: left;">
+	<div id="person-form-basic" class="tab-subcontent tab-pane fade in active"
+	     style="position: relative;
+		    width: 100%;
+		    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 95%; max-height:100%; overflow-y: auto;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <input class="col-md-8 form-control-static hidden" id="person-form-basic-dn" data-value="">
+	      <input class="col-md-8 form-control-static hidden" id="person-form-basic-backend">
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-uid">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Username
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-uid"
+			 placeholder="Username" data-value="">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-status">Status</label>
+		  <input id="person-form-basic-status" type="checkbox"
+			 data-toggle="toggle" data-on="Yes" data-off="No"
+			 data-width="100%" data-onstyle="success"
+			 data-offstyle="danger" data-value="">
+		</div>		
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-lastname">
+		    <i class="fa fa-fw fa-align-left"></i>
+		    Last Name
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-lastname"
+			 placeholder="Last Name" data-value="">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-firstname">
+		    <i class="fa fa-fw fa-align-left"></i>
+		    First Name
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-firstname"
+			 placeholder="First Name" data-value="">
+		</div>		
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-email">
+		    <i class="fa fa-fw fa-envelope"></i>
+		    Email
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-email"
+			 placeholder="Email" data-value="">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-displayname">
+		    <i class="fa fa-fw fa-align-left"></i>
+		    Display Name
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-displayname"
+			 placeholder="Display Name" data-value="">
+		</div>		
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-mobile">
+		    <i class="fa fa-fw fa-mobile"></i>
+		    Mobile
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-mobile"
+			 placeholder="Mobile" data-value="">
+		</div>
+		<div class="col-md-6 form-group">
+		  <label for="person-form-basic-title">
+		    <i class="fa fa-fw fa-shield-alt"></i>
+		    Title
+		  </label>
+		  <input type="text" class="form-control"
+			 id="person-form-basic-title"
+			 placeholder="Title" data-value="">
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>	
+	<div id="person-form-terminal" class="tab-subcontent tab-pane fade in"
+	     style="position: relative;
+		    width: 100%;
+		    height: 100%;">
+	  <ul class="nav nav-pills nav-justified" data-tabs="tabs"
+	      style="max-height:7%;position:absolute;width:100%;">
+	    <li class="nav-item active" role="presentation">
+	      <a class="nav-link" data-toggle="tab" href="#person-form-terminal-info">
+		<i class="fa fa-fw fa-id-badge"></i>
+		Details
+	      </a>
+	    </li>
+	    <li class="nav-item" role="presentation">
+	      <a class="nav-link" data-toggle="tab" href="#person-form-terminal-groups">
+		<i class="fa fa-fw fa-users"></i>
+		Groups
+	      </a>
+	    </li>
+	    <li class="nav-item" role="presentation">
+	      <a class="nav-link" data-toggle="tab" href="#person-form-terminal-keys">
+		<i class="fa fa-fw fa-key"></i>
+		SSH Keys
+	      </a>
+	    </li>
+	  </ul>
+	  <div class="tab-content" style="height:93%;position:absolute;bottom:0px;width:100%;padding-top:4%">
+	    <div id="person-form-terminal-info" class="tab-pane fade in active" style="position:relative;width:100%;height:100%;">
+	      <form style="float: left;
+			   top: 50%;
+			   left: 50%;
+			   position: absolute;
+			   min-width: 95%; max-width: 100%; max-height: 100%; overflow-y:auto;
+			   transform: translateX(-50%) translateY(-50%);"
+		    role="form" method="POST">
+		<fieldset>
+		  <div class="row" style="margin:0px">
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-uidNumber">
+			<i class="fa fa-fw fa-user"></i>
+			UID
+		      </label>
+		      <input type="number" class="form-control"
+			     id="person-form-terminal-uidNumber" name="terminal-uidNumber"
+			     placeholder="UID">
+		    </div>
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-status">Status</label>
+		      <input id="person-form-terminal-status" type="checkbox"
+			     data-toggle="toggle" data-on="Yes" data-off="No"
+			     data-width="100%" data-onstyle="success"
+			     data-offstyle="danger">
+		    </div>		
+		  </div>
+		  <div class="row" style="margin:0px">
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-gidNumber">
+			<i class="fa fa-fw fa-users"></i>
+			GID
+		      </label>
+		      <input type="number" class="form-control"
+			     id="person-form-terminal-gidNumber" name="terminal-gidNumber"
+			     placeholder="GID">
+		    </div>
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-home">
+			<i class="fa fa-fw fa-home"></i>
+			Home
+		      </label>
+		      <input type="text" class="form-control"
+			     id="person-form-terminal-homeDirectory" name="terminal-homeDirectory"
+			     placeholder="Home">
+		    </div>		    
+		  </div>
+		  <div class="row" style="margin:0px">
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-gecos">
+			<i class="fa fa-fw fa-align-left"></i>
+			Gecos
+		      </label>
+		      <input type="text" class="form-control"
+			     id="person-form-terminal-gecos" name="terminal-gecos"
+			     placeholder="Gecos">
+		    </div>
+		    <div class="col-md-6 form-group">
+		      <label for="person-form-terminal-loginShell">
+			<span class="fa-stack" style="font-size: 0.60em;width:2em;">
+			  <i class="fas fa-square fa-stack-2x" style="vertical-align: middle;"></i>
+			  <i class="fas fa-terminal fa-stack-1x fa-inverse" style="vertical-align: middle;"></i>
+			</span>
+			Shell
+		      </label>
+		      <select class="selectpicker show-tick form-control"
+			      id="person-form-terminal-loginShell" name="terminal-shell">
+			<option value="/bin/bash"
+				data-tokens="/bin/bash">/bin/bash</option>
+			<option value="/bin/sh"
+				data-tokens="/bin/sh">/bin/sh</option>
+			<option value="/bin/false"
+				data-tokens="/bin/false">/bin/false</option>
+		      </select>
+		    </div>
+		  </div>
+		</fieldset>
+	      </form>
+	    </div>
+	    <div id="person-form-terminal-groups" class="tab-pane fade in" style="position:relative;width:100%;height:100%;padding-left:1%;">
+	      <table id="org-person-group-table"
+		     data-toolbar="#org-person-group-table-toolbar"
+		     data-show-toggle="false" data-show-export="false"
+		     data-show-columns="false" data-show-multi-sort="true"
+		     data-sort-name="gid" data-pagination="true"
+		     data-toggle="table" data-search="true"
+		     data-show-footer="false" data-page-size="100"
+		     data-escape="false" data-maintain-selected="true"
+		     data-show-refresh="true" data-icon-size="sm"
+		     data-response-handler="PersonGroupResponseHandler"
+		     data-query-params="PersonGroupParams"
+		     data-side-pagination="client"
+		     class="table table-hover table-striped table-compact
+			    table-condensed table-autosize">
+		<thead>
+		  <tr>
+		    <th data-field="select" data-visible="true"
+			data-checkbox="true">
+		      <i class="fa fa-fw fa-check-square"></i>
+		    </th>
+		    <th data-field="gid" data-halign="center"
+			data-valign="middle" data-align="left" data-sortable="true"
+			data-formatter="PersonGroupFormatterDN">
+		      <i class="fa fa-fw fa-align-left"></i>
+		      GID
+		    </th>
+		    <th data-field="name" data-halign="center"
+			data-valign="middle" data-align="left" data-sortable="true"
+			data-formatter="PersonGroupFormatterDN">
+		      <i class="fa fa-fw fa-align-left"></i>
+		      Name
+		    </th>
+		    <th data-field="uid" data-halign="center"
+			data-valign="middle" data-align="center" data-sortable="false">
+		      <i class="fa fa-fw fa-users"></i>
+		      Members
+		    </th>
+		  </tr>
+		</thead>
+		<tbody></tbody>
+	      </table>	      
+	    </div>
+	    <div id="person-form-terminal-keys" class="tab-pane fade in">
+	    </div>
+	  </div>
+	</div>
+	<div id="person-form-security" class="tab-subcontent tab-pane fade in"
+	     style="position: relative;
+		    width: 100%;
+		    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Administrator
+		  </label>
+		  <div>
+		    <input id="user-form-settings-admin" type="checkbox"
+			   data-toggle="toggle"
+			   data-on="Yes" data-off="No" data-width="100%"
+			   data-onstyle="warning" data-offstyle="primary">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-slash"></i>
+		    Status
+		  </label>
+		  <div>
+		    <input id="user-form-settings-status" type="checkbox" data-toggle="toggle"
+			   data-on="Active" data-off="Blocked" data-width="100%" data-onstyle="success"
+			   data-offstyle="danger">
+		  </div>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+      </div>
+    </div>
+    <div class="modal-footer" style="height:10%">
+      <div class="pull-right" style="position:relative;top:50%;transform:translateY(-50%)">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary" id="person-save">
+	  Save
+	</button>
+      </div>
+    </div>
+  </div>
+</div>

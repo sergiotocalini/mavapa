@@ -1,5 +1,8 @@
 var BACKEND_ID = null;
 $(document).ready(function () {
+    $('.nav a').on('shown.bs.tab', function() {
+	autosize_tables();
+    });
     $(".section-toolbar a[data-click=section-switch]").on("click", function(a) {
 	a.preventDefault();
 	if (BACKEND_ID != null) {
@@ -13,6 +16,9 @@ $(document).ready(function () {
 	a.preventDefault();
 	BACKEND_ID = $(this).data('id');
 	getTree();
+	$('#table-org-people').bootstrapTable("refreshOptions", {
+	    url: "{{ url_for('api_backends_search_users') }}?backend=" + BACKEND_ID,
+	});
 	$('#table-org-terminal').bootstrapTable("refreshOptions", {
 	    url: "{{ url_for('api_backends_search') }}?backend=" + BACKEND_ID,
 	});
@@ -25,6 +31,9 @@ $(document).ready(function () {
 	a.preventDefault();
 	BACKEND_ID = $(this).parent().parent().parent().parent().parent().data('id');
 	getTree();
+	$('#table-org-people').bootstrapTable("refreshOptions", {
+	    url: "{{ url_for('api_backends_search_users') }}?backend=" + BACKEND_ID,
+	});
 	$('#table-org-terminal').bootstrapTable("refreshOptions", {
 	    url: "{{ url_for('api_backends_search') }}?backend=" + BACKEND_ID,
 	});
@@ -89,35 +98,7 @@ $(document).ready(function () {
 function jqlisteners() {
     console.log("Loading");
     jqlisteners_modal_backend();
-    jqlisteners_modal_terminal();
-    
-    $("#table-org-terminal a[data-click=user-term-open]").unbind()
-    $("#table-org-terminal a[data-click=user-term-open]").on("click", function(a) {
-	a.preventDefault();
-	var backend = $(this).data('backend');
-	var dn = $(this).data('dn');
-	var modal = '#ModalTerminal';
-
-	$.ajax({
-	    url: "{{ url_for('api_backends_items') }}",
-	    type: 'GET',
-	    contentType: "application/json",
-	    data: { dn: dn, backend: backend },
-	    success: function(e) {
-		var user = e['data'] ? e['data'][0] : ['', {}];
-		$(modal).find('.modal-title').html('<i class="fa fa-fw fa-user"></i> ' + user[1]['uid']);
-		$(modal).find('#terminal-dn').val(user[0]);
-		$(modal).find('#terminal-backend').val(backend);
-		$(modal).find('#terminal-uidNumber').val(user[1]['uidNumber'][0]);
-		$(modal).find('#terminal-gidNumber').val(user[1]['gidNumber'][0]);
-		$(modal).find('#terminal-homeDirectory').val(user[1]['homeDirectory'][0]);
-		$(modal).find('#terminal-gecos').val(user[1]['gecos'] ? user[1]['gecos'][0] : '');
-		$(modal).find('#terminal-loginShell').selectpicker('val', user[1]['loginShell'] ? user[1]['loginShell'][0] : '/bin/bash');
-		$(modal).find('#terminal-uid').val(user[1]['uid'][0]);
-		$(modal).modal('show');
-	    }	
-	});
-    });    
+    jqlisteners_modal_person();
 };
 
 
@@ -127,35 +108,6 @@ function OrgItemFormatterValue(value, row) {
     html +=  '<span>' + value + '</span>';
     html += '</div>'
     return html;
-};
-
-
-function TerminalParams(params) {
-    return {
-	filter: '(ObjectClass=posixAccount)',
-	exclude: 'jpegPhoto,photo'
-    }
-};
-
-
-function TerminalResponseHandler(res) {
-    var data = [];
-    for (r in res.data) {
-	var row = res.data[r];
-	var doc = {
-	    'backend': row[1]['backend'] ? row[1]['backend']['id'] : null,
-	    'dn': row[0],
-	    'uidNumber': row[1]['uidNumber'] ? row[1]['uidNumber'][0] : null,
-	    'uid': row[1]['uid'] ? row[1]['uid'][0] : null,
-	    'gecos': row[1]['gecos'] ? row[1]['gecos'][0] : null,
-	    'gidNumber': row[1]['gidNumber'] ? row[1]['gidNumber'][0] : null,
-	    'homeDirectory': row[1]['homeDirectory'] ? row[1]['homeDirectory'][0] : null,
-	    'loginShell': row[1]['loginShell'] ? row[1]['loginShell'][0] : null,
-	    'mail': row[1]['mail'] ? row[1]['mail'][0] : null
-	};
-	data.push(doc);
-    };
-    return data
 };
 
 
@@ -284,10 +236,102 @@ function getTree() {
     });
 };
 
-function TerminalFormatterActions(value, row) {
-    html ='<a class="user-term-open" data-toggle="confirmation" data-click="user-term-open"';
-    html+='   data-dn="' + row.dn + '" data-backend="' + row.backend + '" data-container="body" href="#user-term-open">';
+
+function PeopleParams(params) {
+    return {
+	filter: '(&(objectClass=person)(objectClass=top))',
+    }
+};
+
+
+function PeopleResponseHandler(res) {
+    var data = [];
+    for (r in res.data) {
+	var row = res.data[r];
+	var avatar = "{{ config['CDN_LOCAL'] }}/img/avatar.jpg";
+	if (row[1]['jpegPhoto']) {
+	    avatar = "data:image/jpg;base64," + row[1]['jpegPhoto'][0];
+	} else if (row[1]['photo']) {
+	    avatar = "data:image/jpg;base64," + row[1]['Photo'][0];
+	}
+	var doc = {
+	    'backend': row[1]['backend'] ? row[1]['backend']['id'] : null,
+	    'dn': row[0], 'display': row[1]['displayName'] ? row[1]['displayName'][0] : null,
+	    'firstname': row[1]['givenName'] ? row[1]['givenName'][0] : null,
+	    'lastname': row[1]['sn'] ? row[1]['sn'][0] : null,
+	    'email': row[1]['mail'] ? row[1]['mail'][0] : null,
+	    'exist': row[1]['exist'], 'avatar': avatar,
+	    'uidNumber': row[1]['uidNumber'] ? row[1]['uidNumber'][0] : null,
+	    'uid': row[1]['uid'] ? row[1]['uid'][0] : null,
+	    'gecos': row[1]['gecos'] ? row[1]['gecos'][0] : null,
+	    'gidNumber': row[1]['gidNumber'] ? row[1]['gidNumber'][0] : null,
+	    'homeDirectory': row[1]['homeDirectory'] ? row[1]['homeDirectory'][0] : null,
+	    'loginShell': row[1]['loginShell'] ? row[1]['loginShell'][0] : null,
+	};
+	data.push(doc);
+    };
+    return data
+};
+
+
+function PeopleFormatterName(value, row) {
+    var html = ""
+    html += '<img class="fa fa-fw img-circle img-zoom-2x" src="' + row.avatar + '"/> ';
+    html += row.lastname + ', ' + row.firstname;
+    return html;
+};
+
+
+function PeopleFormatterEmail(value, row) {
+    var html = ""
+    html +='<span class="pull-left">'
+    html +=' <a href="mailto:' + value + '" style="padding-right:4px;text-decoration:none;outline:none;color:inherit;">';
+    html +='  <i class="fa fa-fw fa-envelope-open-text" style="vertical-align: middle;"></i>';
+    html +=' </a>';
+    html +='</span>';
+    html += value;
+    return html;
+};
+
+
+function PeopleFormatterUsername(value, row) {
+    var html = ""
+    html += value
+    html+='<span class="pull-right">';
+    if (row.uidNumber) {
+	html+='<span class="fa-stack" style="font-size: 0.60em;">'
+	html+=' <i class="fas fa-square fa-stack-2x" style="vertical-align: middle;"></i>'
+	html+=' <i class="fas fa-terminal fa-stack-1x fa-inverse" style="vertical-align: middle;"></i>'
+	html+='</span>'
+    }
+    html+='</span>';
+    return html;
+};
+
+
+function PeopleFormatterActions(value, row) {
+    var html ='';    
+    if (! row.exist) {
+	html+='<a class="person-add" data-toggle="confirmation" data-click="person-add" style="color: Orange;"';
+	html+='   data-dn="' + row.dn + '" data-backend="' + row.backend + '" data-container="body" href="#person-add">';
+	html+=' <i class="fa fa-fw fa-plus-circle"></i>';
+	html+='</a>';
+	html+='<span style="color: Marron;">';
+	html+=' <i class="fa fa-fw fa-recycle"></i>';
+	html+='</span>';
+    } else {
+	html+='<span style="color: Green;">';
+	html+=' <i class="fa fa-fw fa-check-circle"></i>';
+	html+='</span>';
+	html+='<a class="person-sync" data-toggle="confirmation" data-click="person-sync"';
+	html+='   data-dn="' + row.dn + '" data-backend="' + row.backend + '" data-container="body" href="#person-sync">';
+	html+=' <i class="fa fa-fw fa-recycle"></i>';
+	html+='</a>';
+    }
+    html+='<a class="person-open" data-toggle="confirmation" data-click="person-open"';
+    html+='   data-dn="' + row.dn + '" data-backend="' + row.backend + '" data-container="body" href="#person-open">';
     html+=' <i class="fa fa-fw fa-search"></i>';
     html+='</a>';
     return html;
-}
+};
+

@@ -133,10 +133,10 @@ class LDAP():
                         entry[attr] = []
                         for a in idx[1][attr]:
                             try:
-                                entry[attr].append(a.decode(codec))
+                                e = a.decode(codec)
                             except Exception:
                                 e = b64encode(a).decode(codec)
-                                entry[attr].append(e)
+                            entry[attr].append(e)
                 rows.append((idx[0], entry))
         except ldap.LDAPError:
             print(ldap.LDAPError)

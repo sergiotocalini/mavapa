@@ -204,18 +204,21 @@ def user_onfly(user, passwd):
                 if oa.auth(query[0][0], passwd):
                     match = get_data('User', email=query[0][1]['mail'][0])
                     if not match:
-                        fname = query[0][1]['givenName'][0].decode('utf-8')
-                        lname = query[0][1]['sn'][0].decode('utf-8')
-                        info = {'email': user.decode('utf-8'), 'backend': i,
-                                'firstname': fname.title(),
-                                'lastname': lname.title()}
+                        fname = query[0][1]['givenName'][0]  # .decode('utf-8')
+                        lname = query[0][1]['sn'][0]  # .decode('utf-8')
+                        info = {
+                            'email': user,  # .decode('utf-8'),
+                            'backend': i,
+                            'firstname': fname.title(),
+                            'lastname': lname.title()
+                        }
                         if 'mobile' in query[0][1]:
-                            mobile = query[0][1]['mobile'][0].decode('utf-8')
+                            mobile = query[0][1]['mobile'][0]  # .decode('utf-8')
                             info['mobile'] = mobile
 
                         if 'mailRecovery' in query[0][1]:
                             recover = query[0][1]['mailRecovery'][0]
-                            info['mailrecovery'] = recover.decode('utf-8')
+                            info['mailrecovery'] = recover  # .decode('utf-8')
 
                         account = User(**info)
                         commit()
@@ -248,17 +251,17 @@ def user_login(user, passwd):
                                    basedn=account.backend.basedn, limit=1)
             if query:
                 if provider.auth(query[0][0], passwd):
-                    fname = query[0][1]['givenName'][0].decode('utf-8')
-                    lname = query[0][1]['sn'][0].decode('utf-8')
+                    fname = query[0][1]['givenName'][0]  # .decode('utf-8')
+                    lname = query[0][1]['sn'][0]  # .decode('utf-8')
                     update = {'firstname': fname.title(),
                               'lastname': lname.title()}
                     if 'mobile' in query[0][1]:
-                        mobile = query[0][1]['mobile'][0].decode('utf-8')
+                        mobile = query[0][1]['mobile'][0]  # .decode('utf-8')
                         update['mobile'] = mobile
 
                     if 'mailRecovery' in query[0][1]:
                         recover = query[0][1]['mailRecovery'][0]
-                        update['mailrecovery'] = recover.decode('utf-8')
+                        update['mailrecovery'] = recover  # .decode('utf-8')
 
                     account.set(**update)
                     commit()
@@ -815,13 +818,13 @@ def api_backends_search():
 @db_session(retry=3)
 def api_backends_search_users():
     args = request.args.to_dict()
-    required = ['email', 'filter', 'only', 'backend']
+    required = ['email', 'filter', 'only', 'backend', 'include', 'exclude']
     qfilter = dict((x, args[x]) for x in args if x in required)
     qfilter.setdefault('email', '*')
     qfilter.setdefault('filter', '(ObjectClass=person)')
     qfilter.setdefault('only', 'all')
     qfilter.setdefault('include', '*')
-    qfilter.setdefault('exclude', 'jpegPhoto,photo')
+    qfilter.setdefault('exclude', '')
     qfilter.setdefault('backend', None)
     data = []
     qfilter['include'] = qfilter['include'].split(',')
@@ -841,9 +844,10 @@ def api_backends_search_users():
                 attrs=qfilter['include'], exclude=qfilter['exclude'],
                 basedn=i.basedn, limit=1,
             )
+            users = select((u.backend.id, u.email) for u in User)
             for row in query:
                 row[1]['exist'] = False
-                if get_data('User', email=row[1]['mail'][0]):
+                if ((conn['id'], row[1]['mail'][0])) in users:
                     row[1]['exist'] = True
                 if qfilter['only'] not in ['all', 'ALL']:
                     if qfilter['only'] == 'exist' and not row[1]['exist']:
@@ -852,24 +856,6 @@ def api_backends_search_users():
                         continue
                 row[1]['backend'] = conn
                 data.append(row)
-
-            # if query:
-            #     for dn, x in query:
-            #         info = {}
-            #         info['exist'] = False
-            #         if get_data('User', email=x['mail'][0]):
-            #             info['exist'] = True
-            #         if qfilter['only'] not in ['all', 'ALL']:
-            #             if qfilter['only'] == 'exist' and not info['exist']:
-            #                 continue
-            #             elif qfilter['only'] == 'noexist' and info['exist']:
-            #                 continue
-            #         info['backend'] = i.to_dict(
-            #             only=['id', 'name', 'type', 'desc']
-            #         )
-            #         for attr in x:
-            #             info[attr] = [e.decode('utf-8') for e in x[attr] if attr not in qfilter['exclude'].split(',')]
-            #         data.append(info)
     return jsonify(datetime=datetime.now(), data=data)
 
 

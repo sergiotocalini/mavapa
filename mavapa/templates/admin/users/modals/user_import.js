@@ -14,13 +14,16 @@ function user_search() {
 	    $(table).bootstrapTable('removeAll');
 	    for(i in e['data']) {
 		var user = e['data'][i];
+		console.log(user);
 		html = '<a class="user-import" data-id="' + i + '">';
                 html+= '<i class="fa fa-fw fa-plus"></i>';
                 html+= '</a>';
 		$(table).bootstrapTable('append', {
-		    'name': user['sn'] + ', ' + user['givenName'],
-		    'email': user['mail'][0],
-		    'backend': user['backend']['name'],
+		    'firstname': user[1]['givenName'],
+		    'lastname': user[1]['sn'],
+		    'name': user[1]['sn'] + ', ' + user[1]['givenName'],
+		    'email': user[1]['mail'][0],
+		    'backend': user[1]['backend']['name'],
 		    'actions': html,
 		});
 	    };
