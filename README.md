@@ -1,4 +1,7 @@
 # mavapa
+
+[![PyPI version](https://badge.fury.io/py/mavapa.svg)](https://badge.fury.io/py/mavapa)
+
 Accounts Management
 
 
