@@ -26,7 +26,6 @@ services:
     ports:
       - 7001:7001
     environment:
-      PYTHONUNBUFFERED: 1
       APP_SETTINGS: mavapa.config.Docker
     depends_on:
       - mysql

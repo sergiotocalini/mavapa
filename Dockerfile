@@ -28,4 +28,4 @@ COPY . .
 
 # Finally, we run uWSGI with the ini file we
 # created earlier
-CMD [ "gunicorn", "run:main", "--access-logfile -", "--error-logfile -", "-w 4", "-b 0.0.0.0:7001" ]
+CMD [ "gunicorn", "run:main", "--access-logfile=-", "--error-logfile=-", "-w 4", "-b 0.0.0.0:7001" ]
