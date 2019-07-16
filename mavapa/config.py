@@ -44,3 +44,7 @@ class Local(Default):
     DB_DEBUG = True
     DB_USER = 'app_mavapa'
     DB_PASS = '1234567890'
+
+
+class Docker(Local):
+    DB_HOST = 'mysql'

@@ -1,0 +1,33 @@
+version: '3'
+services:
+  mysql:
+    container_name: mysql
+    restart: always
+    image: mysql:latest
+    volumes:
+      - ~/.docker/volumes/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    security_opt:
+    - seccomp:unconfined
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root1234'
+      MYSQL_USER: 'app_mavapa'
+      MYSQL_PASSWORD: '1234567890'
+      MYSQL_DATABASE: 'mavapa'
+
+  mavapa:
+    container_name: mavapa
+    restart: always
+    image: mavapa:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 7001:7001
+    environment:
+      PYTHONUNBUFFERED: 1
+      APP_SETTINGS: mavapa.config.Docker
+    depends_on:
+      - mysql
+

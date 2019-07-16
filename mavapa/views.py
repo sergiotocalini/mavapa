@@ -234,7 +234,7 @@ def user_login(user, passwd):
     attrs = ['givenName', 'sn', 'mobile', 'mailRecovery']
     if account:
         if not account.backend:
-            passwd_md5 = md5(passwd).hexdigest()
+            passwd_md5 = md5(passwd.encode('utf-8')).hexdigest()
             if account.passwd == passwd_md5:
                 return account
         elif account.backend.type in ['LDAP', 'AD']:
@@ -352,7 +352,7 @@ def login_required(f):
 
 def admin_required(f):
     @wraps(f)
-    @db_session(retry=3)
+#    @db_session(retry=3)
     def decorated_func(*args, **kwargs):
         if not g.user.admin:
             return redirect(url_for('index'))

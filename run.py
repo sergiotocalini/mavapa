@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from werkzeug.serving import run_simple
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from mavapa import app
 
 
@@ -12,7 +12,7 @@ def simple(env, resp):
 addr = app.config.get('BIND', '0.0.0.0')
 port = app.config.get('PORT', 7001)
 root = app.config.get('APPLICATION_ROOT', '/')
-disp = DispatcherMiddleware(simple, {root: app})
+main = DispatcherMiddleware(simple, {root: app})
 
 
 if __name__ == "__main__":
