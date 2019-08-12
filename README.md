@@ -1,6 +1,7 @@
 # mavapa
-
-[![PyPI version](https://badge.fury.io/py/mavapa.svg)](https://badge.fury.io/py/mavapa)
+![Stars](https://img.shields.io/github/stars/sergiotocalini/mavapa?colorA=orange&colorB=orange&logo=github)
+![Issues](https://img.shields.io/github/issues/sergiotocalini/mavapa)
+![License](https://img.shields.io/github/license/sergiotocalini/mavapa)
 
 Accounts Management
 
