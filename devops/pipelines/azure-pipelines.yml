@@ -16,7 +16,7 @@ stages:
   condition: succeeded()
   jobs:
   - job:
-    displayName: 'Base'
+    displayName: Basics
     pool:
       vmImage: $(vmImageName)
     steps:
@@ -30,8 +30,12 @@ stages:
       env:
         Action: '##vso[build.updatebuildnumber]'
         BuildVersion: $(GitVersion.SemVer)
+    - script: |
+        sudo apt update
+        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
   - job: 
-    displayName: 'Use different Python versions'
+    displayName: 'Using'
+    dependsOn: Basics
     pool:
       vmImage: $(vmImageName)
     strategy:
@@ -47,8 +51,6 @@ stages:
       displayName: 'Use Python $(python.version)'
 
     - script: |
-        sudo apt update
-        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
         virtualenv -p python$(python.version) "~/.venvs/mavapa"
         . "~/.venvs/mavapa/bin/activate"
         pip install --upgrade pip
