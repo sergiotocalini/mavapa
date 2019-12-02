@@ -23,15 +23,23 @@ steps:
 
 - script: |
     sudo apt update
-    sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-virtualenv
+    sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
   displayName: 'Install OS dependencies'
 
 - script: |
-    python -m pip install --upgrade pip
+    virtualenv -p python$(python.version) "~/.venvs/mavapa"
+    . "~/.venvs/mavapa/bin/activate"
+    pip install --upgrade pip
+    pip install pyflakes pylint nose nosexcover
     pip install -r requirements.txt
-  displayName: 'Install Python dependencies'
+  displayName: 'Initialize Python virtualenv'
 
 # - script: |
 #    pip install pytest pytest-azurepipelines
 #    pytest
 #  displayName: 'pytest'
+
+- script: |
+    deactivate
+  displayName: 'Disabling Python virtualenv'
+
