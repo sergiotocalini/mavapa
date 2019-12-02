@@ -15,8 +15,23 @@ stages:
 - stage: 'Build'
   condition: succeeded()
   jobs:
+  - job:
+    displayName: 'Base'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: GitVersion@5
+      displayName: 'GitVersion'
+      inputs:
+        updateAssemblyInfo: true
+        preferBundledVersion: false
+    - script: echo %Action%%BuildVersion%
+      displayName: 'Set build version'
+      env:
+        Action: '##vso[build.updatebuildnumber]'
+        BuildVersion: $(GitVersion.SemVer)
   - job: 
-    displayName: 'Use Python Version'
+    displayName: 'Use different Python versions'
     pool:
       vmImage: $(vmImageName)
     strategy:
@@ -30,17 +45,6 @@ stages:
       inputs:
         versionSpec: '$(python.version)'
       displayName: 'Use Python $(python.version)'
-    - task: GitVersion@5
-      displayName: 'GitVersion'
-      inputs:
-        updateAssemblyInfo: true
-        preferBundledVersion: false
-
-    - script: echo %Action%%BuildVersion%
-      displayName: 'Set build version'
-      env:
-        Action: '##vso[build.updatebuildnumber]'
-        BuildVersion: $(GitVersion.SemVer)
 
     - script: |
         sudo apt update
