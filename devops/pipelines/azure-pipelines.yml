@@ -22,6 +22,7 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    sudo apt update
     sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-virtualenv
   displayName: 'Install OS dependencies'
 
