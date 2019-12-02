@@ -11,9 +11,6 @@ variables:
   vmImageName: 'ubuntu-latest'
   buildConfiguration: 'Release'
 
-pool:
-  vmImage: $(vmImageName)
-
 stages:
 - stage: 'Build'
   condition: succeeded()
@@ -23,15 +20,11 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: GitVersion@4
+    - task: "GitVersion@4"
       displayName: 'GitVersion'
       inputs:
         updateAssemblyInfo: true
         preferBundledVersion: false
-    - task: UsePythonVersion@0
-      displayName: 'Use Python 3.7'
-      inputs:
-        versionSpec: '3.7'
 
     - script: echo %Action%%BuildVersion%
       displayName: 'Set build version'
@@ -49,9 +42,5 @@ stages:
         pip install -r requirements.txt
       displayName: 'Initialize dependencies'
 
-# - script: |
-#    pip install pytest pytest-azurepipelines
-#    pytest
-#  displayName: 'pytest'
 
 
