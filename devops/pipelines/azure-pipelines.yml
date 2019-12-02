@@ -26,9 +26,13 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-virtualenv
+  displayName: 'Install OS dependencies'
+
+- script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install dependencies'
+  displayName: 'Install Python dependencies'
 
 - script: |
     pip install pytest pytest-azurepipelines
