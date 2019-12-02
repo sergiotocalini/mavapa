@@ -15,8 +15,8 @@ stages:
 - stage: 'Build'
   condition: succeeded()
   jobs:
-  - job:
-    displayName: Basics
+  - job: 'Basics'
+    displayName: 'Basics'
     pool:
       vmImage: $(vmImageName)
     steps:
@@ -35,7 +35,7 @@ stages:
         sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
   - job: 
     displayName: 'Using'
-    dependsOn: Basics
+    dependsOn: 'Basics'
     pool:
       vmImage: $(vmImageName)
     strategy:
