@@ -30,15 +30,9 @@ stages:
       env:
         Action: '##vso[build.updatebuildnumber]'
         BuildVersion: $(GitVersion.SemVer)
-    - script: |
-        sudo apt update
-        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
-      displayName: 'Install OS dependencies'
   - job: 
     displayName: 'Using'
     dependsOn: basics
-    workspace: 
-      clean: outputs
     pool:
       vmImage: $(vmImageName)
     strategy:
@@ -53,12 +47,16 @@ stages:
         versionSpec: '$(python.version)'
       displayName: 'Use Python $(python.version)'
     - script: |
+        sudo apt update
+        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
+      displayName: 'Install OS dependencies'
+    - script: |
         virtualenv -p python$(python.version) "~/.venvs/mavapa"
         . "~/.venvs/mavapa/bin/activate"
         pip install --upgrade pip
         pip install pyflakes pylint nose nosexcover
         pip install -r requirements.txt
-      displayName: 'Initialize dependencies'
+      displayName: 'Install Python dependencies'
 
 
 
