@@ -20,6 +20,11 @@ strategy:
 #  buildConfiguration: 'Release'
 
 steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
 - task: GitVersion@4
   displayName: 'GitVersion'
   inputs:
@@ -31,11 +36,6 @@ steps:
   env:
     Action: '##vso[build.updatebuildnumber]'
     BuildVersion: $(GitVersion.SemVer)
-
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
 
 - script: |
     sudo apt update
