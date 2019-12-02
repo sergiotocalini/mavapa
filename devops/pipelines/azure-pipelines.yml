@@ -16,6 +16,9 @@ strategy:
     Python37:
       python.version: '3.7'
 
+variables:
+  buildConfiguration: 'Release'
+
 steps:
 - task: GitVersion@4
   displayName: 'GitVersion'
