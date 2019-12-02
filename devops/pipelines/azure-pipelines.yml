@@ -17,6 +17,12 @@ strategy:
       python.version: '3.7'
 
 steps:
+- task: GitVersion@4
+  displayName: 'GitVersion'
+  inputs:
+    updateAssemblyInfo: true
+    preferBundledVersion: false
+
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(python.version)'
