@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- develop
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -24,15 +25,12 @@ steps:
 - script: |
     sudo apt update
     sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
-  displayName: 'Install OS dependencies'
-
-- script: |
     virtualenv -p python$(python.version) "~/.venvs/mavapa"
     . "~/.venvs/mavapa/bin/activate"
     pip install --upgrade pip
     pip install pyflakes pylint nose nosexcover
     pip install -r requirements.txt
-  displayName: 'Initialize Python virtualenv'
+  displayName: 'Initialize dependencies'
 
 # - script: |
 #    pip install pytest pytest-azurepipelines
