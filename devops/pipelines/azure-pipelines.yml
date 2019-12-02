@@ -39,7 +39,4 @@ steps:
 #    pytest
 #  displayName: 'pytest'
 
-- script: |
-    deactivate
-  displayName: 'Disabling Python virtualenv'
 
