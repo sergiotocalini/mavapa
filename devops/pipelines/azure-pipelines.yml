@@ -7,45 +7,47 @@ trigger:
 - master
 - develop
 
+variables:
+  vmImageName: 'ubuntu-latest'
+  buildConfiguration: 'Release'
+
 pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python27:
-      python.version: '2.7'
-    Python37:
-      python.version: '3.7'
+  vmImage: $(vmImageName)
 
-#variables:
-#  buildConfiguration: 'Release'
+stages:
+- stage: 'Build'
+  condition: succeeded()
+  jobs:
+  - job: 
+    displayName: 'Use Python Version'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: GitVersion@4
+      displayName: 'GitVersion'
+      inputs:
+        updateAssemblyInfo: true
+        preferBundledVersion: false
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.7'
+      inputs:
+        versionSpec: '3.7'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+    - script: echo %Action%%BuildVersion%
+      displayName: 'Set build version'
+      env:
+        Action: '##vso[build.updatebuildnumber]'
+        BuildVersion: $(GitVersion.SemVer)
 
-- task: GitVersion@4
-  displayName: 'GitVersion'
-  inputs:
-    updateAssemblyInfo: true
-    preferBundledVersion: false
-
-- script: echo %Action%%BuildVersion%
-  displayName: 'Set build version'
-  env:
-    Action: '##vso[build.updatebuildnumber]'
-    BuildVersion: $(GitVersion.SemVer)
-
-- script: |
-    sudo apt update
-    sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
-    virtualenv -p python$(python.version) "~/.venvs/mavapa"
-    . "~/.venvs/mavapa/bin/activate"
-    pip install --upgrade pip
-    pip install pyflakes pylint nose nosexcover
-    pip install -r requirements.txt
-  displayName: 'Initialize dependencies'
+    - script: |
+        sudo apt update
+        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
+        virtualenv -p python$(python.version) "~/.venvs/mavapa"
+        . "~/.venvs/mavapa/bin/activate"
+        pip install --upgrade pip
+        pip install pyflakes pylint nose nosexcover
+        pip install -r requirements.txt
+      displayName: 'Initialize dependencies'
 
 # - script: |
 #    pip install pytest pytest-azurepipelines
