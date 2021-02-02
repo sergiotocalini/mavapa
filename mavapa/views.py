@@ -13,10 +13,10 @@ from flask import url_for, abort, flash, redirect, session, make_response
 from pony.orm import select, count, commit, desc
 from forms import Login, Reset
 # from .lib import *
-from lib.models import db, db_session
-from lib.models import App, Token, User, Backend, Session, Retrieve
-from lib.models import NotifyAgent
-from lib.backends import LDAP
+from models import db, db_session
+from models import App, Token, User, Backend, Session, Retrieve
+from models import NotifyAgent
+from modules.backends import LDAP
 from mavapa_server import mavapa_server
 from datetime import datetime, timedelta
 

@@ -13,8 +13,8 @@ def simple(env, resp):
 addr = app.config.get('BIND', '0.0.0.0')
 port = app.config.get('PORT', 7001)
 root = app.config.get('APPLICATION_ROOT', '/')
-run  = DispatcherMiddleware(simple, {root: app})
+main  = DispatcherMiddleware(simple, {root: app})
 
 
 if __name__ == "__main__":
-    run_simple(addr, port, run)
+    run_simple(addr, port, main)
