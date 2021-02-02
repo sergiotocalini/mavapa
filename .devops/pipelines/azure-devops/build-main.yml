@@ -4,9 +4,14 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
-- master
-- develop
-
+  branches:
+    include:
+      - refs/tags/*
+      - develop
+  paths:
+    include:
+      - /src/mavapa
+      
 variables:
   vmImageName: 'ubuntu-latest'
   buildConfiguration: 'Release'

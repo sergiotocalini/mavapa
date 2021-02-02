@@ -11,17 +11,17 @@ import pony
 from flask import Flask, request, render_template, g, jsonify, current_app
 from flask import url_for, abort, flash, redirect, session, make_response
 from pony.orm import select, count, commit, desc
-from .forms import Login, Reset
+from forms import Login, Reset
 # from .lib import *
-from .lib.models import db, db_session
-from .lib.models import App, Token, User, Backend, Session, Retrieve
-from .lib.models import NotifyAgent
-from .lib.backends import LDAP
-from .mavapa_server import mavapa_server
+from lib.models import db, db_session
+from lib.models import App, Token, User, Backend, Session, Retrieve
+from lib.models import NotifyAgent
+from lib.backends import LDAP
+from mavapa_server import mavapa_server
 from datetime import datetime, timedelta
 
 app = Flask(__name__, instance_relative_config=False)
-app.config.from_object(os.environ.get('APP_SETTINGS', None))
+app.config.from_object(os.environ.get('APP_SETTINGS', "config.Default"))
 app.register_blueprint(mavapa_server)
 
 context = app.config.get('APPLICATION_ROOT', '')

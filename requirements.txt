@@ -3,6 +3,7 @@ flask
 werkzeug
 arrow
 wtforms
+email_validator
 pony
 python-ldap
 PyMySQL
