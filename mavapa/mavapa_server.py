@@ -8,8 +8,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, abort
 from flask import redirect, request, jsonify, session, url_for
 from pony.orm import commit
-from modules import *
-from forms import *
+from models import db_session
 
 MAVAPA_URL = ''
 AUTH_URL = MAVAPA_URL + '/auth?response_type=code'
