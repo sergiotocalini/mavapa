@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y \
     ldap-utils
 COPY ./.devops/docker/docker-entrypoint.sh  /
 COPY ./.devops/docker/docker-entrypoint.d/* /docker-entrypoint.d/
-COPY ./requirements.txt			    /app/
+COPY ./requirements.txt			    /app
 RUN pip install -r requirements.txt
-COPY ./mavapa/*                             /app/
+COPY ./mavapa                               /app
 RUN echo "${version}" > VERSION
 RUN ls -laR
 ENTRYPOINT ["/docker-entrypoint.sh"]
