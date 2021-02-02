@@ -12,10 +12,10 @@ RUN apt-get update && apt-get install -y \
     ldap-utils
 COPY ./.devops/docker/docker-entrypoint.sh  /
 COPY ./.devops/docker/docker-entrypoint.d/* /docker-entrypoint.d/
-COPY ./requirements.txt			    /app
-RUN echo "${version}" > VERSION \
-    && pip install -r requirements.txt \
-COPY ./mavapa                               /app
+COPY ./requirements.txt			    /app/
+RUN pip install -r requirements.txt
+COPY ./mavapa/*                             /app/
+RUN echo "${version}" > VERSION
 RUN ls -laR
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD [ "gunicorn", "manage:run", "--workers=2", "--threads=4", "--worker-class=gthread", "--worker-tmp-dir", "/dev/shm", "-b", "0.0.0.0:5000", "--access-logfile=-", "--error-logfile=-" ]
