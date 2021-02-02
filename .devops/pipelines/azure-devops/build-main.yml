@@ -19,7 +19,7 @@ pool:
       
 variables:
   project.id: 'mavapa'
-  artifact.docker.repo: 'sergiotocalini@dockerhub'
+  artifact.docker.repo: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
   artifact.docker.name: 'mavapa'
   artifact.helm.repo: ''
   artifact.helm.name: 'mavapa'
