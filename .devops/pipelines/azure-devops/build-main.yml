@@ -26,9 +26,7 @@ variables:
   artifact.helm.work: '$(Build.SourcesDirectory)/.devops/helm'
   artifact.helm.dest: '$(Build.ArtifactStagingDirectory)/helm'
   
-stages:
-- stage: 'Build'
-  steps:
+steps:
   - task: GitVersion@5
     displayName: 'GitVersion'
     inputs:
