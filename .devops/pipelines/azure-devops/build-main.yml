@@ -19,8 +19,8 @@ pool:
       
 variables:
   project.id: 'mavapa'
-  artifact.docker.repo: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
-  artifact.docker.name: 'mavapa'
+  artifact.docker.conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
+  artifact.docker.repo: 'sergiotocalini/mavapa'
   artifact.helm.repo: ''
   artifact.helm.name: 'mavapa'
   artifact.helm.work: '$(Build.SourcesDirectory)/.devops/helm'
@@ -35,8 +35,8 @@ steps:
   - task: Docker@2
     displayName: 'docker: Build'
     inputs:
-      containerRegistry: '$(artifact.docker.repo)'
-      repository: '$(artifact.docker.name)'
+      containerRegistry: '$(artifact.docker.conn)'
+      repository: '$(artifact.docker.repo)'
       command: build
       Dockerfile: .devops/docker/Dockerfile
       buildContext: '$(Build.SourcesDirectory)'
@@ -46,8 +46,8 @@ steps:
   - task: Docker@2
     displayName: 'docker: Push'
     inputs:
-      containerRegistry: '$(artifact.docker.repo)'
-      repository: '$(artifact.docker.name)'
+      containerRegistry: '$(artifact.docker.conn)'
+      repository: '$(artifact.docker.repo)'
       command: push
       tags: '$(Build.BuildNumber)'
     condition: |
