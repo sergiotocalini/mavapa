@@ -10,58 +10,76 @@ trigger:
       - develop
   paths:
     include:
-      - /src/mavapa
+      - /mavapa
+      - /requirements.txt
+
+pool:
+  name: 'Azure Pipelines'
+  vmimage: 'ubuntu-latest'
       
 variables:
-  vmImageName: 'ubuntu-latest'
-  buildConfiguration: 'Release'
+  project.id: 'mavapa'
+  artifact.docker.conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
+  artifact.docker.repo: 'sergiotocalini/mavapa'
+  artifact.helm.repo: ''
+  artifact.helm.name: 'mavapa'
+  artifact.helm.work: '$(Build.SourcesDirectory)/.devops/helm'
+  artifact.helm.dest: '$(Build.ArtifactStagingDirectory)/helm'
+  
+steps:
+  - task: GitVersion@5
+    displayName: 'GitVersion'
+    inputs:
+      configFilePath: GitVersion.yml
 
-stages:
-- stage: 'Build'
-  condition: succeeded()
-  jobs:
-  - job: basics
-    displayName: 'Basics'
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: GitVersion@5
-      displayName: 'GitVersion'
-      inputs:
-        updateAssemblyInfo: true
-        preferBundledVersion: false
-    - script: echo %Action%%BuildVersion%
-      displayName: 'Set build version'
-      env:
-        Action: '##vso[build.updatebuildnumber]'
-        BuildVersion: $(GitVersion.SemVer)
-  - job: 
-    displayName: 'Using'
-    dependsOn: basics
-    pool:
-      vmImage: $(vmImageName)
-    strategy:
-      matrix:
-        Python27:
-          python.version: '2.7'
-        Python37:
-          python.version: '3.7'
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(python.version)'
-      displayName: 'Use Python $(python.version)'
-    - script: |
-        sudo apt update
-        sudo apt install build-essential libsasl2-dev ldap-utils libldap2-dev libmysqlclient-dev python-pip python-virtualenv
-      displayName: 'Install OS dependencies'
-    - script: |
-        virtualenv -p python$(python.version) "~/.venvs/mavapa"
-        . "~/.venvs/mavapa/bin/activate"
-        pip install --upgrade pip
-        pip install pyflakes pylint nose nosexcover
-        pip install -r requirements.txt
-      displayName: 'Install Python dependencies'
+  - task: Docker@2
+    displayName: 'docker: Build'
+    inputs:
+      containerRegistry: '$(artifact.docker.conn)'
+      repository: '$(artifact.docker.repo)'
+      command: build
+      Dockerfile: .devops/docker/Dockerfile
+      buildContext: '$(Build.SourcesDirectory)'
+      tags: '$(Build.BuildNumber)'
+      arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
+  - task: Docker@2
+    displayName: 'docker: Push'
+    inputs:
+      containerRegistry: '$(artifact.docker.conn)'
+      repository: '$(artifact.docker.repo)'
+      command: push
+      tags: '$(Build.BuildNumber)'
+    condition: |
+      and
+      (
+        succeeded(),
+        or
+        (
+          not(in(variables['Build.Reason'], 'PullRequest')),
+          eq(variables['artifact.docker.publish'], true)
+        )
+      )
+
+  - task: AzureCLI@1
+    displayName: "Helm: Package and Push"
+    inputs:
+      azureSubscription: '$(artifact.helm.sign)'
+      scriptLocation: inlineScript
+      inlineScript: |
+        az acr helm repo add -n $(artifact.helm.repo)
+        helm package $(artifact.helm.work) --app-version $(Build.BuildNumber) --version $(Build.BuildNumber) --destination $(artifact.helm.dest)
+        az acr helm push $(artifact.helm.dest)/$(artifact.helm.name)-$(Build.BuildNumber).tgz -n $(artifact.helm.repo) --force
+    condition: |
+      and
+      (
+        succeeded(),
+        or
+        (
+          not(in(variables['Build.Reason'], 'PullRequest')),
+          eq(variables['artifact.helm.publish'], true)
+        )
+      )
+    enabled: false
 
 
