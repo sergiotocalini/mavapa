@@ -16,7 +16,7 @@ from forms import Login, Reset
 from models import db, db_session
 from models import App, Token, User, Backend, Session, Retrieve
 from models import NotifyAgent
-from modules.backends import LDAP
+from backends import LDAP
 from mavapa_server import mavapa_server
 from datetime import datetime, timedelta
 

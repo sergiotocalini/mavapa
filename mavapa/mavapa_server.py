@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, abort
 from flask import redirect, request, jsonify, session, url_for
 from pony.orm import commit
-from models import db_session
+from models import db_session, select, Token
 
 MAVAPA_URL = ''
 AUTH_URL = MAVAPA_URL + '/auth?response_type=code'
@@ -33,7 +33,7 @@ def get_data(table, **kwargs):
     else:
         return select(o for o in eval(table))
 
-    
+
 @db_session
 def save_code(app, user, code):
     """
@@ -75,7 +75,7 @@ def who_im():
 @mavapa_server.route('/token', methods=['POST'])
 @db_session
 def token():
-    grant_type = request.form.get('grant_type')
+    # grant_type = request.form.get('grant_type')
     code = request.form.get('code')
     redirect_uri = request.form.get('redirect_uri')
     redirect_uri = urllib.parse.unquote(redirect_uri)
@@ -115,7 +115,11 @@ def accept_app():
         session.pop('redirect_uri')
         if accepted:
             account = get_data('User', email=user)
-            app = get_data('App', client_id=client_id, redirect_uri=redirect_uri)
+            app = get_data(
+                'App',
+                client_id=client_id,
+                redirect_uri=redirect_uri
+            )
             account.apps.add(app)
             commit()
             return redirect(auth_url)
@@ -160,4 +164,3 @@ def auth():
         'scopes': scopes,
     }
     return jsonify(data)
-
