@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, abort
 from flask import redirect, request, jsonify, session, url_for
 from pony.orm import commit
-from lib import *
+from modules import *
 from forms import *
 
 MAVAPA_URL = ''
