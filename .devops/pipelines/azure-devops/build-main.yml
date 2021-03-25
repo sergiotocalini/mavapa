@@ -15,7 +15,7 @@ trigger:
 
 pool:
   name: 'Azure Pipelines'
-  vmimage: 'ubuntu-latest'
+  vmimage: 'ubuntu-18.04'
       
 variables:
   project.id: 'mavapa'
