@@ -19,7 +19,8 @@ pool:
       
 variables:
   project.id: 'mavapa'
-  artifact.docker.conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
+#  artifact.docker.conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
+  artifact.docker.conn: 'aa7a8ee3-4a60-43d8-9155-65b514cb05d6'
   artifact.docker.repo: 'sergiotocalini/mavapa'
   artifact.helm.repo: ''
   artifact.helm.name: 'mavapa'
