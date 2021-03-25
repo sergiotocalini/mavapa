@@ -13,9 +13,9 @@
 	    <p style="font-size: 17px;">({{ctx.app_desc}})</p>
 	  </div>
 	  <div class="logos text-center">
-	    <img class="img-rounded" src="{{ g.user.avatar(96) }}">
+	    <img class="img-rounded" src="{{ g.user.avatar(96) }}" alt="{{ g.user.displayname }}">
 	    <i class="fa fa-exchange fa-lg" aria-hidden="true"></i>
-	    <img class="img-rounded" src="{{ctx.app_icon}}">
+	    <img class="img-rounded" src="{{ctx.app_icon}}" alt="{{ ctx.app_icon }}">
 	  </div>
 	  <div class="message">
 	    <p>Do you want to access to <strong>{{ctx.app_name}}</strong> with your <strong>Single Sign-On</strong> account?</p>

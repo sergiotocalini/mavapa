@@ -3,7 +3,6 @@
 from hashlib import md5
 from functools import wraps, update_wrapper
 import os
-# import datetime
 import urllib
 import requests
 import arrow
@@ -12,7 +11,6 @@ from flask import Flask, request, render_template, g, jsonify, current_app
 from flask import url_for, abort, flash, redirect, session, make_response
 from pony.orm import select, count, commit, desc
 from forms import Login, Reset
-# from .lib import *
 from models import db, db_session
 from models import App, Token, User, Backend, Session, Retrieve
 from models import NotifyAgent

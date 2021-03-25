@@ -12,7 +12,7 @@ imagePullSecrets:
 
 ports:
   - name: http
-    containerPort: 7000
+    containerPort: 5000
     protocol: TCP
     
 service:
