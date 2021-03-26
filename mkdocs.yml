@@ -17,8 +17,12 @@ extra:
   social:
     - type: github
       icon: fontawesome/brands/github-alt
-      link: 'https://github.com/sergiotocalini/mavapa'
-
+      link: https://github.com/sergiotocalini/mavapa
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/sergiotocalini/mavapa/
+  version:
+    provider: mike
+      
 markdown_extensions:
   - admonition
   - codehilite:

@@ -21,12 +21,13 @@ def make_hash(lenght=24):
 class Token(db.Entity):
     _table_ = "tokens"
     created_on = Required(
-       datetime,
-       sql_type='TIMESTAMP', default=datetime.now
+        datetime,
+        sql_type='TIMESTAMP',
+        default=datetime.now
     )
     expired_on = Required(
-       datetime,
-       default=lambda: datetime.now() + timedelta(days=30)
+        datetime,
+        default=lambda: datetime.now() + timedelta(days=30)
     )
     code = Required(unicode)
     access_token = Optional(unicode)
@@ -45,7 +46,7 @@ class User(db.Entity):
     firstname = Optional(unicode)
     lastname = Optional(unicode)
     dname = Optional(
-       unicode, default="{lastname}, {firstname}", column="displayname"
+        unicode, default="{lastname}, {firstname}", column="displayname"
     )
     mobile = Optional(unicode)
     mailrecovery = Optional(unicode)
@@ -83,10 +84,10 @@ class Session(db.Entity):
     _table_ = "sessions"
     id = PrimaryKey(unicode, default=lambda: make_hash())
     created_on = Required(
-       datetime, sql_type='TIMESTAMP', default=datetime.now
+        datetime, sql_type='TIMESTAMP', default=datetime.now
     )
     expired_on = Required(
-       datetime, default=lambda: datetime.now() + timedelta(days=30)
+        datetime, default=lambda: datetime.now() + timedelta(days=30)
     )
     agent_address = Required(unicode)
     agent_string = Optional(unicode)
@@ -109,7 +110,7 @@ class App(db.Entity):
     client_secret = Required(unicode)
     redirect_uri = Required(unicode)
     created_at = Required(
-       datetime, sql_type='TIMESTAMP', default=datetime.now
+        datetime, sql_type='TIMESTAMP', default=datetime.now
     )
     tags = Optional(unicode)
     users = Set(User)
@@ -132,6 +133,7 @@ class Backend(db.Entity):
     timeout = Optional(int)
     onfly = Required(bool, default=False)
     login = Required(unicode, default='mail')
+    last_seen = Optional(datetime, default=datetime.now)
     users = Set(User)
 
 
@@ -153,10 +155,10 @@ class Retrieve(db.Entity):
     id = PrimaryKey(int, auto=True)
     code = Required(unicode, unique=True, default=lambda: make_hash(8))
     created_on = Required(
-       datetime, sql_type='TIMESTAMP', default=datetime.now
+        datetime, sql_type='TIMESTAMP', default=datetime.now
     )
     expired_on = Required(
-       datetime, default=lambda: datetime.now() + timedelta(hours=1)
+        datetime, default=lambda: datetime.now() + timedelta(hours=1)
     )
     used_on = Optional(datetime, nullable=True)
     methods = Optional(unicode, nullable=True, default='')

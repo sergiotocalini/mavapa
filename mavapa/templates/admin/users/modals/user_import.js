@@ -12,10 +12,10 @@ function user_search() {
 	    var table = '#table-users-search';
 	    $(table).bootstrapTable('showLoading');
 	    $(table).bootstrapTable('removeAll');
-	    for(i in e['data']) {
+	    for(let i in e['data']) {
 		var user = e['data'][i];
 		console.log(user);
-		html = '<a class="user-import" data-id="' + i + '">';
+		var html = '<a class="user-import" data-id="' + i + '">';
                 html+= '<i class="fa fa-fw fa-plus"></i>';
                 html+= '</a>';
 		$(table).bootstrapTable('append', {

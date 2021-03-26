@@ -32,7 +32,8 @@
 	<em class="fa fa-plus fa-fw"></em>
       </button>      
     </div>
-    <table id="table-apps" data-show-toggle="false"
+    <table id="table-apps" aria-describedby="Registered Applications"
+	   data-show-toggle="false"
 	   data-show-export="false" data-toolbar="#toolbar-apps"
 	   data-show-columns="true" data-show-multi-sort="true"
 	   data-sort-name="display" data-pagination="true"
@@ -40,7 +41,6 @@
 	   data-show-footer="false" data-page-size="50" data-escape="false"
 	   class="table table-hover table-striped table-compact 
 		  table-condensed table-autosize">
-      <caption>Registered Applications</caption>
       <thead>
 	<tr>
 	  <th scope="col" data-field="name">
@@ -101,8 +101,8 @@
     </table>
   </div>
   <div id="sessions" class="tab-pane fade">
-    <table id="table-sessions" data-show-toggle="false"
-	   data-show-export="false" data-row-style="rowStyle"
+    <table id="table-sessions" aria-describedby="Sessions"
+	   data-show-toggle="false" data-show-export="false" data-row-style="rowStyle"
 	   data-show-columns="true" data-show-multi-sort="true"
 	   data-sort-name="status" data-sort-order="desc"
 	   data-pagination="true"
@@ -110,7 +110,6 @@
 	   data-show-footer="false" data-page-size="50" data-escape="false"
 	   class="table table-hover table-striped table-compact 
 		  table-condensed table-autosize">
-      <caption>Sessions</caption>
       <thead>
       	<tr>
 	  <th data-field="status" data-visible="false" data-checkbox="true">

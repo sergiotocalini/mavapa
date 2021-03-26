@@ -11,7 +11,34 @@ $(document).ready(function () {
 	    autosize_tables();
 	}
     });
+        
+    $(".switch-toolbar a[data-click=new]").on("click", function(a) {
+	a.preventDefault();
+	$("#ModalBackend").modal("show");
+    });
+
+    $(".switch-toolbar a[data-click=refresh]").on("click", function(e){
+	e.preventDefault();
+	getOrgs();
+    });
     
+    $(".nav-tabs a[data-toggle=tab]").on("click", function(e) {
+	if ($(this).parent().hasClass("disabled")) {
+	    e.preventDefault();
+	    return false;
+	}
+    });
+    getOrgs();
+});
+
+
+function jqlisteners() {
+    console.log("Loading");
+    jqlisteners_modal_backend();
+    jqlisteners_modal_person();
+};
+
+function jqlisteners_orgs() {
     $(".section-switch .button-connection").on("dblclick", function(a) {
 	a.preventDefault();
 	BACKEND_ID = $(this).data('id');
@@ -80,27 +107,88 @@ $(document).ready(function () {
 	    }
 	});
     });
+}
+
+function getOrgs() {
+    console.log("entro");
     
-    $(".switch-toolbar a[data-click=new]").on("click", function(a) {
-	a.preventDefault();
-	$("#ModalBackend").modal("show");
-    });
-    
-    $(".nav-tabs a[data-toggle=tab]").on("click", function(e) {
-	if ($(this).parent().hasClass("disabled")) {
-	    e.preventDefault();
-	    return false;
+    $.ajax({
+	url: "{{ url_for('api_backends') }}",
+	type: 'GET',
+	contentType: "application/json",
+	success: function(e) {
+	    var html = ""
+	    for (var idx in e.backends) {
+		var org = e.backends[idx];
+		org["last_seen_ago"] = moment(Date.parse(org["last_seen"])).fromNow();
+		html += `
+<button type="button" data-id="${org.id}" style="outline:none;" class="list-group-item list-group-item-action button-connection">
+  <div class="d-flex w-100 justify-content-between">
+    <h4 class="mb-1">
+      <em class="fa fa-database"></em>
+      ${org.name}
+    </h4>
+    <div class="bt-group" style="position: absolute;
+				 right: 0px;
+				 top: 0px;
+				 margin: 1%;
+				 padding: 1.5% 3%;
+				 border-radius: 50%;">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: gray;">
+	<em class="fa fa-ellipsis-v"></em>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-right">
+	<li>
+	  <a href="#connect" data-click="connect">
+	    <em class="fa fa-fw fa-plug"></em>
+	    Connect
+	  </a>
+	</li>
+	<li>
+	  <a href="#edit" data-click="edit">
+	    <em class="fa fa-fw fa-pencil-alt"></em>
+	    Edit
+	  </a>
+	</li>
+	<li>
+	  <a href="#copy" data-click="copy">
+	    <em class="fa fa-fw fa-copy"></em>
+	    Copy
+	  </a>
+	</li>
+	<li role="separator" class="divider"></li>
+	<li>
+	  <a href="#delete" data-click="delete">
+	    <em class="fa fa-fw fa-trash"></em>
+	    Delete
+	  </a>
+	</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="d-flex w-100 justify-content-between">
+    <p class="mb-1">${org.type}</p>
+  </div>
+      
+  <div class="d-flex w-100 justify-content-between">
+    <small class="mb-1">
+      <i class="fa fa-fw fa-plug"></i>
+      ${org.host}
+    </small>
+    <small class="pull-right">
+      ${org.last_seen_ago}
+    </small>
+  </div>
+</button>
+`
+	    }
+	    $("#orgs-list").html(html);
+	    jqlisteners_orgs();
 	}
     });
-});
 
-
-function jqlisteners() {
-    console.log("Loading");
-    jqlisteners_modal_backend();
-    jqlisteners_modal_person();
 };
-
 
 function OrgItemFormatterValue(value, row) {
     var html = ""
@@ -121,7 +209,7 @@ function getTree() {
 	    var get_tree = function(item) {
 		var data = []
 		if (item.children) {
-		    for (child in item.children) {
+		    for (var child in item.children) {
 			data.push(get_tree(item.children[child]));
 		    }
 		} else {
@@ -168,13 +256,13 @@ function getTree() {
 		    return data;
 		}
 		var nodes_enable = []
-		for (e in data) {
+		for (var e in data) {
 		    var enables = find_node_dep(data[e]['nodeId']);
 		    console.log(data[e]);
 		    nodes_enable.concat(enables);
 		}
 		console.log(nodes_enable);
-		for (c in nodes) {
+		for (var c in nodes) {
 		    if ( ! nodes_enable.includes(nodes[c]['nodeId']) ) {
 			// var node = $(this).treeview('getNode', c);
 			$('li[data-nodeid=' + nodes[c]['nodeId'] + ']').addClass('hidden');
@@ -206,14 +294,15 @@ function getTree() {
 		    data: { dn: data['dn'], backend: data['backend'] },
 		    success: function(e) {
 			var data = e['data'];
+			console.log(data);
 			for (user in data) {
 			    $(table).bootstrapTable('append', {
 				'key': 'dn',
 				'value': data[user][0],
 				'input': data[user][0],				
 			    });
-			    for (key in data[user][1]) {
-				for (value in data[user][1][key]) {
+			    for (var key in data[user][1]) {
+				for (var value in data[user][1][key]) {
 				    $(table).bootstrapTable('append', {
 					'key': key,
 					'value': data[user][1][key][value],
@@ -246,7 +335,7 @@ function PeopleParams(params) {
 
 function PeopleResponseHandler(res) {
     var data = [];
-    for (r in res.data) {
+    for (var r in res.data) {
 	var row = res.data[r];
 	var avatar = "{{ config['CDN_LOCAL'] }}/img/avatar.jpg";
 	if (row[1]['jpegPhoto']) {

@@ -63,12 +63,13 @@ function jqlisteners_users() {
 		    type: 'GET',
 		    success: function(e2) {
 			var backends = e2['backends']
+			var htlm = "";
 			if (data['backend']) {
 			    html = '<option value="0">Local</option>'
 			} else {
 			    html = '<option value="0" selected="selected">Local</option>'
 			}
-			for(i in backends) {
+			for(let i in backends) {
 			    if (data['backend']['id'] == backends[i]['id']) {
 				html += '<option selected="selected" '
 				html += 'value="' + backends[i]['id'] + '">';
@@ -95,7 +96,7 @@ function UsersParams(params) {
 
 function UsersResponseHandler(res) {
     var data = [];
-    for(r in res.data) {
+    for(let r in res.data) {
 	var row = res.data[r];
 	var doc = {
 	    id: row.id,

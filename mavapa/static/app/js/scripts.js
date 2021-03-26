@@ -49,5 +49,4 @@ function autosize_tables() {
 function table_height(table) {
     var parent = $(table).parent().parent().parent().parent();
     return parent.height();
-};
-
+}

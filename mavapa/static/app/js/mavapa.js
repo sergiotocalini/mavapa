@@ -11,7 +11,7 @@ function makeMenu(apps) {
     }
     html += '<a class="more" arial-label="More Mavapa apps" href="' + url + '" target="_blank" aria-expanded="false" aria-hidden="false">More</a>';
     return html;
-};
+}
 
 $(document).ready(function(){
     var url = $('script[src$="/mavapa.js"]').attr('src') + '/../../../../api/apps?favorites=true';

@@ -72,22 +72,20 @@ class LDAP():
         root = Node(kwargs['basedn'], dn=kwargs['basedn'])
         if query:
             res = []
-            for x in query:
-                if not kwargs['basedn'] == x[0]:
-                    entries = (
-                        x[0].replace(',%s' % (kwargs['basedn']), '')
-                    ).split(',')
-                    entries.reverse()
-                    res.append(','.join(entries))
+            for x in [r for r in query if not kwargs['basedn'] == r[0]]:
+                entries = (
+                    x[0].replace(',%s' % (kwargs['basedn']), '')
+                ).split(',')
+                entries.reverse()
+                res.append(','.join(entries))
             res.sort()
             for dn in res:
                 entries = dn.split(',')
                 parent = root
                 for e in entries:
                     node = None
-                    for c in parent.children:
-                        if c.name == e:
-                            node = c
+                    for c in [r for r in parent.children if r.name == e]:
+                        node = c
                     if not node:
                         node = Node(
                             e, parent=parent, dn=','.join([e, parent.dn])
