@@ -3,12 +3,12 @@
 fullnameOverride: mavapa
 replicaCount: 2
 image:
-  repository: docker.pkg.github.com/sergiotocalini/mavapa
+  repository: registry.hub.docker.com/sergiotocalini/mavapa
   pullPolicy: IfNotPresent
 
 # ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 imagePullSecrets:
-  - name: docker.pkg.github.com
+  - name: registry.hub.docker.com
 
 ports:
   - name: http

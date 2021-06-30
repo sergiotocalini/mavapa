@@ -386,8 +386,7 @@
 {% endblock %}
 
 {% block scripts %}
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
+{% include "__include__/bootstrap-table.html" %}
 
 <script>
     $(document).ready(function () {

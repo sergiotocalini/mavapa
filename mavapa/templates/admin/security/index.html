@@ -79,8 +79,7 @@
 {% endblock %}
 
 {% block scripts %}
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+{% include "__include__/bootstrap-select.html" %}
 
 <script>
 {% include "admin/security/index.js" %}

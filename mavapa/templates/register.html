@@ -546,24 +546,13 @@ li.active {
     transform: translateX(-50%);
 }
 </style>
-<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet">
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/css/bootstrap-table.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-table/1.11.1/js/bootstrap-table.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-<link  href="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-
-<link href="{{ config['CDN_EXTRAS'] }}/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-
-<link href="{{ config['CDN_EXTRAS'] }}/bootstrap-pincode-input/1.4.0/css/bootstrap-pincode-input.css" rel="stylesheet">
-<script src="{{ config['CDN_EXTRAS'] }}/bootstrap-pincode-input/1.4.0/js/bootstrap-pincode-input.js"></script>
+{% include "__include__/moment.js.html" %}
+{% include "__include__/flag-icon-css.html" %}
+{% include "__include__/bootstrap-table.html" %}
+{% include "__include__/bootstrap-select.html" %}
+{% include "__include__/bootstrap-toggle.html" %}
+{% include "__include__/bootstrap-datetimepicker.html" %}
+{% include "__include__/bootstrap-pincode-input.html" %}
 
 <script>
 $(document).ready(function() {
