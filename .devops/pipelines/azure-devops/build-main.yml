@@ -101,6 +101,6 @@ steps:
               succeeded(),
               or
                 (
-                  not(in(variables['Build.Reason'], 'PullRequest'))
+                  not(in(variables['Build.Reason'], 'PullRequest')),
                 )
             )
