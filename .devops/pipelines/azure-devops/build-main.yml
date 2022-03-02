@@ -59,7 +59,7 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
-  - ${{ if eq(parameters.artifact_helm_push, true) }}:
+  - ${{ if eq(parameters.artifact_docker_push, true) }}:
     - task: Docker@2
       displayName: 'docker: Push'
       inputs:
