@@ -27,13 +27,9 @@ pool:
   vmimage: 'ubuntu-18.04'
       
 variables:
-  project.id: 'mavapa'
-  artifact.docker.conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
-  artifact.docker.repo: 'sergiotocalini/mavapa'
-  artifact.helm.repo: 'https://github.com/sergiotocalini/helm-charts'
-  artifact.helm.name: 'mavapa'
-  artifact.helm.work: '$(Build.SourcesDirectory)/.devops/helm'
-  artifact.helm.dest: '$(Build.ArtifactStagingDirectory)/helm'
+  project_id: 'mavapa'
+  artifact_docker_conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
+  artifact_docker_repo: 'sergiotocalini/mavapa'
 
 resources:
   repositories:
@@ -45,24 +41,18 @@ resources:
   
 steps:
   - checkout: self
-
-  - task: Bash@3
-    displayName: "list dir"
-    inputs:
-      targetType: 'inline'
-      script: |
-        ls -la
-
+  - checkout: helm-repo
+  
   - task: gitversion/setup@0
-    displayName: 'Setup GitVersion'
+    displayName: 'GitVersion: Setup'
     inputs:
       versionSpec: '5.x'
 
   - task: gitversion/execute@0
-    displayName: 'Execute GitVersion'
+    displayName: 'GitVersion: Execute'
     inputs:
       useConfigFile: true
-      configFilePath: 'GitVersion.yml'
+      configFilePath: '$(Build.SourcesDirectory)/mavapa/GitVersion.yml'
       
   - task: Docker@2
     displayName: 'docker: Build'
@@ -70,8 +60,8 @@ steps:
       containerRegistry: '$(artifact.docker.conn)'
       repository: '$(artifact.docker.repo)'
       command: build
-      Dockerfile: .devops/docker/Dockerfile
-      buildContext: '$(Build.SourcesDirectory)'
+      Dockerfile: '$(Build.SourcesDirectory)/mavapa/.devops/docker/Dockerfile'
+      buildContext: '$(Build.SourcesDirectory)/mavapa'
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
@@ -92,8 +82,6 @@ steps:
                 not(in(variables['Build.Reason'], 'PullRequest')),
               )
             )
-
-  - checkout: helm-repo
     
   - ${{ if eq(parameters.artifact_helm_push, true) }}:
       - task: Bash@3
@@ -101,12 +89,18 @@ steps:
         inputs:
           targetType: 'inline'
           script: |
+            cd "$(Build.SourcesDirectory)/mavapa"
             DIFFS="$(git diff HEAD HEAD~ --name-only)"
             if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
-            helm package $(artifact.helm.work) --app-version $(Build.BuildNumber) --version $(Build.BuildNumber) --destination $(artifact.helm.dest)   
-            az acr helm push $(artifact.helm.dest)/$(artifact.helm.name)-$(Build.BuildNumber).tgz -n $(artifact.helm.repo) --force
+              cd "$(Build.SourcesDirectory)/helm-charts"
+              helm package "$(Build.SourcesDirectory)/mavapa/.devops/helm" \
+                --app-version $(Build.BuildNumber) \
+                --version $(Build.BuildNumber) \
+                --destination "$(Build.SourcesDirectory)/helm-charts/charts/mavapa"
+              git add charts/*
+              git commit -m "Adding new mavapa chart version $(Build.BuildNumber)"
+              git push
             fi
-            ls -l "$(Build.SourcesDirectory)"
             condition: |
               and
               (
