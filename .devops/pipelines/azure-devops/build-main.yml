@@ -46,6 +46,13 @@ resources:
 steps:
   - checkout: self
 
+  - task: Bash@3
+    displayName: "list dir"
+    inputs:
+      targetType: 'inline'
+      script: |
+        ls -la
+
   - task: gitversion/setup@0
     displayName: 'Setup GitVersion'
     inputs:
@@ -76,14 +83,14 @@ steps:
           repository: '$(artifact.docker.repo)'
           command: push
           tags: '$(Build.BuildNumber)'
-          condition: |
-            and
+        condition: |
+          and
             (
-            succeeded(),
-            or
-            (
-            not(in(variables['Build.Reason'], 'PullRequest')),
-            )
+              succeeded(),
+              or
+              (
+                not(in(variables['Build.Reason'], 'PullRequest')),
+              )
             )
 
   - checkout: helm-repo
@@ -92,7 +99,7 @@ steps:
       - task: Bash@3
         displayName: "Helm: Build & Push"
         inputs:
-          stargetType: 'inline'
+          targetType: 'inline'
           script: |
             DIFFS="$(git diff HEAD HEAD~ --name-only)"
             if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
