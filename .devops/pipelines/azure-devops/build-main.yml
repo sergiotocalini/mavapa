@@ -95,14 +95,12 @@ steps:
               git commit -m "Adding new mavapa chart version $(Build.BuildNumber)"
               git push
             fi
-            condition: |
-              and
-              (
+        condition: |
+          and
+            (
               succeeded(),
               or
-              (
-              not(in(variables['Build.Reason'], 'PullRequest'))
-              )
-              )
-
-
+                (
+                  not(in(variables['Build.Reason'], 'PullRequest'))
+                )
+            )
