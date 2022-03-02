@@ -26,10 +26,6 @@ pool:
   name: 'Azure Pipelines'
   vmimage: 'ubuntu-18.04'
 
-variables:
-  artifact_helm_push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.helm, true)]
-  artifact_docker_push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.docker, true)]
-
 resources:
   repositories:
   - repository: helm-repo
