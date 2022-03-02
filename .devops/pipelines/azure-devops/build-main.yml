@@ -3,11 +3,11 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 parameters:
-  - name: push_helm
+  - name: artifact.helm.push
     displayName: "Push Helm Chart"
     type: boolean
     default: true
-  - name: push_docker
+  - name: artifact.docker.push
     displayName: "Push Docker Container"
     type: boolean
     default: true
@@ -62,6 +62,7 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
+  - ${{ if eq(parameters.artifact.docker.push, true) }}:
   - task: Docker@2
     displayName: 'docker: Push'
     inputs:
@@ -76,12 +77,12 @@ steps:
         or
         (
           not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.push_docker, true)
         )
       )
 
   - checkout: helm-repo
-      
+    
+  - ${{ if eq(parameters.artifact.helm.push, true) }}:
   - task: Bash@3
     displayName: "Helm: Build & Push"
     inputs:
@@ -99,8 +100,7 @@ steps:
         succeeded(),
         or
         (
-          not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.push_helm, true)
+          not(in(variables['Build.Reason'], 'PullRequest'))
         )
       )
 
