@@ -39,7 +39,7 @@ resources:
   repositories:
   - repository: helm-repo
     type: github
-    endpoint: 33359ee0-9862-4dc0-a235-e07867196c99
+    endpoint: sergiotocalini@github.com
     name: sergiotocalini/helm-charts
     ref: main
   
