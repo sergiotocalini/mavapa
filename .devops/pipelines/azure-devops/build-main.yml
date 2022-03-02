@@ -59,48 +59,42 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
-  - task: Docker@2
-    displayName: 'docker: Push'
-    inputs:
-      containerRegistry: sergiotocalini@docker.io
-      repository: sergiotocalini/mavapa
-      command: push
-      tags: '$(Build.BuildNumber)'
-    condition: |
-      and
-      (
-        succeeded(),
-        or
+  - ${{ if eq(parameters.artifact_helm_push, true) }}:
+    - task: Docker@2
+      displayName: 'docker: Push'
+      inputs:
+        containerRegistry: sergiotocalini@docker.io
+        repository: sergiotocalini/mavapa
+        command: push
+        tags: '$(Build.BuildNumber)'
+      condition: |
+        and
         (
-          not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.artifact_docker_push, true)
+          succeeded(),
+          not(in(variables['Build.Reason'], 'PullRequest'))
         )
-      )
 
-  - task: Bash@3
-    displayName: "Helm: Build & Push"
-    inputs:
-      targetType: 'inline'
-      script: |
-        cd "$(Build.SourcesDirectory)/mavapa"
-        DIFFS="$(git diff HEAD HEAD~ --name-only)"
-        if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
-          cd "$(Build.SourcesDirectory)/helm-charts"
-          helm package "$(Build.SourcesDirectory)/mavapa/.devops/helm" \
-            --app-version $(Build.BuildNumber) \
-            --version $(Build.BuildNumber) \
-            --destination "$(Build.SourcesDirectory)/helm-charts/charts/mavapa"
-          git add charts/*
-          git commit -m "Adding new mavapa chart version $(Build.BuildNumber)"
-          git push
-        fi
-    condition: |
-      and
-      (
-        succeeded(),
-        or
+  - ${{ if eq(parameters.artifact_helm_push, true) }}:
+    - task: Bash@3
+      displayName: "Helm: Build & Push"
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd "$(Build.SourcesDirectory)/mavapa"
+          DIFFS="$(git diff HEAD HEAD~ --name-only)"
+          if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
+            cd "$(Build.SourcesDirectory)/helm-charts"
+            helm package "$(Build.SourcesDirectory)/mavapa/.devops/helm" \
+              --app-version $(Build.BuildNumber) \
+              --version $(Build.BuildNumber) \
+              --destination "$(Build.SourcesDirectory)/helm-charts/charts/mavapa"
+            git add charts/*
+            git commit -m "Adding new mavapa chart version $(Build.BuildNumber)"
+            git push
+          fi
+      condition: |
+        and
         (
-          not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.artifact_helm_push, true)
+          succeeded(),
+          not(in(variables['Build.Reason'], 'PullRequest'))
         )
-      )
