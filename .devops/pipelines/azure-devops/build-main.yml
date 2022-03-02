@@ -25,11 +25,6 @@ trigger:
 pool:
   name: 'Azure Pipelines'
   vmimage: 'ubuntu-18.04'
-      
-variables:
-  project_id: 'mavapa'
-  artifact_docker_conn: '23a0ddbc-cb18-4dda-a06f-0bedcaa8e010'
-  artifact_docker_repo: 'sergiotocalini/mavapa'
 
 resources:
   repositories:
@@ -38,11 +33,11 @@ resources:
     endpoint: sergiotocalini@github.com
     name: sergiotocalini/helm-charts
     ref: main
-  
+
 steps:
   - checkout: self
   - checkout: helm-repo
-  
+
   - task: gitversion/setup@0
     displayName: 'GitVersion: Setup'
     inputs:
@@ -53,12 +48,12 @@ steps:
     inputs:
       useConfigFile: true
       configFilePath: '$(Build.SourcesDirectory)/mavapa/GitVersion.yml'
-      
+
   - task: Docker@2
     displayName: 'docker: Build'
     inputs:
-      containerRegistry: '$(artifact.docker.conn)'
-      repository: '$(artifact.docker.repo)'
+      containerRegistry: sergiotocalini@docker.io
+      repository: sergiotocalini/mavapa
       command: build
       Dockerfile: '$(Build.SourcesDirectory)/mavapa/.devops/docker/Dockerfile'
       buildContext: '$(Build.SourcesDirectory)/mavapa'
@@ -69,8 +64,8 @@ steps:
       - task: Docker@2
         displayName: 'docker: Push'
         inputs:
-          containerRegistry: '$(artifact.docker.conn)'
-          repository: '$(artifact.docker.repo)'
+          containerRegistry: sergiotocalini@docker.io
+          repository: sergiotocalini/mavapa
           command: push
           tags: '$(Build.BuildNumber)'
         condition: |
@@ -82,7 +77,7 @@ steps:
                 not(in(variables['Build.Reason'], 'PullRequest')),
               )
             )
-    
+
   - ${{ if eq(parameters.artifact_helm_push, true) }}:
       - task: Bash@3
         displayName: "Helm: Build & Push"
