@@ -46,8 +46,7 @@ steps:
   - task: gitversion/execute@0
     displayName: 'GitVersion: Execute'
     inputs:
-      useConfigFile: true
-      configFilePath: '$(Build.SourcesDirectory)/mavapa/GitVersion.yml'
+      targetPath: '$(Build.SourcesDirectory)/mavapa'
 
   - task: Docker@2
     displayName: 'docker: Build'
