@@ -3,12 +3,12 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 parameters:
-  - name: artifact.helm.publish
-    displayName: "Publish Helm Chart"
+  - name: push_helm
+    displayName: "Push Helm Chart"
     type: boolean
     default: true
-  - name: artifact.docker.publish
-    displayName: "Publish Docker Container"
+  - name: push_docker
+    displayName: "Push Docker Container"
     type: boolean
     default: true
 
@@ -76,7 +76,7 @@ steps:
         or
         (
           not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.artifact.docker.publish, true)
+          eq(parameters.push_docker, true)
         )
       )
 
@@ -100,7 +100,7 @@ steps:
         or
         (
           not(in(variables['Build.Reason'], 'PullRequest')),
-          eq(parameters.artifact.helm.publish, true)
+          eq(parameters.push_helm, true)
         )
       )
 
