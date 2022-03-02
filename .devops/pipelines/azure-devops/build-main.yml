@@ -3,12 +3,12 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 parameters:
-  - name: artifact_helm_push
-    displayName: "Push Helm Chart"
+  - name: docker
+    displayName: "Docker Container"
     type: boolean
     default: true
-  - name: artifact_docker_push
-    displayName: "Push Docker Container"
+  - name: helm
+    displayName: "Helm Chart"
     type: boolean
     default: true
 
@@ -25,6 +25,10 @@ trigger:
 pool:
   name: 'Azure Pipelines'
   vmimage: 'ubuntu-18.04'
+
+variables:
+  artifact_helm_push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.helm, true)]
+  artifact_docker_push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.docker, true)]
 
 resources:
   repositories:
@@ -59,7 +63,7 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
-  - ${{ if eq(parameters.artifact_docker_push, true) }}:
+  - ${{ if eq(variables['artifact.docker.push'], true) }}:
       - task: Docker@2
         displayName: 'docker: Push'
         inputs:
@@ -67,17 +71,8 @@ steps:
           repository: sergiotocalini/mavapa
           command: push
           tags: '$(Build.BuildNumber)'
-        condition: |
-          and
-            (
-              succeeded(),
-              or
-              (
-                not(in(variables['Build.Reason'], 'PullRequest')),
-              )
-            )
 
-  - ${{ if eq(parameters.artifact_helm_push, true) }}:
+  - ${{ if eq(variables['artifact.helm.push'], true) }}:
       - task: Bash@3
         displayName: "Helm: Build & Push"
         inputs:
@@ -95,12 +90,3 @@ steps:
               git commit -m "Adding new mavapa chart version $(Build.BuildNumber)"
               git push
             fi
-        condition: |
-          and
-            (
-              succeeded(),
-              or
-                (
-                  not(in(variables['Build.Reason'], 'PullRequest')),
-                )
-            )
