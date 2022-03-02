@@ -3,11 +3,11 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 parameters:
-  - name: artifact.helm.push
+  - name: artifact_helm_push
     displayName: "Push Helm Chart"
     type: boolean
     default: true
-  - name: artifact.docker.push
+  - name: artifact_docker_push
     displayName: "Push Docker Container"
     type: boolean
     default: true
@@ -62,46 +62,46 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
-  - ${{ if eq(parameters.artifact.docker.push, true) }}:
-  - task: Docker@2
-    displayName: 'docker: Push'
-    inputs:
-      containerRegistry: '$(artifact.docker.conn)'
-      repository: '$(artifact.docker.repo)'
-      command: push
-      tags: '$(Build.BuildNumber)'
-    condition: |
-      and
-      (
-        succeeded(),
-        or
-        (
-          not(in(variables['Build.Reason'], 'PullRequest')),
-        )
-      )
+  - ${{ if eq(parameters.artifact_docker_push, true) }}:
+      - task: Docker@2
+        displayName: 'docker: Push'
+        inputs:
+          containerRegistry: '$(artifact.docker.conn)'
+          repository: '$(artifact.docker.repo)'
+          command: push
+          tags: '$(Build.BuildNumber)'
+          condition: |
+            and
+            (
+            succeeded(),
+            or
+            (
+            not(in(variables['Build.Reason'], 'PullRequest')),
+            )
+            )
 
   - checkout: helm-repo
     
-  - ${{ if eq(parameters.artifact.helm.push, true) }}:
-  - task: Bash@3
-    displayName: "Helm: Build & Push"
-    inputs:
-      stargetType: 'inline'
-      script: |
-        DIFFS="$(git diff HEAD HEAD~ --name-only)"
-        if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
-           helm package $(artifact.helm.work) --app-version $(Build.BuildNumber) --version $(Build.BuildNumber) --destination $(artifact.helm.dest)   
-           az acr helm push $(artifact.helm.dest)/$(artifact.helm.name)-$(Build.BuildNumber).tgz -n $(artifact.helm.repo) --force
-        fi
-        ls -l "$(Build.SourcesDirectory)"
-    condition: |
-      and
-      (
-        succeeded(),
-        or
-        (
-          not(in(variables['Build.Reason'], 'PullRequest'))
-        )
-      )
+  - ${{ if eq(parameters.artifact_helm_push, true) }}:
+      - task: Bash@3
+        displayName: "Helm: Build & Push"
+        inputs:
+          stargetType: 'inline'
+          script: |
+            DIFFS="$(git diff HEAD HEAD~ --name-only)"
+            if [[ "${DIFFS[@]}" =~ ".devops/helm" ]]; then
+            helm package $(artifact.helm.work) --app-version $(Build.BuildNumber) --version $(Build.BuildNumber) --destination $(artifact.helm.dest)   
+            az acr helm push $(artifact.helm.dest)/$(artifact.helm.name)-$(Build.BuildNumber).tgz -n $(artifact.helm.repo) --force
+            fi
+            ls -l "$(Build.SourcesDirectory)"
+            condition: |
+              and
+              (
+              succeeded(),
+              or
+              (
+              not(in(variables['Build.Reason'], 'PullRequest'))
+              )
+              )
 
 
