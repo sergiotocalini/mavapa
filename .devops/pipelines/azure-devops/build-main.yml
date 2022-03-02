@@ -45,11 +45,14 @@ resources:
   
 steps:
   - checkout: self
-  
+
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'runtime'
+    
   - task: GitVersion@5
     displayName: 'GitVersion'
     inputs:
-      runtime: 'full'
       configFilePath: GitVersion.yml
 
   - task: Docker@2
