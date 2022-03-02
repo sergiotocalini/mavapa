@@ -54,8 +54,7 @@ steps:
     inputs:
       useConfigFile: true
       configFilePath: 'GitVersion.yml'
-      updateAssemblyInfo: true
-    
+      
   - task: Docker@2
     displayName: 'docker: Build'
     inputs:
