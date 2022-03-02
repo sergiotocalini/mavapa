@@ -3,11 +3,11 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 parameters:
-  - name: pushDocker
+  - name: artifact_docker_push
     displayName: "Docker Container"
     type: boolean
     default: true
-  - name: pushHelm
+  - name: artifact_helm_push
     displayName: "Helm Chart"
     type: boolean
     default: true
@@ -34,10 +34,6 @@ resources:
     name: sergiotocalini/helm-charts
     ref: main
 
-variables:
-  artifact.docker.push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.pushDocker, true))]
-  artifact.helm.push: $[or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.pushHelm, true))]
-
 steps:
   - checkout: self
   - checkout: helm-repo
@@ -63,7 +59,7 @@ steps:
       tags: '$(Build.BuildNumber)'
       arguments: '--build-arg "version=$(Build.BuildNumber)"'
 
-  - ${{ if eq(variables['artifact.docker.push'], true) }}:
+  - ${{ if or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.artifact_docker_push, true)) }}:
       - task: Docker@2
         displayName: 'docker: Push'
         inputs:
@@ -72,7 +68,7 @@ steps:
           command: push
           tags: '$(Build.BuildNumber)'
 
-  - ${{ if eq(variables['artifact.helm.push'], true) }}:
+  - ${{ if or(not(in(variables['Build.Reason'], 'PullRequest')), eq(parameters.artifact_helm_push, true)) }}:
       - task: Bash@3
         displayName: "Helm: Build & Push"
         inputs:
