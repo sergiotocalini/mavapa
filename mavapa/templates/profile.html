@@ -12,12 +12,12 @@
 	{{ account.lastname }}, {{ account.firstname }}
       </div>
       <div class="title">
-	{% if account.has_key('title') %}
+	{% if "title" in account %}
 	<p>{{ account.title.decode('utf-8') }}</p>
 	{% endif%}
       </div>
       <div class="description">
-	{% if account.has_key('description') %}
+	{% if "description" in account %}
 	{{ account.description.decode('utf-8') }}
 	{% endif%}
       </div>
@@ -45,7 +45,7 @@
 	  </span>
 	  <div class="clear"></div>
 	</li>
-	{% if account.has_key('idNumber') %}
+	{% if "idNumber" in account %}
 	<li>
 	  <i class="fa fa-info fa-fw"></i>
 	  <label>ID</label>
@@ -53,7 +53,7 @@
 	  <div class="clear"></div>
 	</li>
 	{% endif %}      
-	{% if account.has_key('birthDate') %}
+	{% if "birthDate" in account %}
 	<li>
 	  <i class="fa fa-calendar fa-fw"></i>
 	  <label>Birthday</label>
@@ -63,7 +63,7 @@
 	  <div class="clear"></div>
 	</li>
 	{% endif %}
-	{% if account.has_key('postalAddress') %}
+	{% if "postalAddress" in account %}
 	<li>
 	  <i class="fa fa-map-marker fa-fw"></i>
 	  <label>Address</label>
@@ -77,7 +77,7 @@
 	  <span class="value">{{ account.mobile }}</span>
 	  <div class="clear"></div>
 	</li>
-	{% if account.has_key('telephoneNumber') %}
+	{% if "telephoneNumber" in account %}
 	<li>
 	  <i class="fa fa-phone fa-fw"></i>
 	  <label>Phone</label>
@@ -85,7 +85,7 @@
 	  <div class="clear"></div>
 	</li>
 	{% endif %}
-	{% if account.has_key('company') %}
+	{% if "company" in account %}
 	<li>
 	  <i class="fa fa-building fa-fw"></i>
 	  <label>Company</label>
@@ -93,7 +93,7 @@
 	  <div class="clear"></div>
 	</li>
 	{% endif %}
-	{% if account.has_key('department') %}
+	{% if "department" in account %}
 	<li>
 	  <i class="fa fa-group fa-fw"></i>
 	  <label>Department</label>

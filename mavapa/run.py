@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from werkzeug.serving import run_simple
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.serving import run_simple
+
 from views import app
 
 

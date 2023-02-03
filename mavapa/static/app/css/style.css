@@ -425,6 +425,7 @@ body {
 .wrapper #admin .content .bootstrap-table a {
     outline: 0;
     cursor: pointer !important;
+    text-decoration: none;
 }
 .wrapper #admin .content .nav {
     position: relative;

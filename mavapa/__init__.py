@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-from .views import app
 from .forms import Login
+from .views import app

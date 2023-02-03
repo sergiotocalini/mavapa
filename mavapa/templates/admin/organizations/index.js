@@ -36,13 +36,15 @@ function jqlisteners() {
     console.log("Loading");
     jqlisteners_modal_backend();
     jqlisteners_modal_person();
+    jqlisteners_modal_schemas();
 };
 
 function jqlisteners_orgs() {
     $(".section-switch .button-connection").on("dblclick", function(a) {
 	a.preventDefault();
 	BACKEND_ID = $(this).data('id');
-	getTree();
+        getSchemasTree();
+	getExploreTree();
 	$('#table-org-people').bootstrapTable("refreshOptions", {
 	    url: "{{ url_for('api_backends_search_users') }}?backend=" + BACKEND_ID,
 	});
@@ -56,8 +58,9 @@ function jqlisteners_orgs() {
     
     $(".section-switch a[data-click=connect]").on("click", function(a) {
 	a.preventDefault();
-	BACKEND_ID = $(this).parent().parent().parent().parent().parent().data('id');
-	getTree();
+        BACKEND_ID = $(this).parent().parent().parent().parent().parent().data('id');
+        getSchemasTree();
+	getExploreTree();
 	$('#table-org-people').bootstrapTable("refreshOptions", {
 	    url: "{{ url_for('api_backends_search_users') }}?backend=" + BACKEND_ID,
 	});
@@ -107,6 +110,17 @@ function jqlisteners_orgs() {
 	    }
 	});
     });
+}
+
+
+function jqlisteners_explore() {
+    $("#org-explore-schemas").unbind();
+    $("#org-explore-schemas").click(function(e){
+	e.preventDefault();
+	var modal = '#ModalSchemas';
+	$(modal).modal('show');
+    });
+
 }
 
 function getOrgs() {
@@ -191,15 +205,55 @@ function getOrgs() {
 };
 
 function OrgItemFormatterValue(value, row) {
-    var html = ""
-    html += '<div class="text-ellipsis">'
-    html +=  '<span>' + value + '</span>';
-    html += '</div>'
-    return html;
+  var html = ""
+  html +='<div class="text-ellipsis">';
+  html +=' <span>' + value + '</span>';
+  html +='</div>';
+  return html;
 };
 
 
-function getTree() {
+function OrgItemFormatterActions(value, row) {
+  var html ='';
+  if (!(['objectClass', 'dn'].includes(row.attr))) {
+    html+='<a href="#attr-open" data-click="attr-open"';
+    html+='   data-attr="' + row.attr + '" data-value="' + row.value + '"';
+    html+='   data-type="' + row.type + '">';
+    html+=' <i class="fa fa-fw fa-pencil"></i>';
+    html+='</a>';
+  }
+  return html;
+};
+
+
+function getSchemasTree() {
+  $('#schemas-treeview').treeview({
+    data: [
+      {
+	text: "Schema", dn: "root", icon: "fa fa-fw fa-book", nodes: [
+	  { text: "attributeTypes", dn: "attributeTypes", icon: "fa fa-fw fa-cubes", nodes: [] },
+	  { text: "objectClasses", dn: "objectClasses", icon: "fa fa-fw fa-cubes", nodes: [] },
+	  { text: "matchingRules", dn: "matchingRules", icon: "fa fa-fw fa-cubes", nodes: [] },
+	  { text: "Syntax", dn: "Syntax", icon: "fa fa-fw fa-cubes", nodes: [] },
+	]
+      }
+    ],
+    showTags: true,
+  });
+  $('#schemas-treeview').treeview('selectNode', [ 0 ]);
+  $('#schemas-treeview-search-btn').on('click', function(e) {
+    var pattern = $('#schemas-treeview-search').val();
+    var options = {
+      ignoreCase: true,
+      exactMatch: false,
+      revealResults: true,
+    };
+    $('#schemas-treeview').treeview('search', [ pattern, options ]);
+  });
+};
+
+
+function getExploreTree() {
     $.ajax({
 	url: "{{ url_for('api_backends_tree') }}",
 	type: 'GET',
@@ -236,43 +290,43 @@ function getTree() {
 		}
 		return info
 	    };
-	    $('#treeview-org').treeview({
+	    $('#explore-treeview').treeview({
 		data: [get_tree(e['data'])],
 		showTags: true,
 	    });
-	    $('#treeview-org').on('searchComplete', function(event, data) {
-		// Your logic goes here
-		$(this).treeview('checkAll', { silent: true });
-		var nodes = $(this).treeview('getChecked');
-		var find_node_dep = function(nodeid) {
-		    var data = []
-		    var node = $('#treeview-org').treeview('getNode', nodeid);
-		    if (typeof node.parentId !== "undefined") {
-			data.push(find_node_dep(node['parentId']))
-		    } else {
-			return node['nodeId'];
-		    }
-		    data.push(node['nodeId']);
-		    return data;
-		}
-		var nodes_enable = []
-		for (var e in data) {
-		    var enables = find_node_dep(data[e]['nodeId']);
-		    console.log(data[e]);
-		    nodes_enable.concat(enables);
-		}
-		console.log(nodes_enable);
-		for (var c in nodes) {
-		    if ( ! nodes_enable.includes(nodes[c]['nodeId']) ) {
-			// var node = $(this).treeview('getNode', c);
-			$('li[data-nodeid=' + nodes[c]['nodeId'] + ']').addClass('hidden');
-		    }
-		}
-	    });
-	    $('#treeview-org').on('nodeSelected', function(event, data) {
+	    // $('#explore-treeview').on('searchComplete', function(event, data) {
+	    // 	// Your logic goes here
+	    // 	$(this).treeview('checkAll', { silent: true });
+	    // 	var nodes = $(this).treeview('getChecked');
+	    // 	var find_node_dep = function(nodeid) {
+	    // 	    var data = []
+	    // 	    var node = $('#explore-treeview').treeview('getNode', nodeid);
+	    // 	    if (typeof node.parentId !== "undefined") {
+	    // 		data.push(find_node_dep(node['parentId']))
+	    // 	    } else {
+	    // 		return node['nodeId'];
+	    // 	    }
+	    // 	    data.push(node['nodeId']);
+	    // 	    return data;
+	    // 	}
+	    // 	var nodes_enable = []
+	    // 	for (var e in data) {
+	    // 	    var enables = find_node_dep(data[e]['nodeId']);
+	    // 	    console.log(data[e]);
+	    // 	    nodes_enable.concat(enables);
+	    // 	}
+	    // 	console.log(nodes_enable);
+	    // 	for (var c in nodes) {
+	    // 	    if ( ! nodes_enable.includes(nodes[c]['nodeId']) ) {
+	    // 		// var node = $(this).treeview('getNode', c);
+	    // 		$('li[data-nodeid=' + nodes[c]['nodeId'] + ']').addClass('hidden');
+	    // 	    }
+	    // 	}
+	    // });
+	    $('#explore-treeview').on('nodeSelected', function(event, data) {
 		var get_path = function(nodeid) {
 		    var data = []
-		    var node = $('#treeview-org').treeview('getNode', nodeid);
+		    var node = $('#explore-treeview').treeview('getNode', nodeid);
 		    if (typeof node.parentId !== "undefined") {
 			data.push(get_path(node['parentId']));
 		    } else {
@@ -283,7 +337,7 @@ function getTree() {
 		    return data.join(',');
 		};
 		// var dn = get_path(data['nodeId']);
-		var table = '#table-org-explore';
+		var table = '#explore-table';
 		$(table).bootstrapTable('removeAll');
 		$(table).bootstrapTable('showLoading');
 		$(table).parent().addClass('table-loading');
@@ -297,16 +351,20 @@ function getTree() {
 			console.log(data);
 			for (user in data) {
 			    $(table).bootstrapTable('append', {
-				'key': 'dn',
+				'attr': 'dn',
 				'value': data[user][0],
-				'input': data[user][0],				
+  			        'size': '',
+			        'type': '',
+			        'required': ''
 			    });
 			    for (var key in data[user][1]) {
 				for (var value in data[user][1][key]) {
 				    $(table).bootstrapTable('append', {
-					'key': key,
+					'attr': key,
 					'value': data[user][1][key][value],
-					'input': data[user][1][key][value],
+				        'size': '',
+				        'type': '',
+				        'required': ''
 				    });
 				};
 			    };
@@ -320,7 +378,16 @@ function getTree() {
 		    }
 		});
 	    });
-	    $('#treeview-org').treeview('selectNode', [ 0 ]);	    
+	    $('#explore-treeview').treeview('selectNode', [ 0 ]);
+  	    $('#explore-treeview-search-btn').on('click', function(e) {
+	      var pattern = $('#explore-treeview-search').val();
+              var options = {
+		ignoreCase: true,
+		exactMatch: false,
+		revealResults: true,
+              };
+              $('#explore-treeview').treeview('search', [ pattern, options ]);
+	    });
 	}
     });
 };
@@ -349,6 +416,7 @@ function PeopleResponseHandler(res) {
 	    'firstname': row[1]['givenName'] ? row[1]['givenName'][0] : null,
 	    'lastname': row[1]['sn'] ? row[1]['sn'][0] : null,
 	    'email': row[1]['mail'] ? row[1]['mail'][0] : null,
+    	    'title': row[1]['title'] ? row[1]['title'][0] : null,
 	    'exist': row[1]['exist'], 'avatar': avatar,
 	    'uidNumber': row[1]['uidNumber'] ? row[1]['uidNumber'][0] : null,
 	    'uid': row[1]['uid'] ? row[1]['uid'][0] : null,
@@ -374,26 +442,12 @@ function PeopleFormatterName(value, row) {
 function PeopleFormatterEmail(value, row) {
     var html = ""
     html +='<span class="pull-left">'
-    html +=' <a href="mailto:' + value + '" style="padding-right:4px;text-decoration:none;outline:none;color:inherit;">';
+    html +=' <a href="mailto:' + value + '"'
+    html +='    style="padding-right:4px;text-decoration:none;outline:none;color:inherit;">';
     html +='  <i class="fa fa-fw fa-envelope-open-text" style="vertical-align: middle;"></i>';
     html +=' </a>';
     html +='</span>';
     html += value;
-    return html;
-};
-
-
-function PeopleFormatterUsername(value, row) {
-    var html = ""
-    html += value
-    html+='<span class="pull-right">';
-    if (row.uidNumber) {
-	html+='<span class="fa-stack" style="font-size: 0.60em;">'
-	html+=' <i class="fas fa-square fa-stack-2x" style="vertical-align: middle;"></i>'
-	html+=' <i class="fas fa-terminal fa-stack-1x fa-inverse" style="vertical-align: middle;"></i>'
-	html+='</span>'
-    }
-    html+='</span>';
     return html;
 };
 

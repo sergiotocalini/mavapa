@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 # from jinja2 import TemplateNotFound
 # import requests
-import urllib
 import random
 import string
+import urllib
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, abort
-from flask import redirect, request, jsonify, session, url_for
-from pony.orm import select, commit
-from models import db_session, Token
+
+from flask import (Blueprint, abort, jsonify, redirect, render_template,
+                   request, session, url_for)
+from models import Token, db_session
+from pony.orm import commit, select
 
 MAVAPA_URL = ''
 AUTH_URL = MAVAPA_URL + '/auth?response_type=code'
 TOKEN_URL = MAVAPA_URL + '/token'
 USER_INFO_URL = MAVAPA_URL + '/who_im/'
 LOGOUT_URL = MAVAPA_URL + '/logout'
-mavapa_server = Blueprint(
-    'mavapa_server', __name__, template_folder='templates'
+
+blueprint = Blueprint(
+    'oauth', __name__, template_folder='templates', url_prefix='/oauth'
 )
 
 
@@ -49,7 +51,7 @@ def save_code(app, user, code):
     return token
 
 
-@mavapa_server.route('/who_im/')
+@blueprint.route('/who_im/')
 @db_session
 def who_im():
     """ get user by TokenTable"""
@@ -72,7 +74,7 @@ def who_im():
     return abort(403)
 
 
-@mavapa_server.route('/token', methods=['POST'])
+@blueprint.route('/token', methods=['POST'])
 @db_session
 def token():
     # grant_type = request.form.get('grant_type')
@@ -96,7 +98,7 @@ def token():
     return jsonify(data)
 
 
-@mavapa_server.route('/accept_app/')
+@blueprint.route('/accept_app/')
 @db_session
 def accept_app():
     user = session.get('mavapa_account')
@@ -128,7 +130,7 @@ def accept_app():
     return render_template('accept_app.html', ctx=ctx)
 
 
-@mavapa_server.route('/auth')
+@blueprint.route('/auth')
 @db_session
 def auth():
     """ Check if account is related to app """
@@ -151,7 +153,7 @@ def auth():
             session['auth_url'] = request.url
             session['client_id'] = client_id
             session['redirect_uri'] = redirect_uri
-            return redirect(url_for('mavapa_server.accept_app'))
+            return redirect(url_for('blueprint.accept_app'))
         url = app.redirect_uri
         code = make_rnd_str()
         url += '?code=' + code

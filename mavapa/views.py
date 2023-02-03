@@ -1,26 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from hashlib import md5
-from functools import wraps, update_wrapper
-import os
 import urllib
-import requests
-import arrow
-import pony
-from flask import Flask, request, render_template, g, jsonify, current_app
-from flask import url_for, abort, flash, redirect, session, make_response
-from pony.orm import select, count, commit, desc
-from forms import Login, Reset
-from models import db, db_session
-from models import App, Token, User, Backend, Session, Retrieve
-from models import NotifyAgent
-from backends import LDAP
-from mavapa_server import mavapa_server
 from datetime import datetime, timedelta
+from functools import update_wrapper, wraps
+from hashlib import md5
 
-app = Flask(__name__, instance_relative_config=False)
-app.config.from_object(os.environ.get('APP_SETTINGS', "config.Default"))
-app.register_blueprint(mavapa_server)
+import arrow
+import requests
+from flask import (Flask, abort, current_app, flash, g, jsonify, make_response,
+                   redirect, render_template, request, session, url_for)
+from pony.orm import commit, count, desc, select, sql_debug
+
+from backends import LDAP
+from blueprints.oauth import blueprint as oauth_endpoints
+from forms import Login, Reset
+from models import (App, Backend, NotifyAgent, Retrieve, Session, Token, User,
+                    db, db_session)
+
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_object('config')
+app.config.from_json('configs.json', silent=True)
+app.config.from_json('secrets.json', silent=True)
+
+db.bind(**app.config['PONY'])
+db.generate_mapping(**app.config['PONY_GENERATE_MAPPING'])
+
+sql_debug(app.config['PONY_DEBUG'])
+
+app.register_blueprint(oauth_endpoints)
 
 context = app.config.get('APPLICATION_ROOT', '')
 if 'CDN_LOCAL' not in app.config:
@@ -31,18 +38,6 @@ if 'CDN_EXTRAS' not in app.config:
 
 if 'CDN_MAVAPA' not in app.config:
     app.config['CDN_MAVAPA'] = '%s/static' % context
-
-if app.config['DB_TYPE'] == 'mysql':
-    db.bind(
-        provider=app.config['DB_TYPE'], host=app.config['DB_HOST'],
-        port=app.config['DB_PORT'], db=app.config['DB_NAME'],
-        user=app.config['DB_USER'], passwd=app.config['DB_PASS']
-    )
-else:
-    exit(0)
-
-db.generate_mapping(create_tables=True)
-pony.orm.sql_debug(app.config['DB_DEBUG'])
 
 
 def get_from_backend(**kwargs):
@@ -108,19 +103,21 @@ def custom_tools():
     def encrypt_email(email):
         tmp = email.split('@')
         stremail = email[0:3]
-        stremail += ''.join(['x' for i in xrange(len(tmp[0]) - 3)])
+        stremail += ''.join(['x' for i in range(len(tmp[0]) - 3)])
         stremail += "@" + tmp[1]
         return stremail
 
     def encrypt_telephone(number, last=4):
         show = number[0:3]
-        show += ''.join(['x' for i in xrange(len(number) - last - 3)])
+        show += ''.join(['x' for i in range(len(number) - last - 3)])
         show += number[len(number) - last:len(number)]
         return show
 
-    return dict(data=get_data, ago=time_humanize, timez=time_generalize,
-                age=time_age, encrypt_email=encrypt_email,
-                encrypt_telephone=encrypt_telephone)
+    return dict(
+        data=get_data, ago=time_humanize, timez=time_generalize,
+        age=time_age, encrypt_email=encrypt_email,
+        encrypt_telephone=encrypt_telephone
+    )
 
 
 @db_session(retry=3)
@@ -161,12 +158,14 @@ def backends_search_users(email, passwd=None, exist=False):
 
 @db_session(retry=3)
 def session_create(account):
-    sid = Session(user=get_data('User', id=account), status=True,
-                  agent_address=request.access_route[0],
-                  agent_string=request.user_agent.string,
-                  agent_platform=request.user_agent.platform,
-                  agent_browser=request.user_agent.browser,
-                  agent_version=request.user_agent.version)
+    sid = Session(
+        user=get_data('User', id=account), status=True,
+        agent_address=request.access_route[0],
+        agent_string=request.user_agent.string,
+        agent_platform=request.user_agent.platform,
+        agent_browser=request.user_agent.browser,
+        agent_version=request.user_agent.version
+    )
     commit()
     return sid.to_dict()
 
@@ -196,8 +195,9 @@ def user_onfly(user, passwd):
             qfilter = '(&(%s=%s)%s)' % (i.login, user, i.filter)
             attrs = ['givenname', 'sn', 'mail', 'mobile', 'mailRecovery']
             oa = LDAP(**i.to_dict(only=['host', 'port', 'binddn', 'bindpw']))
-            query = oa.query(filter=qfilter, attrs=attrs,
-                             basedn=i.basedn, limit=1)
+            query = oa.query(
+                filter=qfilter, attrs=attrs, basedn=i.basedn, limit=1
+            )
             if query:
                 if oa.auth(query[0][0], passwd):
                     match = get_data('User', email=query[0][1]['mail'][0])
@@ -205,18 +205,18 @@ def user_onfly(user, passwd):
                         fname = query[0][1]['givenName'][0]  # .decode('utf-8')
                         lname = query[0][1]['sn'][0]  # .decode('utf-8')
                         info = {
-                            'email': user,  # .decode('utf-8'),
+                            'email': user,
                             'backend': i,
                             'firstname': fname.title(),
                             'lastname': lname.title()
                         }
                         if 'mobile' in query[0][1]:
-                            mobile = query[0][1]['mobile'][0]  # .decode('utf-8')
+                            mobile = query[0][1]['mobile'][0]
                             info['mobile'] = mobile
 
                         if 'mailRecovery' in query[0][1]:
                             recover = query[0][1]['mailRecovery'][0]
-                            info['mailrecovery'] = recover  # .decode('utf-8')
+                            info['mailrecovery'] = recover
 
                         account = User(**info)
                         commit()
@@ -236,10 +236,12 @@ def user_login(user, passwd):
             if account.passwd == passwd_md5:
                 return account
         elif account.backend.type in ['LDAP', 'AD']:
-            provider = LDAP(host=account.backend.host,
-                            port=account.backend.port,
-                            binddn=account.backend.binddn,
-                            bindpw=account.backend.bindpw)
+            provider = LDAP(
+                host=account.backend.host,
+                port=account.backend.port,
+                binddn=account.backend.binddn,
+                bindpw=account.backend.bindpw
+            )
 
             qfilter = '(&(%s=%s)%s)' % (
                 account.backend.login, user,
@@ -251,8 +253,10 @@ def user_login(user, passwd):
                 if provider.auth(query[0][0], passwd):
                     fname = query[0][1]['givenName'][0]  # .decode('utf-8')
                     lname = query[0][1]['sn'][0]  # .decode('utf-8')
-                    update = {'firstname': fname.title(),
-                              'lastname': lname.title()}
+                    update = {
+                        'firstname': fname.title(),
+                        'lastname': lname.title()
+                    }
                     if 'mobile' in query[0][1]:
                         mobile = query[0][1]['mobile'][0]  # .decode('utf-8')
                         update['mobile'] = mobile
@@ -284,17 +288,21 @@ def user_changepwd(user, passwd):
                 backend['login'], user,
                 backend['filter']
             )
-            query = provider.query(filter=qfilter, attrs=['userPassword'],
-                                   basedn=backend['basedn'], limit=1)
+            query = provider.query(
+                filter=qfilter, attrs=['userPassword'],
+                basedn=backend['basedn'], limit=1
+            )
             if query:
                 if backend['type'] == 'LDAP':
                     newpwd = provider.make_secret(passwd)
                 else:
                     n = ('"', passwd, '"')
                     newpwd = ''.join(n).encode('utf-16').lstrip('\377\376')
-                provider.modify(query[0][0],
-                                {'unicodePwd': newpwd},
-                                {'unicodePwd': '*'})
+                provider.modify(
+                    query[0][0],
+                    {'unicodePwd': newpwd},
+                    {'unicodePwd': '*'}
+                )
     return False
 
 
@@ -303,9 +311,9 @@ def crossdomain(origin=None, methods=None, headers=None,
                 automatic_options=True):
     if methods is not None:
         methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
+    if headers is not None and not isinstance(headers, str):
         headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
+    if not isinstance(origin, str):
         origin = ', '.join(origin)
     if isinstance(max_age, timedelta):
         max_age = max_age.total_seconds()
@@ -378,9 +386,9 @@ def is_admin():
 def before_request():
     mavapa_session = session.get('mavapa_session', None)
     mavapa_account = session.get('mavapa_account', None)
-    mavapa_expired = session.get('mavapa_expired', None)
-    if mavapa_session and (mavapa_expired > datetime.now()):
-        if mavapa_account:
+    mavapa_expired = session.get('mavapa_expired', datetime.now())
+    if (mavapa_expired.replace(tzinfo=None) > datetime.now()):
+        if mavapa_session and mavapa_account:
             g.user = get_data('User', email=mavapa_account)
             if g.user:
                 g.user.last_seen = datetime.now()
@@ -507,6 +515,7 @@ def profile(userid):
     else:
         qfilter = {'id': userid}
     account = get_from_backend(**qfilter)
+    print(account)
     return render_template('profile.html', account=account)
 
 
@@ -881,7 +890,11 @@ def api_users():
             if user:
                 if session.get('mavapa_session'):
                     data = user.to_dict(exclude=['passwd'])
-                    data['backend'] = user.backend.to_dict(only=only_backend) if user.backend else False
+                    data['backend'] = False
+                    if user.backend:
+                        data['backend'] = user.backend.to_dict(
+                            only=only_backend
+                        )
                 else:
                     only = ['id', 'email', 'firstname', 'lastname']
                     data = user.to_dict(only)
@@ -950,7 +963,9 @@ def api_users_all():
         row = i.to_dict(related_objects=False)
         row['displayname'] = i.displayname
         row['avatar'] = i.avatar()
-        row['backend'] = i.backend.to_dict(only=only_backend) if i.backend else False
+        row['backend'] = False
+        if i.backend:
+            row['backend'] = i.backend.to_dict(only=only_backend)
         # if args['filter'] != 'team' and i.team:
         #     team = i.team.to_dict(only_team)
         #     team['manager'] = i.team.manager.to_dict(only_user)

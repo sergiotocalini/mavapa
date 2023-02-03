@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
-from hashlib import md5
-from decimal import Decimal
-from pony.orm import Database, Required, Optional, PrimaryKey, Set
-from pony.orm import unicode, db_session, get
-import string
 import random
+import string
+from datetime import datetime, timedelta
+from decimal import Decimal
+from hashlib import md5
 
+from pony.orm import (Database, Optional, PrimaryKey, Required, Set,
+                      db_session, get, unicode)
 
 db = Database()
 

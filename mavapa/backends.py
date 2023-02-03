@@ -1,9 +1,10 @@
 #!/usr/bin/env python
-import os
 import hashlib
-import ldap
-from codecs import encode
+import os
 from base64 import b64encode
+from codecs import encode
+
+import ldap
 from anytree import Node
 from anytree.exporter import DictExporter
 
