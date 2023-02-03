@@ -2,7 +2,7 @@ apiVersion: v2
 name: mavapa
 version: "1.0.0"
 appVersion: "1.0.0"
-home: https://mavapa.readthedocs.io/
+home: https://github.com/sergiotocalini/mavapa
 description: "A mavapa Helm chart for Kubernetes"
 keywords:
   - idp

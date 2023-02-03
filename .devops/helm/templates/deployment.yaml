@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ default .Chart.Version .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.ports }}
           ports:
@@ -49,12 +49,12 @@ spec:
           volumeMounts:
             {{- range $key, $val := .Values.configmaps.files }}
             - name: configs
-              mountPath: {{ $.Values.files_path }}/configs/{{ $key }}
+              mountPath: {{ $.Values.configmaps_files_path }}/{{ $key }}
               subPath: {{ $key }}
             {{- end }}
             {{- range $key, $val := .Values.secrets.files }}
             - name: secrets
-              mountPath: {{ $.Values.files_path }}/secrets/{{ $key }}
+              mountPath: {{ $.Values.secrets_files_path }}/{{ $key }}
               subPath: {{ $key }}
               readOnly: true
             {{- end }}
@@ -78,8 +78,10 @@ spec:
             {{- end }}
           {{- end }}
           {{- with .Values.resources }}
-          resources:
-            {{ toYaml . | indent 2 }}
+          resources: {{- . | toYaml | nindent 12 }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext: {{- . | toYaml | nindent 12 }}
           {{- end }}
           
       {{- if or .Values.configmaps.files .Values.secrets.files }}

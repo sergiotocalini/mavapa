@@ -7,14 +7,14 @@ This chart bootstraps an mavapa deployment on a [Kubernetes](http://kubernetes.i
 ## Get Repo Info
 
 ```console
-helm repo add mavapa https://sergiotocalini.github.io/helm-charts/repos/mavapa
+helm repo add sergiotocalini https://sergiotocalini.github.io/helm-charts
 helm repo update
 ```
 
 ## Install Chart
 
 ```console
-helm install [RELEASE_NAME] mavapa/mavapa
+helm install [RELEASE_NAME] sergiotocalini/mavapa
 ```
 
 The command deploys ingress-nginx on the Kubernetes cluster in the default configuration.
@@ -46,5 +46,5 @@ _See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documen
 See [Customizing the Chart Before Installing](https://helm.sh/docs/intro/using_helm/#customizing-the-chart-before-installing). To see all configurable options with detailed comments, visit the chart's [values.yaml](./values.yaml), or run these configuration commands:
 
 ```console
-helm show values mavapa/mavapa
+helm show values sergiotocalini/mavapa
 ```
