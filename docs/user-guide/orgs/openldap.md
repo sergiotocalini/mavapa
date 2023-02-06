@@ -154,7 +154,7 @@ $
 
 Integration between **mavapa** and **OpenLDAP** requires a direct connection from the installation to the service. Once we have this connectivity established we are able to onboard the Organization using the next form:
 
-![Administration: Organization Form](../../assets/img/admin-org-form.png)
+![Administration: Organization Form](../../assets/screenshots/admin-org-form.png)
    
 ## References
 
