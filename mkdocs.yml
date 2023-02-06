@@ -27,6 +27,7 @@ theme:
     - search.share
     - content.tooltips
   include_sidebar: true
+  custom_dir: docs/overrides
 
 plugins:
   - search
