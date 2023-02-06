@@ -26,12 +26,12 @@ ltb-passwd:
   enabled: false
 EOF
 $ helm upgrade --install openldap jp-gouin/openldap \
--n openldap --create-namespace \
--f $HELM_VALUES_OPENLDAP
+    -n openldap --create-namespace \
+    -f $HELM_VALUES_OPENLDAP
 $ kubectl get secret --namespace openldap openldap \
--o jsonpath="{.data.LDAP_ADMIN_PASSWORD}" | base64 --decode; echo
+    -o jsonpath="{.data.LDAP_ADMIN_PASSWORD}" | base64 --decode; echo
 $ kubectl get secret --namespace openldap openldap \
--o jsonpath="{.data.LDAP_CONFIG_PASSWORD}" | base64 --decode; echo
+    -o jsonpath="{.data.LDAP_CONFIG_PASSWORD}" | base64 --decode; echo
 ```
 
 To perform the initial population of the OpenLDAP tree we would need to reach our service from our local computer with **ldap-tools**, to do so we will need to use port forwarding.
@@ -40,7 +40,8 @@ To perform the initial population of the OpenLDAP tree we would need to reach ou
 $ kubectl port-forward service/openldap 3389:ldap-port -n openldap
 ```
 
-> In case we don't have ldap-tools installed in our local computer we can deploy a container with these tools ready to use for this operation.
+!!! warning
+    In case we don't have ldap-tools installed in our local computer we can deploy a container with these tools ready to use for this operation.
 
 ## Population
 
@@ -84,9 +85,9 @@ homeDirectory: /home/sergio.tocalini
 
 EOF
 $ ldapadd -x -H ldap://localhost:3389 \
--D "cn=admin,dc=zontikcorp,dc=com" \
--f $OPENLDAP_LDIF_INITIAL \
--W
+    -D "cn=admin,dc=zontikcorp,dc=com" \
+    -f $OPENLDAP_LDIF_INITIAL \
+    -W
 Enter LDAP Password:
 adding new entry "ou=People,dc=zontikcorp,dc=com"
 
@@ -101,7 +102,8 @@ adding new entry "uid=sergio.tocalini,ou=People,dc=zontikcorp,dc=com"
 $ 
 ```
 
-> LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
+!!! warning
+    LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
 
 As you may notice this user doesn't have a password assigned and we can do that using the following commands:
 
@@ -118,23 +120,24 @@ add: userPassword
 userPassword: {SHA}kl8Km4j5bhue+Mp0pZ3QvFnzvns=
 EOF
 $ ldapmodify -x -H ldap://localhost:3389 \
--D "cn=admin,dc=zontikcorp,dc=com" \
--f $OPENLDAP_LDIF_MODIFY \
--W
+    -D "cn=admin,dc=zontikcorp,dc=com" \
+    -f $OPENLDAP_LDIF_MODIFY \
+    -W
 Enter LDAP Password:
 modifying entry "uid=sergio.tocalini,ou=People,dc=zontikcorp,dc=com"
 
 $
 ```
 
-> LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
+!!! warning
+    LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
 
 To reset the password once it is not empty we can perform the following operation:
 
 ```shell
 $ ldappasswd -H ldap://localhost:3389 -x \
--D "cn=admin,dc=zontikcorp,dc=com" -W -A -S \
-"uid=sergio.tocalini,ou=People,dc=zontikcorp,dc=com"
+    -D "cn=admin,dc=zontikcorp,dc=com" -W -A -S \
+    "uid=sergio.tocalini,ou=People,dc=zontikcorp,dc=com"
 Old password:
 Re-enter old password:
 New password:
@@ -144,10 +147,18 @@ Enter LDAP Password:
 $
 ```
 
-> LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
+!!! warning
+    LDAP Password is referring to the **LDAP_ADMIN_PASSWORD** in the Kubernetes secret.
 
 ## Onboarding
 
 Integration between **mavapa** and **OpenLDAP** requires a direct connection from the installation to the service. Once we have this connectivity established we are able to onboard the Organization using the next form:
 
-![](images/admin-org-form.png)
+<img title="" src="/assets/img/admin-org-form.png" alt="" data-align="center">
+
+## References
+
+1. [How To Change Account Passwords on an OpenLDAP Server | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-change-account-passwords-on-an-openldap-server)
+2. [Create An OpenLDAP server with Bitnami Containers on Kubernetes](https://docs.bitnami.com/tutorials/create-openldap-server-kubernetes/)
+3. [GitHub - osixia/docker-openldap: OpenLDAP container image 🐳🌴](https://github.com/osixia/docker-openldap)
+4. [Installing OpenLDAP on Kubernetes with Helm](https://www.talkingquickly.co.uk/installing-openldap-kubernetes-helm)

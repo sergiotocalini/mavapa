@@ -1,18 +1,39 @@
-site_name: 'mavapa'
+site_name: 'Mavapa'
+site_author: 'Sergio Tocalini'
 site_description:
   Identity Provider using several backend systems
-site_author: 'Sergio Tocalini'
 site_url: 'https://mavapa.readthedocs.io'
 
-nav:
-  - Home: index.md
-
-theme:
-  name: material
 
 repo_name: 'sergiotocalini/mavapa'
 repo_url: 'https://github.com/sergiotocalini/mavapa'
 
+extra_css:
+  - "assets/css/style.css"
+  
+theme:
+  name: material
+  font:
+    text: Ubuntu
+    code: Ubuntu Mono
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.instant
+    - navigation.sections
+    - navigation.tracking
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.share
+    - content.tooltips
+  include_sidebar: true
+
+plugins:
+  - search
+  - git-authors
+  
 extra:
   social:
     - type: github
@@ -20,16 +41,46 @@ extra:
       link: https://github.com/sergiotocalini/mavapa
     - icon: fontawesome/brands/docker
       link: https://hub.docker.com/r/sergiotocalini/mavapa/
+  consent:
+    title: Cookie consent
+    description: >- 
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+    actions:
+      - accept
+      - reject
+      - manage
       
 markdown_extensions:
   - admonition
   - codehilite:
       guess_lang: false
   - toc:
-      permalink: true
+      permalink: "#"
   - meta
+  - footnotes
+  - abbr
+  - attr_list
+  - pymdownx.snippets:
+      auto_append:
+        - "docs/includes/abbreviations.md"
 
 # Google Analytics
 google_analytics:
   - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
   - auto
+
+nav:
+  - Home:
+      - Welcome: "index.md"
+      - Architecture: "architecture.md"
+  - Deployment:
+      - Kubernetes: "user-guide/kubernetes.md"
+  - User Guide:
+      - Organization:
+          - Active Directory: "user-guide/orgs/ad.md"
+          - OAuth: "user-guide/orgs/oauth.md"
+          - OpenLDAP: "user-guide/orgs/openldap.md"
+          - SAML: "user-guide/orgs/saml.md"

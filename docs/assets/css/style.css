@@ -1,0 +1,26 @@
+footer {
+    position: sticky;
+    bottom: 0;
+}
+
+.md-typeset__table {
+    min-width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+    td:nth-child(1) {
+	white-space: nowrap;
+    }
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-width: 0;
+  border-left-width: 4px;
+}
+
+.md-typeset abbr {
+    border-bottom: 0.05rem dotted var(--md-default-fg-color--light);
+    cursor: help;
+    text-decoration: none;
+}
