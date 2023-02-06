@@ -154,11 +154,12 @@ $
 
 Integration between **mavapa** and **OpenLDAP** requires a direct connection from the installation to the service. Once we have this connectivity established we are able to onboard the Organization using the next form:
 
-<img title="" src="/assets/img/admin-org-form.png" alt="" data-align="center">
-
+![Administration: Organization Form](../../assets/img/admin-org-form.png)
+   
 ## References
 
 1. [How To Change Account Passwords on an OpenLDAP Server | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-change-account-passwords-on-an-openldap-server)
 2. [Create An OpenLDAP server with Bitnami Containers on Kubernetes](https://docs.bitnami.com/tutorials/create-openldap-server-kubernetes/)
 3. [GitHub - osixia/docker-openldap: OpenLDAP container image 🐳🌴](https://github.com/osixia/docker-openldap)
 4. [Installing OpenLDAP on Kubernetes with Helm](https://www.talkingquickly.co.uk/installing-openldap-kubernetes-helm)
+

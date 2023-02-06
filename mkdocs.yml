@@ -56,14 +56,17 @@ markdown_extensions:
   - codehilite:
       guess_lang: false
   - toc:
-      permalink: "#"
+      permalink: true # "#"
   - meta
   - footnotes
   - abbr
   - attr_list
+  - md_in_html
   - pymdownx.snippets:
       auto_append:
         - "docs/includes/abbreviations.md"
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
 
 # Google Analytics
 google_analytics:
