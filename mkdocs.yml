@@ -2,8 +2,6 @@ site_name: 'Mavapa'
 site_author: 'Sergio Tocalini'
 site_description:
   Identity Provider using several backend systems
-site_url: 'https://mavapa.readthedocs.io'
-
 
 repo_name: 'sergiotocalini/mavapa'
 repo_url: 'https://github.com/sergiotocalini/mavapa'
