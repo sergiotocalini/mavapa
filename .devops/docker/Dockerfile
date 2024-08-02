@@ -1,6 +1,6 @@
 ARG version=master
 
-FROM python:3-slim-bullseye
+FROM python:3.10-slim-bullseye
 ARG version
 WORKDIR /app
 ENV PORT=5000
